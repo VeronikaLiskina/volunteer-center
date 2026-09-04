@@ -1,0 +1,48 @@
+@use "../../styles/variables" as *;
+
+.home-page {
+  display: grid;
+  min-height: calc(100vh - 73px);
+  place-items: center;
+
+  &__hero {
+    width: min(1120px, calc(100% - 40px));
+    padding: 96px 0 128px;
+  }
+
+  &__eyebrow {
+    margin: 0 0 16px;
+    color: $color-accent;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  &__title {
+    max-width: 780px;
+    margin: 0;
+    font-size: clamp(40px, 6vw, 64px);
+    font-weight: 750;
+    letter-spacing: -0.04em;
+    line-height: 1.06;
+  }
+
+  &__title-accent {
+    color: $color-accent;
+  }
+
+  &__description {
+    max-width: 650px;
+    margin: 24px 0 0;
+    color: $color-text-muted;
+    font-size: clamp(17px, 2vw, 19px);
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 560px) {
+  .home-page__hero {
+    padding: 72px 0 96px;
+  }
+}

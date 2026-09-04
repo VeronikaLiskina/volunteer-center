@@ -1,0 +1,57 @@
+@use "../../styles/variables" as *;
+
+.system-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: min(100%, 560px);
+  margin-top: 40px;
+  padding: 24px 28px;
+  border: 1px solid $color-border;
+  border-radius: 14px;
+  background: $color-surface;
+  box-shadow: $shadow-card;
+
+  &__label {
+    margin: 0 0 7px;
+    color: $color-text-muted;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  &__value {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 650;
+  }
+
+  &__indicator {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+    border: 4px solid transparent;
+    border-radius: 50%;
+
+    &--loading {
+      border-color: rgba($color-warning, 0.22);
+      background: $color-warning;
+      animation: status-pulse 1.4s ease-in-out infinite;
+    }
+
+    &--available {
+      border-color: rgba($color-success, 0.2);
+      background: $color-success;
+    }
+
+    &--unavailable {
+      border-color: rgba($color-error, 0.2);
+      background: $color-error;
+    }
+  }
+}
+
+@keyframes status-pulse {
+  50% { opacity: 0.45; }
+}

@@ -1,0 +1,61 @@
+@use "../../styles/variables" as *;
+
+.header {
+  border-bottom: 1px solid $color-border;
+  background: rgba($color-surface, 0.96);
+  backdrop-filter: blur(12px);
+
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: min(1120px, calc(100% - 40px));
+    min-height: 72px;
+    margin: 0 auto;
+  }
+
+  &__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: $color-text;
+    text-decoration: none;
+  }
+
+  &__logo {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 12px;
+    background: $color-accent-soft;
+    color: $color-accent;
+  }
+
+  &__logo-icon {
+    width: 26px;
+    height: 26px;
+    fill: currentColor;
+  }
+
+  &__name {
+    font-size: 21px;
+    font-weight: 700;
+  }
+
+  &__caption {
+    padding: 8px 12px;
+    border: 1px solid $color-border;
+    border-radius: 10px;
+    background: $color-surface-muted;
+    color: $color-text-muted;
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 560px) {
+  .header__caption {
+    display: none;
+  }
+}
