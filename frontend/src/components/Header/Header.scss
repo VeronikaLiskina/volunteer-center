@@ -9,8 +9,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: min(1120px, calc(100% - 40px));
-    min-height: 72px;
+    width: min(1480px, calc(100% - 48px));
+    min-height: 80px;
     margin: 0 auto;
   }
 
@@ -22,13 +22,20 @@
     text-decoration: none;
   }
 
+  &__navigation { display: flex; gap: 8px; }
+  &__link {
+    padding: 12px 14px; border-radius: 6px; text-decoration: none; color: $color-text; font-size: 15px;
+    &--active { background: $color-accent-soft; color: #1251c4; }
+    &:hover { background: $color-surface-muted; }
+  }
+
   &__logo {
     display: grid;
-    width: 42px;
-    height: 42px;
+    width: 28px;
+    height: 32px;
     place-items: center;
     border-radius: 12px;
-    background: $color-accent-soft;
+    background: transparent;
     color: $color-accent;
   }
 
@@ -39,23 +46,33 @@
   }
 
   &__name {
-    font-size: 21px;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: 600;
   }
 
   &__caption {
-    padding: 8px 12px;
-    border: 1px solid $color-border;
-    border-radius: 10px;
-    background: $color-surface-muted;
-    color: $color-text-muted;
-    font-size: 13px;
-    font-weight: 600;
+    display: flex; align-items: center; gap: 12px;
+    padding-left: 20px;
+    border-left: 1px solid $color-border;
+    color: $color-text;
+    font-size: 14px;
+    font-weight: 400;
+    .icon { width: 20px; height: 20px; color: $color-accent; }
+  }
+  &__account { display: flex; align-items: center; gap: 20px; }
+  &__notification { display: grid; place-items: center; padding: 6px; border: 0; background: none; color: #7a89a4; .icon { width: 20px; height: 20px; } }
+}
+
+@media (max-width: 800px) {
+  .header__account {
+    display: none;
   }
 }
 
-@media (max-width: 560px) {
-  .header__caption {
-    display: none;
-  }
+@media (max-width: 540px) {
+  .header__content { width: calc(100% - 32px); flex-wrap: wrap; gap: 12px; padding: 14px 0; }
+  .header__navigation { margin-left: auto; }
+  .header__link { padding: 8px; font-size: 13px; }
+  .header__name { font-size: 14px; }
+  .header__brand { gap: 8px; }
 }

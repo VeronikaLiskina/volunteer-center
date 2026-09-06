@@ -1,0 +1,37 @@
+@use "../../styles/variables" as *;
+
+.animal-form {
+  padding: 24px;
+  border: 1px solid $color-border;
+  border-radius: 12px;
+  background: $color-surface;
+
+  &__title { margin: 0 0 8px; font-size: 22px; }
+  &__hint { margin: 0 0 24px; font-size: 13px; color: #566581; }
+  &__fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+  &__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  &__input {
+    width: 100%; min-height: 44px; padding: 10px 12px;
+    border: 1px solid #b8c8de; border-radius: 6px; color: $color-text;
+    background: $color-surface; resize: vertical;
+    &:disabled { background: $color-surface-muted; color: #566581; }
+    &--error { border-color: $color-error; }
+  }
+  &__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  &__button {
+    min-height: 44px; padding: 10px 18px; border: 1px solid #b8c8de; border-radius: 6px;
+    background: $color-surface; color: $color-text; cursor: pointer;
+    &--primary { margin-left: auto; border-color: $color-accent; background: $color-accent; color: white; }
+    &--secondary { border-color: $color-accent-soft; background: $color-accent-soft; color: #1251c4; }
+    &:disabled { opacity: 0.6; cursor: wait; }
+  }
+  &__error { padding: 12px; border: 1px solid #f0bdc3; border-radius: 6px; background: #fff4f5; color: #b52535; }
+}
+
+@media (max-width: 680px) {
+  .animal-form {
+    padding: 18px;
+    &__grid { grid-template-columns: 1fr; gap: 18px; }
+    &__button { width: 100%; }
+  }
+}

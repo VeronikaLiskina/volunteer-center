@@ -1,0 +1,53 @@
+@use "../../styles/variables" as *;
+.today-procedures {
+  display: flex; flex-direction: column; min-width: 0; padding: 28px; border: 1px solid $color-border; border-radius: 12px; background: white;
+  &__title { margin: 0 0 24px; font-size: 19px; font-weight: 600; }
+  &__scroll { overflow-x: auto; border: 1px solid $color-border; border-radius: 6px; flex: 1; display: flex; }
+  &__table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;
+    th { padding: 18px 14px; font-weight: 500; background: #f7f9fc; border-bottom: 1px solid $color-border; }
+  }
+  &__empty { text-align: center; padding: 60px 20px; }
+  &__empty-icon { display: inline-grid; place-items: center; width: 56px; height: 56px; border-radius: 16px; color: #93b9fa; background: #f2f7ff; .icon { width: 30px; height: 30px; } }
+  &__empty-title { margin: 18px 0 8px; font-size: 17px; font-weight: 500; }
+  &__empty-description { margin: 0; font-size: 14px; color: #6a7b98; line-height: 1.7; }
+  &__footer { display: flex; align-items: center; gap: 10px; margin-top: 22px; color: #6a7b98; font-size: 14px; .icon { width: 16px; height: 16px; } }
+  &__soon { border-radius: 4px; padding: 4px 8px; background: #f2f5fa; font-size: 12px; }
+}
+.system-overview {
+  padding: 28px; border: 1px solid $color-border; border-radius: 12px; background: white;
+  &__heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  &__title { margin: 0; font-size: 19px; font-weight: 600; }
+  &__list { list-style: none; padding: 0; margin: 0; }
+  &__item { display: flex; gap: 16px; align-items: center; padding: 17px 0; border-bottom: 1px solid $color-border;
+    &:last-child { padding-bottom: 0; border-bottom: 0; }
+    > .icon { color: $color-accent; width: 26px; height: 26px; }
+    &--available > .icon { color: #29966a; }
+    &--unavailable > .icon { color: #dd8a19; }
+  }
+  &__label { margin: 0 0 5px; font-size: 15px; font-weight: 500; }
+  &__description { margin: 0; color: #6a7b98; font-size: 13px; line-height: 1.5; }
+  &__retry { border: 0; background: transparent; color: #1251c4; cursor: pointer; font-size: 14px; }
+}
+.quick-actions {
+  padding: 28px; border: 1px solid $color-border; border-radius: 12px; background: white;
+  &__title { margin: 0 0 20px; font-size: 19px; font-weight: 600; }
+  &__grid { display: grid; gap: 14px; }
+  &__action { display: flex; align-items: center; gap: 16px; min-height: 92px;
+    padding: 18px; border: 1px solid #b4cfff; border-radius: 10px; background: white; color: $color-text;
+    text-decoration: none; line-height: 1.4; transition: 150ms ease;
+    > .icon { width: 20px; height: 20px; margin-left: auto; flex-shrink: 0; color: $color-accent; }
+    &:hover { background: #f1f6ff; border-color: $color-accent; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(23, 105, 255, 0.1); }
+    &:focus-visible { outline: 3px solid rgba(23, 105, 255, 0.24); outline-offset: 2px; }
+  }
+  &__icon { display: grid; place-items: center; width: 48px; height: 48px; flex: 0 0 48px; border-radius: 12px; background: $color-accent-soft; color: $color-accent;
+    .icon { width: 27px; height: 27px; }
+  }
+  &__content { display: grid; gap: 5px; min-width: 0; }
+  &__label { font-size: 16px; font-weight: 600; }
+  &__description { color: #61718d; font-size: 13px; }
+}
+@media (max-width: 540px) {
+  .today-procedures, .system-overview, .quick-actions { padding: 18px; }
+  .today-procedures__table { min-width: 390px; }
+  .quick-actions__action { min-height: 84px; padding: 14px; gap: 12px; }
+}

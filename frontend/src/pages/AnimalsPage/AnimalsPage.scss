@@ -1,0 +1,46 @@
+@use "../../styles/variables" as *;
+
+.animals-page {
+  width: min(1360px, calc(100% - 40px)); margin: 0 auto; padding: 40px 0 64px;
+  &__heading { margin-bottom: 28px; }
+  &__title { margin: 0 0 12px; font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.03em; }
+  &__description { margin: 0; color: #566581; line-height: 1.6; }
+  &__section-navigation { display: grid; grid-template-columns: repeat(2, minmax(220px, 320px)); gap: 16px; margin-top: 26px; }
+  &__section-link { display: grid; gap: 4px; min-height: 78px; align-content: center; padding: 14px 20px;
+    border: 1px solid #aac8ff; border-radius: 10px; background: white; color: $color-text; text-decoration: none;
+    transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+    &:hover { border-color: $color-accent; background: #f5f8ff; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(23, 105, 255, 0.1); }
+    &:focus-visible { outline: 3px solid rgba(23, 105, 255, 0.24); outline-offset: 2px; }
+    &--primary { border-color: $color-accent; background: $color-accent; color: white;
+      &:hover { background: #0f5de9; color: white; }
+    }
+  }
+  &__section-link-title { font-size: 16px; font-weight: 600; }
+  &__section-link-description { font-size: 13px; opacity: 0.8; }
+  &__workspace { display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: start; gap: 24px; margin-bottom: 24px; }
+  &__workspace--form { grid-template-columns: minmax(0, 1fr); }
+  &__workspace--dictionaries { grid-template-columns: minmax(280px, 680px); }
+  &__form { min-width: 0; scroll-margin-top: 24px; }
+  #animal-form-title, #dictionaries-title { scroll-margin-block: 32px; }
+  &__dictionaries { padding: 24px; background: white; border: 1px solid $color-border; border-radius: 12px; }
+  &__subtitle { margin: 0 0 20px; font-size: 22px; }
+  &__dictionary { border: 1px solid $color-border; border-radius: 8px; margin-top: 12px; }
+  &__dictionary-title { padding: 16px 12px; color: #1251c4; cursor: pointer; }
+  &__dictionary-list { padding: 0 16px 12px 28px; margin: 0; font-size: 14px; line-height: 1.8; }
+  &__breed-group { padding: 0 4px; }
+  &__breed-title { padding: 0 12px; font-size: 14px; }
+  &__notice, &__error { padding: 14px 18px; border-radius: 8px; margin: 0 0 24px; line-height: 1.5; }
+  &__notice { color: #187044; background: #eaf8ef; border: 1px solid #b6e0c8; }
+  &__error { color: #b52535; background: #fff4f5; border: 1px solid #f0bdc3; }
+  &__state { padding: 24px; background: white; border: 1px solid $color-border; border-radius: 12px; }
+  &__retry { min-height: 44px; padding: 10px 18px; border: 1px solid #b8c8de; border-radius: 6px; background: white; cursor: pointer; }
+}
+
+@media (max-width: 960px) {
+  .animals-page__workspace { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .animals-page__section-navigation { grid-template-columns: 1fr; }
+  .animals-page__section-link { min-height: 70px; }
+}

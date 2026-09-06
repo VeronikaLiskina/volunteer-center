@@ -7,9 +7,10 @@ __pycache__/
 
 node_modules/
 dist/
+test-results/
+playwright-report/
 *.local
 
 .idea/
 .vscode/
 .DS_Store
-

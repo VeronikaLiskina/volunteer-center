@@ -1,0 +1,42 @@
+@use "../styles/variables" as *;
+
+.animal-section-page {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 40px 0 64px;
+
+  &__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+  &__title { margin: 0 0 10px; font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.03em; }
+  &__description { margin: 0; color: #566581; line-height: 1.6; }
+  &__close { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; padding: 10px 16px;
+    border: 1px solid #b8c8de; border-radius: 8px; background: white; color: $color-text; text-decoration: none; white-space: nowrap;
+    &:hover { border-color: $color-accent; background: $color-accent-soft; color: #1251c4; }
+    &:focus-visible { outline: 3px solid rgba(23, 105, 255, 0.24); outline-offset: 2px; }
+  }
+  &__close-icon { font-size: 22px; line-height: 1; }
+  &__state, &__error, &__notice { padding: 18px 20px; border-radius: 10px; line-height: 1.5; }
+  &__state { border: 1px solid $color-border; background: white; }
+  &__error { border: 1px solid #f0bdc3; background: #fff4f5; color: #b52535; }
+  &__notice { border: 1px solid #b6e0c8; background: #eaf8ef; color: #187044; }
+  &__retry { min-height: 44px; margin-left: 16px; padding: 10px 18px; border: 1px solid #b8c8de; border-radius: 6px; background: white; cursor: pointer; }
+}
+
+.dictionaries-card {
+  padding: 28px; border: 1px solid $color-border; border-radius: 12px; background: white;
+  &__title { margin: 0 0 22px; font-size: 24px; }
+  &__item { border: 1px solid $color-border; border-radius: 9px; margin-top: 14px; overflow: hidden; }
+  &__summary { padding: 18px; color: #1251c4; font-size: 16px; font-weight: 600; cursor: pointer; background: #fbfcff; }
+  &__list { margin: 0; padding: 4px 24px 18px 46px; line-height: 1.9; }
+  &__group { padding: 4px 20px 16px; }
+  &__group-title { margin: 12px 0 6px; font-size: 15px; }
+  &__group &__list { padding-bottom: 0; }
+}
+
+@media (max-width: 600px) {
+  .animal-section-page {
+    padding-top: 28px;
+    &__header { flex-direction: column-reverse; gap: 18px; }
+    &__close { align-self: flex-end; }
+  }
+  .dictionaries-card { padding: 18px; }
+}
