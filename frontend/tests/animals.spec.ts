@@ -20,6 +20,7 @@ test.beforeEach(async ({ page }) => {
       total: animals.length, in_care: animals.filter((animal) => animal.status === AnimalStatus.InCare).length,
       archived: animals.filter((animal) => animal.status === AnimalStatus.Archived).length,
     } });
+    if (path === "/volunteers/summary") return route.fulfill({ json: { total: 0, active: 0, inactive: 0 } });
     if (path === "/animal-types") return route.fulfill({ json: types });
     if (path === "/breeds") return route.fulfill({ json: breeds });
     if (path === "/animals" && method === "GET") {
@@ -123,6 +124,11 @@ test("server field errors and list retry", async ({ page }) => {
 
 test("mobile layout and direct route", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/animals/abc/edit");
+  await expect(page.getByRole("alert")).toHaveText(/Некорректный номер карточки/);
+  await expect(page.locator("#animal-name")).toHaveCount(0);
+  await page.getByRole("link", { name: "Закрыть и вернуться к списку животных" }).click();
+  await expect(page).toHaveURL(/\/animals$/);
   await page.goto("/animals");
   await expect(page.getByRole("heading", { name: "Карточка животного", exact: true })).toHaveCount(0);
   await page.getByRole("link", { name: /Добавить животное/ }).click();
@@ -135,12 +141,15 @@ test("mobile layout and direct route", async ({ page }, testInfo) => {
 
 test("dashboard matches layout, displays API counts and opens animal sections", async ({ page }, testInfo) => {
   await page.route("**/api/v1/animals/summary", (route) => route.fulfill({ json: { total: 4, in_care: 3, archived: 1 } }));
+  await page.route("**/api/v1/volunteers/summary", (route) => route.fulfill({ json: { total: 7, active: 5, inactive: 2 } }));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Главная панель" })).toBeVisible();
   await expect(page.locator(".dashboard-metrics__card")).toHaveCount(4);
   await expect(page.locator(".dashboard-metrics__value").first()).toHaveText("3");
+  await expect(page.locator(".dashboard-metrics__value").last()).toHaveText("5");
   await expect(page.getByText("Под опекой: 3 · В архиве: 1")).toBeVisible();
+  await expect(page.getByText("Активны: 5 · Неактивны: 2")).toBeVisible();
   await expect(page.getByRole("link", { name: /Карточка животного/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Справочники/ })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("dashboard-desktop.png"), fullPage: true });

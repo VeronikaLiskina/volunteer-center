@@ -3,6 +3,8 @@ import { HomePage } from "../pages/HomePage/HomePage";
 import { AnimalsPage } from "../pages/AnimalsPage/AnimalsPage";
 import { AnimalCardPage } from "../pages/AnimalCardPage/AnimalCardPage";
 import { DictionariesPage } from "../pages/DictionariesPage/DictionariesPage";
+import { VolunteersPage } from "../pages/VolunteersPage/VolunteersPage";
+import { VolunteerCardPage } from "../pages/VolunteerCardPage/VolunteerCardPage";
 import { Link, Route, Routes } from "react-router-dom";
 
 export function App() {
@@ -16,6 +18,9 @@ export function App() {
           <Route path="/animals/new" element={<AnimalCardPage />} />
           <Route path="/animals/:animalId/edit" element={<AnimalCardPage />} />
           <Route path="/animals/dictionaries" element={<DictionariesPage />} />
+          <Route path="/volunteers" element={<VolunteersPage />} />
+          <Route path="/volunteers/new" element={<VolunteerCardPage />} />
+          <Route path="/volunteers/:volunteerId/edit" element={<VolunteerCardPage />} />
           <Route path="*" element={<div className="app__not-found"><h1>Страница не найдена</h1><Link to="/">На главную</Link></div>} />
         </Routes>
       </main>

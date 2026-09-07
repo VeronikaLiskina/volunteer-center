@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Icon } from "../Icon/Icon";
 import type { AnimalSummary } from "../../types/animal";
+import type { VolunteerSummary } from "../../types/volunteer";
 import type { SystemState } from "../SystemStatus/SystemStatus";
 import "./DashboardPanels.scss";
 
@@ -22,8 +23,8 @@ export function TodayProcedures() {
   </section>;
 }
 
-export function SystemOverview({ state, summary, onRetry }: {
-  state: SystemState; summary: AnimalSummary | null; onRetry: () => void;
+export function SystemOverview({ state, summary, volunteerSummary, onRetry }: {
+  state: SystemState; summary: AnimalSummary | null; volunteerSummary: VolunteerSummary | null; onRetry: () => void;
 }) {
   const systemText = { loading: "Проверяем подключение…", available: "Система работает", unavailable: "Сервис временно недоступен" }[state];
   return <section className="system-overview" aria-labelledby="system-overview-title">
@@ -47,7 +48,9 @@ export function SystemOverview({ state, summary, onRetry }: {
       </div></li>
       <li className="system-overview__item"><Icon name="user" /><div>
         <p className="system-overview__label">Команда волонтёров</p>
-        <p className="system-overview__description">Модуль пока не подключён</p>
+        <p className="system-overview__description">{volunteerSummary
+          ? `Активны: ${volunteerSummary.active} · Неактивны: ${volunteerSummary.inactive}`
+          : "Сведения о волонтёрах временно недоступны"}</p>
       </div></li>
     </ul>
   </section>;
@@ -55,7 +58,7 @@ export function SystemOverview({ state, summary, onRetry }: {
 
 export function QuickActions() {
   return <section className="quick-actions" aria-labelledby="quick-actions-title">
-    <h2 className="quick-actions__title" id="quick-actions-title">Работа с животными</h2>
+    <h2 className="quick-actions__title" id="quick-actions-title">Быстрые действия</h2>
     <div className="quick-actions__grid">
       <Link className="quick-actions__action" to="/animals/new">
         <span className="quick-actions__icon"><Icon name="paw" /></span>
@@ -70,6 +73,14 @@ export function QuickActions() {
         <span className="quick-actions__content">
           <strong className="quick-actions__label">Справочники</strong>
           <span className="quick-actions__description">Посмотреть типы животных и породы</span>
+        </span>
+        <Icon name="arrow" />
+      </Link>
+      <Link className="quick-actions__action" to="/volunteers/new">
+        <span className="quick-actions__icon"><Icon name="user" /></span>
+        <span className="quick-actions__content">
+          <strong className="quick-actions__label">Карточка волонтёра</strong>
+          <span className="quick-actions__description">Добавить участника команды</span>
         </span>
         <Icon name="arrow" />
       </Link>

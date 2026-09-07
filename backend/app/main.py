@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
 from app.core.config import settings
-from app.core.errors import AnimalError
+from app.core.errors import AnimalError, VolunteerError
 from app.db.session import engine
 
 
@@ -22,6 +22,14 @@ app = FastAPI(title=settings.app_name, lifespan=lifespan)
 
 @app.exception_handler(AnimalError)
 async def animal_error_handler(_: Request, error: AnimalError) -> JSONResponse:
+    return JSONResponse(
+        status_code=error.status_code,
+        content={"detail": {"message": error.message, "field": error.field}},
+    )
+
+
+@app.exception_handler(VolunteerError)
+async def volunteer_error_handler(_: Request, error: VolunteerError) -> JSONResponse:
     return JSONResponse(
         status_code=error.status_code,
         content={"detail": {"message": error.message, "field": error.field}},

@@ -11,8 +11,10 @@ type FormData = { types: AnimalType[]; breeds: Breed[]; animal: Animal | null };
 export function AnimalCardPage() {
   const { animalId } = useParams();
   const navigate = useNavigate();
-  const editId = animalId ? Number(animalId) : null;
-  const requestKey = editId ? `edit-${editId}` : "new";
+  const isEditRoute = animalId !== undefined;
+  const editId = isEditRoute ? Number(animalId) : null;
+  const hasValidEditId = editId !== null && Number.isInteger(editId) && editId > 0;
+  const requestKey = isEditRoute ? `edit-${animalId}` : "new";
   const [resource, setResource] = useState<{ data: FormData | null; error: string; key: string }>({ data: null, error: "", key: "" });
   const [revision, setRevision] = useState(0);
   const [notice, setNotice] = useState("");
@@ -20,8 +22,11 @@ export function AnimalCardPage() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const animalRequest = editId && Number.isInteger(editId) && editId > 0
-      ? getAnimal(editId) : editId ? Promise.reject(new Error("Некорректный номер карточки")) : Promise.resolve(null);
+    const animalRequest = !isEditRoute
+      ? Promise.resolve(null)
+      : hasValidEditId
+        ? getAnimal(editId)
+        : Promise.reject(new Error("Некорректный номер карточки"));
     Promise.all([getAnimalTypes(controller.signal), getBreeds(undefined, controller.signal), animalRequest])
       .then(([types, breeds, animal]) => {
         if (!controller.signal.aborted) setResource({ data: { types, breeds, animal }, error: "", key: `${requestKey}-${revision}` });
@@ -31,14 +36,14 @@ export function AnimalCardPage() {
           error: cause instanceof Error ? cause.message : "Не удалось открыть карточку животного", key: `${requestKey}-${revision}` });
       });
     return () => controller.abort();
-  }, [editId, requestKey, revision]);
+  }, [editId, hasValidEditId, isEditRoute, requestKey, revision]);
 
   async function save(data: AnimalCreate, addAnother: boolean) {
     const saved = resource.data?.animal ? await updateAnimal(resource.data.animal.id, data) : await createAnimal(data);
     const message = resource.data?.animal ? "Изменения карточки сохранены" : "Карточка животного сохранена";
     if (addAnother) {
       setNotice(`${message}. Можно заполнить следующую карточку.`);
-      if (editId) navigate("/animals/new", { replace: true });
+      if (isEditRoute) navigate("/animals/new", { replace: true });
     } else {
       navigate("/animals", { state: { notice: message } });
     }
@@ -48,7 +53,7 @@ export function AnimalCardPage() {
   return <div className="animal-section-page">
     <header className="animal-section-page__header">
       <div>
-        <h1 className="animal-section-page__title">{editId ? "Карточка животного" : "Добавление животного"}</h1>
+        <h1 className="animal-section-page__title">{isEditRoute ? "Карточка животного" : "Добавление животного"}</h1>
         <p className="animal-section-page__description">Заполните сведения и сохраните карточку</p>
       </div>
       <Link className="animal-section-page__close" to="/animals" aria-label="Закрыть и вернуться к списку животных">
@@ -62,7 +67,7 @@ export function AnimalCardPage() {
       : resource.data && <AnimalForm key={requestKey} animal={resource.data.animal} types={resource.data.types}
         breeds={resource.data.breeds} onSave={save} onClear={() => {
           setNotice("");
-          if (editId) navigate("/animals/new");
+          if (isEditRoute) navigate("/animals/new");
         }} />}
   </div>;
 }
