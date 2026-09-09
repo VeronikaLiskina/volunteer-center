@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.routes import (
-    animal_types, animals, breeds, care_procedure_types, care_procedures, health,
+    analytics, animal_types, animals, breeds, care_procedure_types, care_procedures, health,
     procedure_executions, volunteers,
 )
 
@@ -14,3 +14,4 @@ api_router.include_router(volunteers.router)
 api_router.include_router(care_procedure_types.router)
 api_router.include_router(care_procedures.router)
 api_router.include_router(procedure_executions.router)
+api_router.include_router(analytics.router)

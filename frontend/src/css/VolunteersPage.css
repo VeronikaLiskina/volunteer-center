@@ -1,0 +1,111 @@
+.volunteers-page {
+  width: min(1360px, 100% - 40px);
+  margin: 0 auto;
+  padding: 40px 0 64px;
+}
+.volunteers-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 28px;
+  margin-bottom: 28px;
+}
+.volunteers-page__eyebrow {
+  margin: 0 0 8px;
+  color: #1769ff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.volunteers-page__title {
+  margin: 0 0 10px;
+  font-size: clamp(30px, 4vw, 42px);
+  letter-spacing: -0.035em;
+}
+.volunteers-page__description {
+  margin: 0;
+  color: #566581;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.volunteers-page__add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  background: #1769ff;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.volunteers-page__add .icon {
+  width: 22px;
+  height: 22px;
+}
+.volunteers-page__add:hover {
+  background: #0f5de9;
+  box-shadow: 0 8px 22px rgba(23, 105, 255, 0.2);
+}
+.volunteers-page__summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.volunteers-page__summary-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 86px;
+  padding: 20px 22px;
+  border: 1px solid #dce6f3;
+  border-radius: 12px;
+  background: white;
+  color: #566581;
+}
+.volunteers-page__summary-card strong {
+  color: #0d1b34;
+  font-size: 30px;
+  font-variant-numeric: tabular-nums;
+}
+.volunteers-page__summary-card--active {
+  border-color: #b6e0c8;
+  background: #f5fbf7;
+}
+.volunteers-page__summary-card--active strong {
+  color: #187044;
+}
+.volunteers-page__notice {
+  padding: 14px 18px;
+  border: 1px solid #b6e0c8;
+  border-radius: 9px;
+  margin: 0 0 24px;
+  background: #eaf8ef;
+  color: #187044;
+}
+
+@media (max-width: 700px) {
+  .volunteers-page {
+    padding-top: 28px;
+  }
+  .volunteers-page__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .volunteers-page__add {
+    width: 100%;
+  }
+  .volunteers-page__summary {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .volunteers-page__summary-card {
+    min-height: 68px;
+    padding: 14px 18px;
+  }
+}

@@ -1,0 +1,111 @@
+.care-procedures-page {
+  width: min(1360px, 100% - 40px);
+  margin: 0 auto;
+  padding: 40px 0 64px;
+}
+.care-procedures-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 28px;
+  margin-bottom: 28px;
+}
+.care-procedures-page__header h1 {
+  margin: 0 0 10px;
+  font-size: clamp(30px, 4vw, 42px);
+  letter-spacing: -0.035em;
+}
+.care-procedures-page__header p:last-child {
+  margin: 0;
+  color: #566581;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.care-procedures-page__eyebrow {
+  margin: 0 0 8px !important;
+  color: #1769ff !important;
+  font-size: 13px !important;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.care-procedures-page__add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  background: #1769ff;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.care-procedures-page__add .icon {
+  width: 22px;
+  height: 22px;
+}
+.care-procedures-page__add:hover {
+  background: #0f5de9;
+  box-shadow: 0 8px 22px rgba(23, 105, 255, 0.2);
+}
+.care-procedures-page__summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.care-procedures-page__summary article {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 86px;
+  padding: 20px 22px;
+  border: 1px solid #dce6f3;
+  border-radius: 12px;
+  background: white;
+  color: #566581;
+}
+.care-procedures-page__summary strong {
+  color: #0d1b34;
+  font-size: 30px;
+  font-variant-numeric: tabular-nums;
+}
+.care-procedures-page__summary-card--completed {
+  border-color: #b6e0c8 !important;
+  background: #f5fbf7 !important;
+}
+.care-procedures-page__summary-card--completed strong {
+  color: #187044;
+}
+.care-procedures-page__notice {
+  padding: 14px 18px;
+  border: 1px solid #b6e0c8;
+  border-radius: 9px;
+  margin: 0 0 24px;
+  background: #eaf8ef;
+  color: #187044;
+}
+
+@media (max-width: 700px) {
+  .care-procedures-page {
+    padding-top: 28px;
+  }
+  .care-procedures-page__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .care-procedures-page__add {
+    width: 100%;
+  }
+  .care-procedures-page__summary {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .care-procedures-page__summary article {
+    min-height: 68px;
+    padding: 14px 18px;
+  }
+}

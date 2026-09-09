@@ -1,19 +1,16 @@
 @use "../../styles/variables" as *;
 
 .home-stats {
-  align-self: center;
-  width: min(100%, 332px);
-  padding: 20px 22px;
-  border: 1px solid rgba(220, 230, 243, 0.9);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 12px 30px rgba(25, 58, 105, 0.1);
+  width: 100%;
+  padding: 18px 28px 22px;
+  border-top: 1px solid #e1e8f1;
+  background: #fff;
 
-  &__greeting { display: grid; justify-items: end; gap: 4px; padding-bottom: 14px; color: #4f6486; text-align: right; }
+  &__greeting { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; padding-bottom: 14px; color: #4f6486; }
   &__date { font-size: 15px; font-weight: 600; }
   &__wish { font-size: 14px; }
-  &__list { margin: 0; padding: 0; list-style: none; }
-  &__item { display: flex; align-items: center; gap: 15px; min-height: 66px; padding: 11px 0; border-top: 1px solid #e5ecf6; }
+  &__list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin: 0; padding: 14px 0 0; border-top: 1px solid #e5ecf6; list-style: none; }
+  &__item { display: flex; align-items: center; gap: 12px; min-width: 0; }
   &__icon {
     display: grid; flex: 0 0 46px; width: 46px; height: 46px; place-items: center; border-radius: 13px;
     .icon { width: 25px; height: 25px; }
@@ -40,5 +37,11 @@
 
 @media (max-width: 760px) {
   .home-stats { width: 100%; padding: 17px 18px; }
-  .home-stats__greeting { justify-items: start; text-align: left; }
+  .home-stats__list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 16px; }
+}
+
+@media (max-width: 430px) {
+  .home-stats__item { gap: 8px; }
+  .home-stats__icon { flex-basis: 36px; width: 36px; height: 36px; border-radius: 10px; }
+  .home-stats__value { font-size: 23px; }
 }

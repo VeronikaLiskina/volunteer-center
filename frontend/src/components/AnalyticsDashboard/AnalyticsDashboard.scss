@@ -1,0 +1,6 @@
+.analytics-dashboard { display: grid; gap: 20px;
+  &__charts { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(360px, 0.75fr); gap: 20px; }
+}
+
+@media (max-width: 980px) { .analytics-dashboard__charts { grid-template-columns: 1fr; } }
+@media (max-width: 430px) { .analytics-dashboard { gap: 14px; } }

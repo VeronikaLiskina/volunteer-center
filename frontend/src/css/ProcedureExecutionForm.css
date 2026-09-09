@@ -1,0 +1,91 @@
+.procedure-execution-form {
+  padding: 30px;
+  border: 1px solid #dce6f3;
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 12px 32px rgba(33, 72, 126, 0.08);
+}
+.procedure-execution-form__heading {
+  margin-bottom: 26px;
+}
+.procedure-execution-form__heading h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+}
+.procedure-execution-form__heading p {
+  margin: 0;
+  color: #566581;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.procedure-execution-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+.procedure-execution-form__field--wide {
+  grid-column: 1/-1;
+}
+.procedure-execution-form__input, .procedure-execution-form__textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 13px;
+  border: 1px solid #b8c8de;
+  border-radius: 7px;
+  background: white;
+  color: #0d1b34;
+  font: inherit;
+}
+.procedure-execution-form__input:focus, .procedure-execution-form__textarea:focus {
+  border-color: #1769ff;
+  outline: 3px solid rgba(23, 105, 255, 0.12);
+}
+.procedure-execution-form__input--error, .procedure-execution-form__textarea--error {
+  border-color: #dc4b55;
+}
+.procedure-execution-form__textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+.procedure-execution-form__error {
+  padding: 13px 15px;
+  border: 1px solid #f0bdc3;
+  border-radius: 7px;
+  background: #fff4f5;
+  color: #b52535;
+}
+.procedure-execution-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 28px;
+}
+.procedure-execution-form__actions button {
+  min-height: 48px;
+  padding: 11px 22px;
+  border: 1px solid #1769ff;
+  border-radius: 7px;
+  background: #1769ff;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+}
+.procedure-execution-form__actions button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+@media (max-width: 680px) {
+  .procedure-execution-form {
+    padding: 20px;
+  }
+  .procedure-execution-form__grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .procedure-execution-form__field--wide {
+    grid-column: auto;
+  }
+  .procedure-execution-form__actions button {
+    width: 100%;
+  }
+}

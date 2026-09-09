@@ -1,0 +1,98 @@
+.procedure-distribution {
+  min-height: 330px;
+  padding: 24px;
+  border: 1px solid #dce6f3;
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 12px 32px rgba(33, 72, 126, 0.08);
+}
+.procedure-distribution__title {
+  margin: 0 0 5px;
+  font-size: 21px;
+}
+.procedure-distribution__subtitle {
+  margin: 0;
+  color: #71809a;
+  font-size: 13px;
+}
+.procedure-distribution__content {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  min-height: 240px;
+}
+.procedure-distribution__chart {
+  position: relative;
+  flex: 0 0 150px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+}
+.procedure-distribution__chart::after {
+  content: "";
+  position: absolute;
+  inset: 25px;
+  border-radius: 50%;
+  background: white;
+}
+.procedure-distribution__chart > span {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  color: #71809a;
+  font-size: 12px;
+  text-align: center;
+}
+.procedure-distribution__chart > span strong {
+  color: #0d1b34;
+  font-size: 24px;
+}
+.procedure-distribution__legend {
+  display: grid;
+  flex: 1;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.procedure-distribution__legend li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  color: #536681;
+  font-size: 13px;
+}
+.procedure-distribution__legend strong {
+  color: #0d1b34;
+  font-variant-numeric: tabular-nums;
+}
+.procedure-distribution__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.procedure-distribution__empty {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  margin: 0;
+  color: #71809a;
+}
+
+@media (max-width: 500px) {
+  .procedure-distribution {
+    min-height: 0;
+    padding: 19px 15px;
+  }
+  .procedure-distribution__content {
+    flex-direction: column;
+    align-items: stretch;
+    padding-top: 24px;
+  }
+  .procedure-distribution__chart {
+    align-self: center;
+  }
+}

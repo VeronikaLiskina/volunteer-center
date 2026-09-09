@@ -55,6 +55,27 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
   return body as T;
 }
 
+export async function requestBlob(path: string, options: RequestInit = {}): Promise<Blob> {
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}/api/v1${path}`, {
+      ...options,
+      headers: { ...options.headers },
+      signal: options.signal
+        ? AbortSignal.any([options.signal, AbortSignal.timeout(10000)])
+        : AbortSignal.timeout(10000),
+    });
+  } catch (error) {
+    if (options.signal?.aborted) throw error;
+    throw new ApiError("Сервис временно недоступен. Проверьте соединение и повторите попытку.", 0);
+  }
+  if (!response.ok) {
+    const body: unknown = await response.json().catch(() => null);
+    throw parseError(body, response.status);
+  }
+  return response.blob();
+}
+
 export async function getHealth(signal?: AbortSignal): Promise<HealthResponse> {
   return request<HealthResponse>("/health", { signal });
 }

@@ -1,0 +1,131 @@
+.home-stats {
+  align-self: center;
+  width: min(100%, 332px);
+  padding: 20px 22px;
+  border: 1px solid rgba(220, 230, 243, 0.9);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 12px 30px rgba(25, 58, 105, 0.1);
+}
+.home-stats__greeting {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  padding-bottom: 14px;
+  color: #4f6486;
+  text-align: right;
+}
+.home-stats__date {
+  font-size: 15px;
+  font-weight: 600;
+}
+.home-stats__wish {
+  font-size: 14px;
+}
+.home-stats__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.home-stats__item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-height: 66px;
+  padding: 11px 0;
+  border-top: 1px solid #e5ecf6;
+}
+.home-stats__icon {
+  display: grid;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 13px;
+}
+.home-stats__icon .icon {
+  width: 25px;
+  height: 25px;
+}
+.home-stats__icon--blue {
+  background: #e8f1ff;
+  color: #1769ff;
+}
+.home-stats__icon--green {
+  background: #e8f8f1;
+  color: #16875b;
+}
+.home-stats__icon--violet {
+  background: #f1eafe;
+  color: #7651d6;
+}
+.home-stats__icon--neutral {
+  background: #edf2f8;
+  color: #3f5f8c;
+}
+.home-stats__content {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.home-stats__value {
+  color: #0d1b34;
+  font-size: 25px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.home-stats__value--error {
+  color: #8794aa;
+}
+.home-stats__label {
+  color: #546989;
+  font-size: 13px;
+  line-height: 1.35;
+}
+.home-stats__skeleton {
+  width: 44px;
+  height: 22px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #edf2f8 25%, #f7f9fc 50%, #edf2f8 75%);
+  background-size: 200% 100%;
+  animation: home-stats-loading 1.4s ease-in-out infinite;
+}
+.home-stats__error {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e5ecf6;
+  color: #8f3e4a;
+  font-size: 12px;
+}
+.home-stats__error button {
+  padding: 4px;
+  border: 0;
+  background: none;
+  color: #1251c4;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+@keyframes home-stats-loading {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-stats__skeleton {
+    animation: none;
+  }
+}
+@media (max-width: 760px) {
+  .home-stats {
+    width: 100%;
+    padding: 17px 18px;
+  }
+  .home-stats__greeting {
+    justify-items: start;
+    text-align: left;
+  }
+}

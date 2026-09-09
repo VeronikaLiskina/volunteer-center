@@ -1,0 +1,90 @@
+.volunteer-card-page {
+  width: min(960px, 100% - 40px);
+  margin: 0 auto;
+  padding: 40px 0 64px;
+}
+.volunteer-card-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 28px;
+  margin-bottom: 28px;
+}
+.volunteer-card-page__eyebrow {
+  margin: 0 0 8px;
+  color: #1769ff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.volunteer-card-page__title {
+  margin: 0 0 10px;
+  font-size: clamp(30px, 4vw, 40px);
+  letter-spacing: -0.035em;
+}
+.volunteer-card-page__description {
+  max-width: 650px;
+  margin: 0;
+  color: #566581;
+  line-height: 1.6;
+}
+.volunteer-card-page__close {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 9px 15px;
+  border: 1px solid #b8c8de;
+  border-radius: 8px;
+  background: white;
+  color: #0d1b34;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.volunteer-card-page__close span {
+  font-size: 22px;
+  line-height: 1;
+}
+.volunteer-card-page__close:hover {
+  border-color: #1769ff;
+  background: #eaf2ff;
+  color: #1251c4;
+}
+.volunteer-card-page__state, .volunteer-card-page__error {
+  padding: 18px 20px;
+  border-radius: 9px;
+  line-height: 1.5;
+}
+.volunteer-card-page__state {
+  border: 1px solid #dce6f3;
+  background: white;
+  color: #566581;
+}
+.volunteer-card-page__error {
+  border: 1px solid #f0bdc3;
+  background: #fff4f5;
+  color: #b52535;
+}
+.volunteer-card-page__retry {
+  min-height: 40px;
+  margin-left: 14px;
+  padding: 8px 14px;
+  border: 1px solid #b8c8de;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+@media (max-width: 650px) {
+  .volunteer-card-page {
+    padding-top: 28px;
+  }
+  .volunteer-card-page__header {
+    flex-direction: column-reverse;
+    gap: 18px;
+  }
+  .volunteer-card-page__close {
+    align-self: flex-end;
+  }
+}

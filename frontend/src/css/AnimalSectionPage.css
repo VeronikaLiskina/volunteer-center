@@ -1,0 +1,142 @@
+.animal-section-page {
+  width: min(1120px, 100% - 40px);
+  margin: 0 auto;
+  padding: 40px 0 64px;
+}
+.animal-section-page__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: 28px;
+}
+.animal-section-page__eyebrow {
+  margin: 0 0 8px;
+  color: #1769ff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.animal-section-page__title {
+  margin: 0 0 10px;
+  font-size: clamp(30px, 4vw, 42px);
+  letter-spacing: -0.035em;
+}
+.animal-section-page__description {
+  margin: 0;
+  color: #566581;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.animal-section-page__close {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #b8c8de;
+  border-radius: 8px;
+  background: white;
+  color: #0d1b34;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.animal-section-page__close:hover {
+  border-color: #1769ff;
+  background: #eaf2ff;
+  color: #1251c4;
+}
+.animal-section-page__close:focus-visible {
+  outline: 3px solid rgba(23, 105, 255, 0.24);
+  outline-offset: 2px;
+}
+.animal-section-page__close-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+.animal-section-page__state, .animal-section-page__error, .animal-section-page__notice {
+  padding: 18px 20px;
+  border-radius: 10px;
+  line-height: 1.5;
+}
+.animal-section-page__state {
+  border: 1px solid #dce6f3;
+  background: white;
+}
+.animal-section-page__error {
+  border: 1px solid #f0bdc3;
+  background: #fff4f5;
+  color: #b52535;
+}
+.animal-section-page__notice {
+  border: 1px solid #b6e0c8;
+  background: #eaf8ef;
+  color: #187044;
+}
+.animal-section-page__retry {
+  min-height: 44px;
+  margin-left: 16px;
+  padding: 10px 18px;
+  border: 1px solid #b8c8de;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+.dictionaries-card {
+  padding: 28px;
+  border: 1px solid #dce6f3;
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 12px 32px rgba(33, 72, 126, 0.08);
+}
+.dictionaries-card__title {
+  margin: 0 0 22px;
+  font-size: 24px;
+}
+.dictionaries-card__item {
+  border: 1px solid #dce6f3;
+  border-radius: 9px;
+  margin-top: 14px;
+  overflow: hidden;
+}
+.dictionaries-card__summary {
+  padding: 18px;
+  color: #1251c4;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fbfcff;
+}
+.dictionaries-card__list {
+  margin: 0;
+  padding: 4px 24px 18px 46px;
+  line-height: 1.9;
+}
+.dictionaries-card__group {
+  padding: 4px 20px 16px;
+}
+.dictionaries-card__group-title {
+  margin: 12px 0 6px;
+  font-size: 15px;
+}
+.dictionaries-card__group .dictionaries-card__list {
+  padding-bottom: 0;
+}
+
+@media (max-width: 600px) {
+  .animal-section-page {
+    padding-top: 28px;
+  }
+  .animal-section-page__header {
+    flex-direction: column-reverse;
+    gap: 18px;
+  }
+  .animal-section-page__close {
+    align-self: flex-end;
+  }
+  .dictionaries-card {
+    padding: 18px;
+  }
+}

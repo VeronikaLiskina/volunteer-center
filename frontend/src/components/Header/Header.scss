@@ -59,6 +59,7 @@
     &__name { font-size: 15px; }
     &__caption { padding-left: 12px; border-left: 0; font-size: 0; gap: 0; }
     &__account { gap: 4px; }
-    &__link { padding: 8px 10px; font-size: 13px; }
+    &__navigation { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); overflow: visible; }
+    &__link { padding: 8px 6px; font-size: 12px; text-align: center; }
   }
 }

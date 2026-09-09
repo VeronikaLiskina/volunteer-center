@@ -1,0 +1,46 @@
+@use "../../styles/variables" as *;
+
+.report-result {
+  min-height: 440px; padding: 28px; border: 1px solid $color-border; border-radius: 14px; background: white; box-shadow: $shadow-card;
+  &__header { display: flex; align-items: flex-start; gap: 15px; padding-bottom: 22px; border-bottom: 1px solid #e8eef6; }
+  &__icon { display: grid; flex: 0 0 48px; width: 48px; height: 48px; place-items: center; border-radius: 13px; background: #eaf2ff; color: $color-accent;
+    .icon { width: 25px; height: 25px; }
+  }
+  &__eyebrow { margin: 0 0 4px; color: #6f81a0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+  &__title { margin: 0; font-size: 23px; }
+  &__period { margin: 7px 0 0; color: #607492; font-size: 13px; }
+  &__metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 24px 0; }
+  &__metric { display: flex; justify-content: space-between; align-items: center; min-height: 74px; padding: 15px; border-radius: 10px; background: #f5f8fc;
+    dt { color: #607492; font-size: 13px; }
+    dd { margin: 0; color: $color-text; font-size: 27px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  }
+  &__footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-top: 20px; border-top: 1px solid #e8eef6; }
+  &__note { margin: 0; color: #7a88a0; font-size: 12px; }
+  &__export { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 16px; border: 1px solid #b6d7c5; border-radius: 8px; background: #eff9f3; color: #187044; cursor: pointer; font-weight: 600; white-space: nowrap;
+    .icon { width: 19px; height: 19px; }
+    &:hover { border-color: #6bb68d; background: #e6f6ed; }
+    &:disabled { opacity: 0.6; cursor: wait; }
+  }
+  &__export-error { padding: 10px 12px; border-radius: 7px; background: #fff4f5; color: #b52535; font-size: 13px; }
+  &__placeholder { display: grid; justify-items: center; align-content: center; min-height: 380px; color: #71809a; text-align: center;
+    > span { display: grid; width: 62px; height: 62px; margin-bottom: 18px; place-items: center; border-radius: 18px; background: #eef3f9; color: #607b9f;
+      .icon { width: 30px; height: 30px; }
+    }
+    p { max-width: 390px; line-height: 1.6; }
+  }
+  &__loading { display: grid; align-content: center; min-height: 380px; gap: 12px;
+    span { height: 65px; border-radius: 10px; background: #f0f4f9; }
+    p { color: #71809a; text-align: center; }
+  }
+  &__error { display: grid; justify-items: center; align-content: center; min-height: 380px; color: #b52535; text-align: center;
+    .icon { width: 34px; height: 34px; }
+  }
+}
+
+@media (max-width: 500px) {
+  .report-result { min-height: 360px; padding: 20px 16px; }
+  .report-result__metrics { grid-template-columns: 1fr; }
+  .report-result__placeholder, .report-result__loading, .report-result__error { min-height: 300px; }
+  .report-result__footer { align-items: stretch; flex-direction: column; }
+  .report-result__export { width: 100%; }
+}

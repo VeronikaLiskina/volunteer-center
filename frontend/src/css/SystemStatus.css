@@ -1,0 +1,51 @@
+.system-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: min(100%, 560px);
+  margin-top: 40px;
+  padding: 24px 28px;
+  border: 1px solid #dce6f3;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgba(33, 72, 126, 0.08);
+}
+.system-status__label {
+  margin: 0 0 7px;
+  color: #70809f;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.system-status__value {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 650;
+}
+.system-status__indicator {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  border: 4px solid transparent;
+  border-radius: 50%;
+}
+.system-status__indicator--loading {
+  border-color: rgba(217, 154, 43, 0.22);
+  background: #d99a2b;
+  animation: status-pulse 1.4s ease-in-out infinite;
+}
+.system-status__indicator--available {
+  border-color: rgba(47, 166, 109, 0.2);
+  background: #2fa66d;
+}
+.system-status__indicator--unavailable {
+  border-color: rgba(220, 75, 85, 0.2);
+  background: #dc4b55;
+}
+
+@keyframes status-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
