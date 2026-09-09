@@ -48,12 +48,12 @@ export function CareProceduresPage() {
     </header>
     <section className="care-procedures-page__summary" aria-label="Сводка на сегодня">
       <article><span>Запланировано сегодня</span><strong>{summary?.today_total ?? "—"}</strong></article>
-      <article className="care-procedures-page__summary-card--completed"><span>Со статусом «Выполнена»</span><strong>{summary?.today_completed ?? "—"}</strong></article>
-      <article><span>Остаётся по плану</span><strong>{summary ? Math.max(0, summary.today_total - summary.today_completed) : "—"}</strong></article>
+      <article className="care-procedures-page__summary-card--completed"><span>Фактически выполнено сегодня</span><strong>{summary?.today_completed ?? "—"}</strong></article>
     </section>
     {notice && <p className="care-procedures-page__notice" role="status">{notice}</p>}
     <CareProceduresTable procedures={list.data} filters={filters} loading={loading} error={list.error}
       onFilters={setFilters} onEdit={(id) => navigate(`/procedures/${id}/edit`)}
+      onExecute={(id) => navigate(`/procedures/${id}/execute`)}
       onRetry={() => setRevision((value) => value + 1)} />
   </div>;
 }

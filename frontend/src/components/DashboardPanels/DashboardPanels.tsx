@@ -56,7 +56,7 @@ export function SystemOverview({ state, summary, volunteerSummary, procedureSumm
       <li className="system-overview__item"><Icon name="calendar" /><div>
         <p className="system-overview__label">Планирование процедур</p>
         <p className="system-overview__description">{procedureSummary
-          ? `Сегодня: ${procedureSummary.today_total} · Выполнено: ${procedureSummary.today_completed}`
+          ? `Планов сегодня: ${procedureSummary.today_total} · Фактов выполнения: ${procedureSummary.today_completed}`
           : "Сведения о расписании временно недоступны"}</p>
       </div></li>
       <li className="system-overview__item"><Icon name="user" /><div>

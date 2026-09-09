@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from "react";
 import { ApiError } from "../../api/client";
-import { AnimalStatus, type Animal, type AnimalCreate, type AnimalType, type Breed,
+import { AnimalStatus, animalStatusLabels, type Animal, type AnimalCreate, type AnimalType, type Breed,
   type AnimalField, type AnimalFieldErrors } from "../../types/animal";
 import { FormField } from "../FormField/FormField";
 import { initialValues, toPayload, validateAnimal } from "./validation";
@@ -66,10 +66,17 @@ export function AnimalForm({ animal, types, breeds, onSave, onClear }: AnimalFor
   }
 
   return <section className="animal-form" aria-labelledby="animal-form-title">
-    <h2 className="animal-form__title" id="animal-form-title" tabIndex={-1}>
-      {archived ? "Архивная карточка" : animal ? "Редактирование карточки" : "Карточка животного"}
-    </h2>
-    <p className="animal-form__hint">{archived ? "Карточка доступна только для просмотра." : "* Обязательные поля"}</p>
+    <div className="animal-form__heading">
+      <div>
+        <h2 className="animal-form__title" id="animal-form-title" tabIndex={-1}>
+          {archived ? "Архивная карточка" : animal ? "Редактирование карточки" : "Карточка животного"}
+        </h2>
+        <p className="animal-form__hint">{archived ? "Карточка доступна только для просмотра." : "* Обязательные поля"}</p>
+      </div>
+      <span className={`animal-form__status animal-form__status--${animal?.status ?? AnimalStatus.InCare}`}>
+        {animal ? animalStatusLabels[animal.status] : "Новая карточка"}
+      </span>
+    </div>
     <form ref={formRef} onSubmit={submit} noValidate aria-busy={saving}>
       {error && <p className="animal-form__error" role="alert">{error}</p>}
       <fieldset className="animal-form__fieldset" disabled={saving || archived}>

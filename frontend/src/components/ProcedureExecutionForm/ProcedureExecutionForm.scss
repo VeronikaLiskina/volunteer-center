@@ -1,0 +1,30 @@
+@use "../../styles/variables" as *;
+
+.procedure-execution-form {
+  padding: 30px; border: 1px solid $color-border; border-radius: 14px; background: white; box-shadow: $shadow-card;
+  &__heading { margin-bottom: 26px;
+    h2 { margin: 0 0 8px; font-size: 24px; }
+    p { margin: 0; color: #566581; font-size: 14px; line-height: 1.5; }
+  }
+  &__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+  &__field--wide { grid-column: 1 / -1; }
+  &__input, &__textarea { width: 100%; min-height: 48px; padding: 11px 13px; border: 1px solid #b8c8de; border-radius: 7px; background: white; color: $color-text; font: inherit;
+    &:focus { border-color: $color-accent; outline: 3px solid rgba(23, 105, 255, 0.12); }
+    &--error { border-color: $color-error; }
+  }
+  &__textarea { min-height: 110px; resize: vertical; }
+  &__error { padding: 13px 15px; border: 1px solid #f0bdc3; border-radius: 7px; background: #fff4f5; color: #b52535; }
+  &__actions { display: flex; justify-content: flex-end; margin-top: 28px;
+    button { min-height: 48px; padding: 11px 22px; border: 1px solid $color-accent; border-radius: 7px; background: $color-accent; color: white; cursor: pointer; font: inherit;
+      &:disabled { opacity: 0.6; cursor: wait; }
+    }
+  }
+}
+
+@media (max-width: 680px) {
+  .procedure-execution-form { padding: 20px;
+    &__grid { grid-template-columns: 1fr; gap: 18px; }
+    &__field--wide { grid-column: auto; }
+    &__actions button { width: 100%; }
+  }
+}

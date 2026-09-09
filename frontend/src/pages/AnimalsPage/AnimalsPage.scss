@@ -1,46 +1,52 @@
 @use "../../styles/variables" as *;
 
 .animals-page {
-  width: min(1360px, calc(100% - 40px)); margin: 0 auto; padding: 40px 0 64px;
-  &__heading { margin-bottom: 28px; }
-  &__title { margin: 0 0 12px; font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.03em; }
-  &__description { margin: 0; color: #566581; line-height: 1.6; }
-  &__section-navigation { display: grid; grid-template-columns: repeat(2, minmax(220px, 320px)); gap: 16px; margin-top: 26px; }
-  &__section-link { display: grid; gap: 4px; min-height: 78px; align-content: center; padding: 14px 20px;
-    border: 1px solid #aac8ff; border-radius: 10px; background: white; color: $color-text; text-decoration: none;
-    transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
-    &:hover { border-color: $color-accent; background: #f5f8ff; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(23, 105, 255, 0.1); }
+  width: min(1360px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 40px 0 64px;
+
+  &__header { display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; margin-bottom: 28px; }
+  &__eyebrow { margin: 0 0 8px; color: $color-accent; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  &__title { margin: 0 0 10px; font-size: clamp(30px, 4vw, 42px); letter-spacing: -0.035em; }
+  &__description { margin: 0; color: #566581; font-size: 16px; line-height: 1.6; }
+  &__actions { display: flex; align-items: center; gap: 12px; }
+  &__action {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 50px; padding: 12px 20px;
+    border: 1px solid #b8c8de; border-radius: 8px; background: white; color: $color-text; font-weight: 600;
+    text-decoration: none; white-space: nowrap; transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+    .icon { width: 22px; height: 22px; }
     &:focus-visible { outline: 3px solid rgba(23, 105, 255, 0.24); outline-offset: 2px; }
+    &--secondary:hover { border-color: $color-accent; background: $color-accent-soft; color: #1251c4; }
     &--primary { border-color: $color-accent; background: $color-accent; color: white;
-      &:hover { background: #0f5de9; color: white; }
+      &:hover { background: #0f5de9; box-shadow: 0 8px 22px rgba(23, 105, 255, 0.2); }
     }
   }
-  &__section-link-title { font-size: 16px; font-weight: 600; }
-  &__section-link-description { font-size: 13px; opacity: 0.8; }
-  &__workspace { display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: start; gap: 24px; margin-bottom: 24px; }
-  &__workspace--form { grid-template-columns: minmax(0, 1fr); }
-  &__workspace--dictionaries { grid-template-columns: minmax(280px, 680px); }
-  &__form { min-width: 0; scroll-margin-top: 24px; }
-  #animal-form-title, #dictionaries-title { scroll-margin-block: 32px; }
-  &__dictionaries { padding: 24px; background: white; border: 1px solid $color-border; border-radius: 12px; }
-  &__subtitle { margin: 0 0 20px; font-size: 22px; }
-  &__dictionary { border: 1px solid $color-border; border-radius: 8px; margin-top: 12px; }
-  &__dictionary-title { padding: 16px 12px; color: #1251c4; cursor: pointer; }
-  &__dictionary-list { padding: 0 16px 12px 28px; margin: 0; font-size: 14px; line-height: 1.8; }
-  &__breed-group { padding: 0 4px; }
-  &__breed-title { padding: 0 12px; font-size: 14px; }
-  &__notice, &__error { padding: 14px 18px; border-radius: 8px; margin: 0 0 24px; line-height: 1.5; }
-  &__notice { color: #187044; background: #eaf8ef; border: 1px solid #b6e0c8; }
-  &__error { color: #b52535; background: #fff4f5; border: 1px solid #f0bdc3; }
-  &__state { padding: 24px; background: white; border: 1px solid $color-border; border-radius: 12px; }
-  &__retry { min-height: 44px; padding: 10px 18px; border: 1px solid #b8c8de; border-radius: 6px; background: white; cursor: pointer; }
+  &__summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+  &__summary-card {
+    display: flex; justify-content: space-between; align-items: center; min-height: 86px; padding: 20px 22px;
+    border: 1px solid $color-border; border-radius: 12px; background: white; color: #566581;
+    strong { color: $color-text; font-size: 30px; font-variant-numeric: tabular-nums; }
+    &--active { border-color: #b6e0c8; background: #f5fbf7; strong { color: #187044; } }
+  }
+  &__notice, &__error { padding: 14px 18px; border-radius: 9px; margin: 0 0 24px; line-height: 1.5; }
+  &__notice { border: 1px solid #b6e0c8; background: #eaf8ef; color: #187044; }
+  &__error { border: 1px solid #f0bdc3; background: #fff4f5; color: #b52535; }
 }
 
-@media (max-width: 960px) {
-  .animals-page__workspace { grid-template-columns: 1fr; }
+@media (max-width: 800px) {
+  .animals-page {
+    padding-top: 28px;
+    &__header { align-items: stretch; flex-direction: column; }
+    &__actions { width: 100%; }
+    &__action { flex: 1; }
+    &__summary { grid-template-columns: 1fr; gap: 10px; }
+    &__summary-card { min-height: 68px; padding: 14px 18px; }
+  }
 }
 
-@media (max-width: 560px) {
-  .animals-page__section-navigation { grid-template-columns: 1fr; }
-  .animals-page__section-link { min-height: 70px; }
+@media (max-width: 520px) {
+  .animals-page {
+    &__actions { flex-direction: column-reverse; }
+    &__action { width: 100%; }
+  }
 }

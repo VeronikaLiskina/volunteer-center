@@ -8,6 +8,7 @@ const paths = {
   clipboard: <><rect x="5" y="5" width="14" height="16" rx="2" /><rect x="9" y="3" width="6" height="4" rx="1" /><path d="M9 12h6m-6 4h6" /></>,
   chart: <path d="M3 21h18M5 21v-8h3v8m3 0V8h3v13m3 0V3h3v18" />,
   book: <path d="M12 5v16M3 4h5a4 4 0 0 1 4 2 4 4 0 0 1 4-2h5v15h-5a5 5 0 0 0-4 2 5 5 0 0 0-4-2H3Z" />,
+  file: <><path d="M6 3h8l4 4v14H6Z" /><path d="M14 3v5h5M9 13h6m-6 4h6" /></>,
   arrow: <path d="m9 5 7 7-7 7" />,
   alert: <><path d="m12 3 10 18H2L12 3Z" /><path d="M12 9v5m0 3h.01" /></>,
   bell: <path d="M5 10a7 7 0 0 1 14 0v5l2 3H3l2-3Zm4 11h6" />,

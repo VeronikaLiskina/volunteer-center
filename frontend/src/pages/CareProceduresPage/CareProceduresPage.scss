@@ -11,7 +11,7 @@
     background: $color-accent; color: white; text-decoration: none; font-weight: 600; white-space: nowrap;
     .icon { width: 22px; height: 22px; } &:hover { background: #0f5de9; box-shadow: 0 8px 22px rgba(23, 105, 255, 0.2); }
   }
-  &__summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px;
+  &__summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px;
     article { display: flex; justify-content: space-between; align-items: center; min-height: 86px; padding: 20px 22px; border: 1px solid $color-border; border-radius: 12px; background: white; color: #566581; }
     strong { color: $color-text; font-size: 30px; font-variant-numeric: tabular-nums; }
   }

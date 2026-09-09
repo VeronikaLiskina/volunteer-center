@@ -18,7 +18,7 @@ export function DashboardMetrics({ summary, volunteerSummary, procedureSummary, 
     { title: "Процедур на сегодня", value: proceduresLoading ? "…" : procedureSummary ? String(procedureSummary.today_total) : "—",
       hint: proceduresLoading ? "Загружаем план" : procedureSummary ? "Назначено на текущую дату" : "Данные недоступны", icon: "clipboard" },
     { title: "Выполнено сегодня", value: proceduresLoading ? "…" : procedureSummary ? String(procedureSummary.today_completed) : "—",
-      hint: proceduresLoading ? "Загружаем данные" : procedureSummary ? "Записей со статусом «Выполнена»" : "Данные недоступны", icon: "check" },
+      hint: proceduresLoading ? "Загружаем данные" : procedureSummary ? "Фактических выполнений за день" : "Данные недоступны", icon: "check" },
     { title: "Активных волонтёров", value: volunteersLoading ? "…" : volunteerSummary ? String(volunteerSummary.active) : "—",
       hint: volunteersLoading ? "Загружаем данные" : volunteerSummary ? "Доступны для назначения" : "Данные недоступны", icon: "user" },
   ];

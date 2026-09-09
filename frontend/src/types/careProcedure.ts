@@ -26,14 +26,20 @@ export interface CareProcedureCreate {
   planned_time: string;
   duration_minutes: number;
   volunteer_id: number;
-  status: CareProcedureStatus;
   comment: string | null;
 }
 
-export type CareProcedureUpdate = Partial<CareProcedureCreate>;
+export type CareProcedureEditableStatus = Exclude<
+  CareProcedureStatus, typeof CareProcedureStatus.Completed
+>;
+
+export type CareProcedureUpdate = Partial<CareProcedureCreate> & {
+  status?: CareProcedureEditableStatus;
+};
 
 export interface CareProcedure extends CareProcedureCreate {
   id: number;
+  status: CareProcedureStatus;
   animal: CareProcedureAnimal;
   procedure_type: CareProcedureType;
   volunteer: CareProcedureVolunteer;

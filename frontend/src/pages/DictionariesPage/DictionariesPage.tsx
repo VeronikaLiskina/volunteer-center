@@ -30,6 +30,7 @@ export function DictionariesPage() {
   return <div className="animal-section-page">
     <header className="animal-section-page__header">
       <div>
+        <p className="animal-section-page__eyebrow">Реестр центра</p>
         <h1 className="animal-section-page__title" ref={titleRef} tabIndex={-1}>Справочники</h1>
         <p className="animal-section-page__description">Типы животных и доступные для них породы</p>
       </div>

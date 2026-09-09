@@ -19,6 +19,7 @@ interface Props {
   error: string;
   onFilters: (filters: CareProcedureFilters) => void;
   onEdit: (id: number) => void;
+  onExecute: (id: number) => void;
   onRetry: () => void;
 }
 
@@ -27,7 +28,7 @@ function formatDate(value: string) {
   return `${day}.${month}.${year}`;
 }
 
-export function CareProceduresTable({ procedures, filters, loading, error, onFilters, onEdit, onRetry }: Props) {
+export function CareProceduresTable({ procedures, filters, loading, error, onFilters, onEdit, onExecute, onRetry }: Props) {
   const [options, setOptions] = useState<{ animals: Animal[]; volunteers: Volunteer[]; types: CareProcedureType[] }>({
     animals: [], volunteers: [], types: [],
   });
@@ -81,7 +82,11 @@ export function CareProceduresTable({ procedures, filters, loading, error, onFil
             <td><strong>{item.animal.name}</strong></td><td>{item.procedure_type.name}<small>{item.duration_minutes} мин</small></td>
             <td>{item.volunteer.full_name}</td><td><span className={`care-procedures-table__status care-procedures-table__status--${item.status}`}>
               {careProcedureStatusLabels[item.status]}</span></td>
-            <td><button className="care-procedures-table__edit" type="button" onClick={() => onEdit(item.id)}>Изменить</button></td>
+            <td><div className="care-procedures-table__actions">
+              <button className="care-procedures-table__edit" type="button" onClick={() => onEdit(item.id)}>Изменить</button>
+              {(item.status === CareProcedureStatus.Assigned || item.status === CareProcedureStatus.Overdue) &&
+                <button className="care-procedures-table__execute" type="button" onClick={() => onExecute(item.id)}>Выполнить</button>}
+            </div></td>
           </tr>)}</tbody></table>
       </div>}
     <div className="care-procedures-table__pagination">

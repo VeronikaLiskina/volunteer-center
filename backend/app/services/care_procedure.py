@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import CareProcedureError
 from app.models.animal import AnimalStatus
-from app.models.care_procedure import CareProcedure
+from app.models.care_procedure import CareProcedure, CareProcedureStatus
 from app.models.volunteer import VolunteerStatus
 from app.repositories.animal import AnimalRepository
 from app.repositories.care_procedure import CareProcedureRepository
@@ -23,18 +23,20 @@ class CareProcedureService:
             raise CareProcedureError("Процедура не найдена", 404)
         return procedure
 
-    async def validate_references(self, data: CareProcedureCreate) -> None:
-        animal = await AnimalRepository(self.session).get(data.animal_id)
+    async def validate_references(
+        self, *, animal_id: int, volunteer_id: int, procedure_type_id: int,
+    ) -> None:
+        animal = await AnimalRepository(self.session).get(animal_id)
         if animal is None:
             raise CareProcedureError("Животное не найдено", 422, "animal_id")
         if animal.status == AnimalStatus.ARCHIVED:
             raise CareProcedureError("Нельзя назначить процедуру архивному животному", 409, "animal_id")
-        volunteer = await VolunteerRepository(self.session).get(data.volunteer_id)
+        volunteer = await VolunteerRepository(self.session).get(volunteer_id)
         if volunteer is None:
             raise CareProcedureError("Волонтёр не найден", 422, "volunteer_id")
         if volunteer.status != VolunteerStatus.ACTIVE:
             raise CareProcedureError("Можно назначить только активного волонтёра", 409, "volunteer_id")
-        if await get_care_procedure_type(self.session, data.procedure_type_id) is None:
+        if await get_care_procedure_type(self.session, procedure_type_id) is None:
             raise CareProcedureError("Тип процедуры не найден", 422, "procedure_type_id")
 
     async def commit(self) -> None:
@@ -45,18 +47,31 @@ class CareProcedureService:
             raise CareProcedureError("Не удалось сохранить процедуру из-за конфликта данных", 409) from error
 
     async def create(self, data: CareProcedureCreate) -> CareProcedure:
-        await self.validate_references(data)
-        procedure = CareProcedure(**data.model_dump())
+        await self.validate_references(
+            animal_id=data.animal_id,
+            volunteer_id=data.volunteer_id,
+            procedure_type_id=data.procedure_type_id,
+        )
+        procedure = CareProcedure(
+            **data.model_dump(), status=CareProcedureStatus.ASSIGNED,
+        )
         self.repository.add(procedure)
         await self.commit()
         return await self.get(procedure.id)
 
     async def update(self, procedure_id: int, changes: CareProcedureUpdate) -> CareProcedure:
         procedure = await self.get(procedure_id, for_update=True)
-        current = {field: getattr(procedure, field) for field in CareProcedureCreate.model_fields}
-        data = CareProcedureCreate.model_validate(current | changes.model_dump(exclude_unset=True))
-        await self.validate_references(data)
-        for field, value in data.model_dump().items():
+        values = {
+            "animal_id": procedure.animal_id,
+            "volunteer_id": procedure.volunteer_id,
+            "procedure_type_id": procedure.procedure_type_id,
+        } | changes.model_dump(exclude_unset=True)
+        await self.validate_references(
+            animal_id=values["animal_id"],
+            volunteer_id=values["volunteer_id"],
+            procedure_type_id=values["procedure_type_id"],
+        )
+        for field, value in changes.model_dump(exclude_unset=True).items():
             setattr(procedure, field, value)
         await self.commit()
         return await self.get(procedure_id)

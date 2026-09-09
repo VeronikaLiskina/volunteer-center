@@ -2,77 +2,63 @@
 
 .header {
   border-bottom: 1px solid $color-border;
-  background: rgba($color-surface, 0.96);
-  backdrop-filter: blur(12px);
+  background: rgba($color-surface, 0.97);
 
   &__content {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: space-between;
-    width: min(1480px, calc(100% - 48px));
-    min-height: 80px;
+    gap: 28px;
+    width: min(1280px, calc(100% - 48px));
+    min-height: 74px;
     margin: 0 auto;
   }
-
-  &__brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    color: $color-text;
-    text-decoration: none;
-  }
-
-  &__navigation { display: flex; gap: 8px; }
+  &__brand { display: inline-flex; align-items: center; gap: 12px; color: $color-text; text-decoration: none; white-space: nowrap; }
+  &__brand-copy { display: grid; gap: 2px; }
+  &__name { font-size: 17px; font-weight: 700; line-height: 1.2; }
+  &__tagline { color: #7a88a1; font-size: 11px; line-height: 1.2; }
+  &__logo { display: grid; width: 32px; height: 34px; place-items: center; color: $color-accent; }
+  &__logo-icon { width: 29px; height: 29px; fill: currentColor; }
+  &__navigation { display: flex; justify-content: center; gap: 4px; min-width: 0; }
   &__link {
-    padding: 12px 14px; border-radius: 6px; text-decoration: none; color: $color-text; font-size: 15px;
-    &--active { background: $color-accent-soft; color: #1251c4; }
-    &:hover { background: $color-surface-muted; }
-  }
-
-  &__logo {
-    display: grid;
-    width: 28px;
-    height: 32px;
-    place-items: center;
-    border-radius: 12px;
-    background: transparent;
-    color: $color-accent;
-  }
-
-  &__logo-icon {
-    width: 26px;
-    height: 26px;
-    fill: currentColor;
-  }
-
-  &__name {
-    font-size: 18px;
-    font-weight: 600;
-  }
-
-  &__caption {
-    display: flex; align-items: center; gap: 12px;
-    padding-left: 20px;
-    border-left: 1px solid $color-border;
+    padding: 10px 12px;
+    border-radius: 8px;
     color: $color-text;
     font-size: 14px;
-    font-weight: 400;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &--active { background: $color-accent-soft; color: #1251c4; font-weight: 600; }
+    &:hover { background: $color-surface-muted; }
+    &:focus-visible { outline: 3px solid rgba(23, 105, 255, 0.2); outline-offset: 1px; }
+  }
+  &__account { display: flex; align-items: center; gap: 18px; }
+  &__notification { position: relative; display: grid; place-items: center; padding: 6px; border: 0; background: none; color: #72829c;
+    .icon { width: 21px; height: 21px; }
+  }
+  &__notification-dot { position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border: 2px solid white; border-radius: 50%; background: #ef6a63; }
+  &__caption { display: flex; align-items: center; gap: 10px; min-height: 30px; padding-left: 18px; border-left: 1px solid $color-border; color: $color-text; font-size: 13px; white-space: nowrap;
     .icon { width: 20px; height: 20px; color: $color-accent; }
   }
-  &__account { display: flex; align-items: center; gap: 20px; }
-  &__notification { display: grid; place-items: center; padding: 6px; border: 0; background: none; color: #7a89a4; .icon { width: 20px; height: 20px; } }
 }
 
-@media (max-width: 800px) {
-  .header__account {
-    display: none;
+@media (max-width: 1120px) {
+  .header {
+    &__content { grid-template-columns: auto auto; gap: 10px 20px; padding: 11px 0 8px; }
+    &__navigation { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; overflow-x: auto; padding: 2px 0 4px; scrollbar-width: none;
+      &::-webkit-scrollbar { display: none; }
+    }
+    &__account { justify-self: end; }
   }
 }
 
-@media (max-width: 540px) {
-  .header__content { width: calc(100% - 32px); flex-wrap: wrap; gap: 12px; padding: 14px 0; }
-  .header__navigation { margin-left: auto; }
-  .header__link { padding: 8px; font-size: 13px; }
-  .header__name { font-size: 14px; }
-  .header__brand { gap: 8px; }
+@media (max-width: 600px) {
+  .header {
+    &__content { width: calc(100% - 28px); gap: 8px 14px; }
+    &__tagline { display: none; }
+    &__name { font-size: 15px; }
+    &__caption { padding-left: 12px; border-left: 0; font-size: 0; gap: 0; }
+    &__account { gap: 4px; }
+    &__link { padding: 8px 10px; font-size: 13px; }
+  }
 }

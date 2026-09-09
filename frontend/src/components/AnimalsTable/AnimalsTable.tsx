@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimalStatus, animalStatusLabels, type Animal, type AnimalFilters, type AnimalType } from "../../types/animal";
 import { PAGE_SIZE } from "../../api/animals";
+import { Icon } from "../Icon/Icon";
 import "./AnimalsTable.scss";
 
 interface AnimalsTableProps {
@@ -55,7 +56,13 @@ export function AnimalsTable({ animals, types, filters, loading, error, opening,
   const weightFormat = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return <section className="animals-table" aria-labelledby="animals-list-title">
-    <h2 className="animals-table__title" id="animals-list-title">Список животных</h2>
+    <div className="animals-table__heading-row">
+      <div>
+        <h2 className="animals-table__title" id="animals-list-title">Список животных</h2>
+        <p className="animals-table__caption">Используйте фильтры, чтобы быстро найти нужную карточку</p>
+      </div>
+      <span className="animals-table__count">На странице: {rows.length}</span>
+    </div>
     <form className="animals-table__filters" onSubmit={(event) => {
       event.preventDefault(); onFilters({ ...filters, search: search.trim(), offset: 0 });
     }}>
@@ -78,19 +85,23 @@ export function AnimalsTable({ animals, types, filters, loading, error, opening,
           <option value={AnimalStatus.Archived}>В архиве</option>
         </select>
       </label>
-      <button className="animals-table__button" type="submit">Найти</button>
+      <button className="animals-table__button animals-table__button--search" type="submit">Найти</button>
     </form>
     {opening && <p className="animals-table__state" role="status">Загружаем карточку…</p>}
     {loading ? <p className="animals-table__state" role="status">Загружаем животных…</p>
       : error ? <div className="animals-table__error" role="alert"><p>{error}</p>
         <button className="animals-table__button" type="button" onClick={onRetry}>Повторить</button></div>
-      : rows.length === 0 ? <p className="animals-table__state" role="status">Животные не найдены. Добавьте карточку или измените фильтры.</p>
+      : rows.length === 0 ? <div className="animals-table__empty" role="status">
+        <span className="animals-table__empty-icon"><Icon name="paw" /></span>
+        <strong className="animals-table__empty-title">Животные не найдены.</strong>
+        <p>Добавьте карточку или измените параметры поиска.</p>
+      </div>
       : <div className="animals-table__scroll" tabIndex={0} role="region" aria-label="Таблица животных">
         <table className="animals-table__table">
           <thead><tr>{["Кличка", "Тип", "Порода", "Вес, кг", "Год рождения", "Хозяин / ответственное лицо", "Телефон", "Статус", "Действия"]
             .map((title) => <th key={title} scope="col" className="animals-table__heading">{title}</th>)}</tr></thead>
           <tbody>{rows.map((animal) => <tr key={animal.id} className="animals-table__row">
-            <td className="animals-table__cell">{animal.name}</td>
+            <td className="animals-table__cell animals-table__cell--name">{animal.name}</td>
             <td className="animals-table__cell">{animal.animal_type.name}</td>
             <td className="animals-table__cell">{animal.breed.name}</td>
             <td className="animals-table__cell animals-table__cell--numeric">{weightFormat.format(Number(animal.weight))}</td>

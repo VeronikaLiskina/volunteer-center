@@ -7,7 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
 from app.core.config import settings
-from app.core.errors import AnimalError, CareProcedureError, VolunteerError
+from app.core.errors import (
+    AnimalError, CareProcedureError, ProcedureExecutionError, VolunteerError,
+)
 from app.db.session import engine
 
 
@@ -40,6 +42,16 @@ async def volunteer_error_handler(_: Request, error: VolunteerError) -> JSONResp
 async def care_procedure_error_handler(_: Request, error: CareProcedureError) -> JSONResponse:
     return JSONResponse(status_code=error.status_code,
                         content={"detail": {"message": error.message, "field": error.field}})
+
+
+@app.exception_handler(ProcedureExecutionError)
+async def procedure_execution_error_handler(
+    _: Request, error: ProcedureExecutionError,
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=error.status_code,
+        content={"detail": {"message": error.message, "field": error.field}},
+    )
 
 app.add_middleware(
     CORSMiddleware,

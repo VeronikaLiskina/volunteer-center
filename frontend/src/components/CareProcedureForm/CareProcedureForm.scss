@@ -12,11 +12,8 @@
     &:focus { border-color: $color-accent; outline: 3px solid rgba(23, 105, 255, 0.12); }
     &--error { border-color: $color-error; }
   }
-  &__status { padding: 7px 11px; border-radius: 999px; font-size: 13px; white-space: nowrap;
-    &--assigned { color: #1251c4; background: #eaf2ff; }
-    &--completed { color: #187044; background: #eaf8ef; }
-    &--cancelled { color: #667085; background: #eef1f5; }
-    &--overdue { color: #a83340; background: #fff0f1; }
+  &__status-field { display: flex; align-items: center; gap: 7px; min-height: 48px; padding: 11px 13px; border: 1px solid #c8d7eb; border-radius: 7px; background: #f6f9fd; color: #394861;
+    > strong { color: #1251c4; }
   }
   &__state, &__error { padding: 18px 20px; border-radius: 9px; }
   &__state { border: 1px solid $color-border; background: white; color: #566581; }

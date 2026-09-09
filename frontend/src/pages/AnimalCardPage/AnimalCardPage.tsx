@@ -53,8 +53,9 @@ export function AnimalCardPage() {
   return <div className="animal-section-page">
     <header className="animal-section-page__header">
       <div>
+        <p className="animal-section-page__eyebrow">Реестр центра</p>
         <h1 className="animal-section-page__title">{isEditRoute ? "Карточка животного" : "Добавление животного"}</h1>
-        <p className="animal-section-page__description">Заполните сведения и сохраните карточку</p>
+        <p className="animal-section-page__description">Основные сведения, параметры и контакты ответственного лица</p>
       </div>
       <Link className="animal-section-page__close" to="/animals" aria-label="Закрыть и вернуться к списку животных">
         <span className="animal-section-page__close-icon" aria-hidden="true">×</span> Закрыть

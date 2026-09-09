@@ -4,6 +4,7 @@ from app.models.breed import Breed
 from app.models.volunteer import Volunteer, VolunteerStatus
 from app.models.care_procedure import CareProcedure, CareProcedureStatus
 from app.models.care_procedure_type import CareProcedureType
+from app.models.procedure_execution import ProcedureExecution
 
 __all__ = ["Animal", "AnimalStatus", "AnimalType", "Breed", "Volunteer", "VolunteerStatus",
-           "CareProcedure", "CareProcedureStatus", "CareProcedureType"]
+           "CareProcedure", "CareProcedureStatus", "CareProcedureType", "ProcedureExecution"]

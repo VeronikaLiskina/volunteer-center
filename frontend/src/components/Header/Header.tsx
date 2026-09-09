@@ -16,16 +16,21 @@ export function Header() {
               <path d="M8.6 21.3c0-4.4 3.4-8.2 7.4-8.2s7.4 3.8 7.4 8.2c0 3-2.1 4.4-4.5 4.4-1.2 0-2-.5-2.9-.5s-1.7.5-2.9.5c-2.4 0-4.5-1.4-4.5-4.4Z" />
             </svg>
           </span>
-          <span className="header__name">АСУВЦ «Лапка»</span>
+          <span className="header__brand-copy">
+            <span className="header__name">АСУВЦ «Лапка»</span>
+            <span className="header__tagline">С заботой о тех, кто рядом</span>
+          </span>
         </Link>
         <nav className="header__navigation" aria-label="Главная навигация">
           <NavLink to="/" end className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Главная</NavLink>
           <NavLink to="/animals" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Животные</NavLink>
           <NavLink to="/procedures" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Процедуры</NavLink>
           <NavLink to="/volunteers" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Волонтёры</NavLink>
+          <NavLink to="/analytics" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Аналитика</NavLink>
+          <NavLink to="/reports" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Отчёты</NavLink>
         </nav>
         <div className="header__account">
-          <button className="header__notification" type="button" disabled aria-label="Уведомления пока недоступны" title="Уведомления пока недоступны"><Icon name="bell" /></button>
+          <button className="header__notification" type="button" disabled aria-label="Уведомления пока недоступны" title="Уведомления пока недоступны"><Icon name="bell" /><span className="header__notification-dot" aria-hidden="true" /></button>
           <span className="header__caption"><Icon name="user" />Гостевой режим</span>
         </div>
       </div>

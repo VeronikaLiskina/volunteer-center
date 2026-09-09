@@ -1,66 +1,56 @@
 import { useEffect, useState } from "react";
-import { getHealth } from "../../api/client";
 import { getAnimalSummary } from "../../api/animals";
+import { getCareProcedureSummary } from "../../api/careProcedures";
 import { getVolunteerSummary } from "../../api/volunteers";
-import { getCareProcedureSummary, getTodayCareProcedures } from "../../api/careProcedures";
+import { AnalyticsLinks } from "../../components/AnalyticsLinks/AnalyticsLinks";
+import { HomeHero } from "../../components/HomeHero/HomeHero";
+import type { SummaryResource } from "../../components/HomeStats/HomeStats";
+import { QuickActions } from "../../components/QuickActions/QuickActions";
 import type { AnimalSummary } from "../../types/animal";
+import type { CareProcedureSummary } from "../../types/careProcedure";
 import type { VolunteerSummary } from "../../types/volunteer";
-import type { CareProcedure, CareProcedureSummary } from "../../types/careProcedure";
-import type { SystemState } from "../../components/SystemStatus/SystemStatus";
-import { DashboardMetrics } from "../../components/DashboardMetrics/DashboardMetrics";
-import { QuickActions, SystemOverview, TodayProcedures } from "../../components/DashboardPanels/DashboardPanels";
 import "./HomePage.scss";
 
+const emptyResource = <T,>(): SummaryResource<T> => ({ data: null, loading: true, error: "" });
+
+function errorMessage(cause: unknown) {
+  return cause instanceof Error ? cause.message : "Не удалось загрузить данные";
+}
+
 export function HomePage() {
-  const [systemState, setSystemState] = useState<SystemState>("loading");
-  const [summary, setSummary] = useState<AnimalSummary | null>(null);
-  const [volunteerSummary, setVolunteerSummary] = useState<VolunteerSummary | null>(null);
-  const [procedureSummary, setProcedureSummary] = useState<CareProcedureSummary | null>(null);
-  const [todayProcedures, setTodayProcedures] = useState<CareProcedure[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [volunteersLoading, setVolunteersLoading] = useState(true);
-  const [proceduresLoading, setProceduresLoading] = useState(true);
-  const [proceduresError, setProceduresError] = useState("");
+  const [animals, setAnimals] = useState<SummaryResource<AnimalSummary>>(emptyResource);
+  const [procedures, setProcedures] = useState<SummaryResource<CareProcedureSummary>>(emptyResource);
+  const [volunteers, setVolunteers] = useState<SummaryResource<VolunteerSummary>>(emptyResource);
   const [revision, setRevision] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
-    getHealth(controller.signal).then((health) => {
-      if (!controller.signal.aborted) setSystemState(health.status === "ok" && health.database === "connected" ? "available" : "unavailable");
-    }).catch(() => { if (!controller.signal.aborted) setSystemState("unavailable"); });
-    getAnimalSummary(controller.signal).then((result) => {
-      if (!controller.signal.aborted) { setSummary(result); setLoading(false); }
-    }).catch(() => { if (!controller.signal.aborted) { setSummary(null); setLoading(false); } });
-    getVolunteerSummary(controller.signal).then((result) => {
-      if (!controller.signal.aborted) { setVolunteerSummary(result); setVolunteersLoading(false); }
-    }).catch(() => { if (!controller.signal.aborted) { setVolunteerSummary(null); setVolunteersLoading(false); } });
-    const now = new Date();
-    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-    Promise.all([getCareProcedureSummary(controller.signal), getTodayCareProcedures(today, controller.signal)])
-      .then(([procedureResult, rows]) => {
-        if (!controller.signal.aborted) { setProcedureSummary(procedureResult); setTodayProcedures(rows); setProceduresError(""); setProceduresLoading(false); }
-      }).catch((cause: unknown) => {
-        if (!controller.signal.aborted) { setProcedureSummary(null); setTodayProcedures([]);
-          setProceduresError(cause instanceof Error ? cause.message : "Не удалось загрузить процедуры"); setProceduresLoading(false); }
-      });
+    getAnimalSummary(controller.signal)
+      .then((data) => { if (!controller.signal.aborted) setAnimals({ data, loading: false, error: "" }); })
+      .catch((cause: unknown) => { if (!controller.signal.aborted) setAnimals({ data: null, loading: false, error: errorMessage(cause) }); });
+
+    getCareProcedureSummary(controller.signal)
+      .then((data) => { if (!controller.signal.aborted) setProcedures({ data, loading: false, error: "" }); })
+      .catch((cause: unknown) => { if (!controller.signal.aborted) setProcedures({ data: null, loading: false, error: errorMessage(cause) }); });
+
+    getVolunteerSummary(controller.signal)
+      .then((data) => { if (!controller.signal.aborted) setVolunteers({ data, loading: false, error: "" }); })
+      .catch((cause: unknown) => { if (!controller.signal.aborted) setVolunteers({ data: null, loading: false, error: errorMessage(cause) }); });
+
     return () => controller.abort();
   }, [revision]);
 
-  function retry() { setSystemState("loading"); setLoading(true); setVolunteersLoading(true); setProceduresLoading(true); setRevision((value) => value + 1); }
+  function retry() {
+    setAnimals(emptyResource());
+    setProcedures(emptyResource());
+    setVolunteers(emptyResource());
+    setRevision((value) => value + 1);
+  }
 
   return <div className="home-page">
-    <h1 className="home-page__title">Главная панель</h1>
-    <DashboardMetrics summary={summary} volunteerSummary={volunteerSummary} procedureSummary={procedureSummary}
-      loading={loading} volunteersLoading={volunteersLoading} proceduresLoading={proceduresLoading} />
-    {!loading && !summary && <p className="home-page__error" role="alert">Не удалось загрузить сведения о животных.
-      <button className="home-page__retry" onClick={retry} type="button">Повторить</button></p>}
-    <div className="home-page__workspace">
-      <TodayProcedures procedures={todayProcedures} loading={proceduresLoading} error={proceduresError} onRetry={retry} />
-      <div className="home-page__sidebar">
-        <SystemOverview state={systemState} summary={summary} volunteerSummary={volunteerSummary} procedureSummary={procedureSummary} onRetry={retry} />
-        <QuickActions />
-      </div>
-    </div>
-    <footer className="home-page__footer"><span>© {new Date().getFullYear()} АСУВЦ «Лапка»</span><span>Версия 0.1.0</span></footer>
+    <HomeHero animals={animals} procedures={procedures} volunteers={volunteers}
+      onRetry={retry} />
+    <QuickActions />
+    <AnalyticsLinks />
   </div>;
 }

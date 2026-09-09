@@ -34,14 +34,13 @@ function initialValues(procedure: CareProcedure | null): FormValues {
     planned_time: procedure?.planned_time.slice(0, 5) ?? "",
     duration_minutes: procedure ? String(procedure.duration_minutes) : "30",
     volunteer_id: procedure ? String(procedure.volunteer_id) : "",
-    status: procedure?.status ?? CareProcedureStatus.Assigned,
     comment: procedure?.comment ?? "",
   };
 }
 
 function validate(values: FormValues) {
   const errors: CareProcedureFieldErrors = {};
-  for (const field of ["animal_id", "procedure_type_id", "planned_date", "planned_time", "volunteer_id", "status"] as const) {
+  for (const field of ["animal_id", "procedure_type_id", "planned_date", "planned_time", "volunteer_id"] as const) {
     if (!values[field]) errors[field] = "Обязательное поле";
   }
   if (!values.duration_minutes) errors.duration_minutes = "Обязательное поле";
@@ -106,7 +105,7 @@ export function CareProcedureForm({ procedure, onSave }: Props) {
         animal_id: Number(values.animal_id), procedure_type_id: Number(values.procedure_type_id),
         planned_date: values.planned_date, planned_time: `${values.planned_time}:00`,
         duration_minutes: Number(values.duration_minutes), volunteer_id: Number(values.volunteer_id),
-        status: values.status as CareProcedureStatus, comment: values.comment.trim() || null,
+        comment: values.comment.trim() || null,
       }, shouldAddAnother);
       if (shouldAddAnother && !procedure) {
         setValues(initialValues(null));
@@ -133,13 +132,12 @@ export function CareProcedureForm({ procedure, onSave }: Props) {
   );
   if (procedure && !volunteers.some((item) => item.id === procedure.volunteer_id))
     volunteers.push(procedure.volunteer);
+  const displayedStatus = procedure?.status ?? CareProcedureStatus.Assigned;
 
   return <section className="care-procedure-form" aria-labelledby="care-procedure-form-title">
     <div className="care-procedure-form__heading">
       <div><h2 id="care-procedure-form-title">{procedure ? "Редактирование назначения" : "Новое назначение"}</h2>
         <p>Поля со звёздочкой обязательны. Доступны только животные под опекой и активные волонтёры.</p></div>
-      <span className={`care-procedure-form__status care-procedure-form__status--${values.status}`}>
-        {careProcedureStatusLabels[values.status as CareProcedureStatus]}</span>
     </div>
     <form ref={formRef} onSubmit={submit} noValidate aria-busy={saving}>
       {error && <p className="care-procedure-form__error" role="alert">{error}</p>}
@@ -172,12 +170,9 @@ export function CareProcedureForm({ procedure, onSave }: Props) {
             {volunteers.map((item) => <option key={item.id} value={item.id}>{item.full_name}</option>)}
           </select>
         </FormField>
-        <FormField name="status" idPrefix="care-procedure" label="Статус" required error={errors.status}>
-          <select {...inputProps("status")} required onChange={(event) => change("status", event.target.value)}>
-            {Object.values(CareProcedureStatus).map((status) =>
-              <option key={status} value={status}>{careProcedureStatusLabels[status]}</option>)}
-          </select>
-        </FormField>
+        <div className="care-procedure-form__status-field">
+          <span>Статус:</span> <strong>{careProcedureStatusLabels[displayedStatus]}</strong>
+        </div>
         <div className="care-procedure-form__comment">
           <FormField name="comment" idPrefix="care-procedure" label="Комментарий" error={errors.comment}>
             <textarea {...inputProps("comment")} rows={4} maxLength={255} placeholder="Дополнительные указания"

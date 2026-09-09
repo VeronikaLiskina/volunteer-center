@@ -27,6 +27,8 @@
     &--overdue { color: #a83340; background: #fff0f1; }
   }
   &__edit { padding: 4px 0; border: 0; background: transparent; color: #1251c4; cursor: pointer; }
+  &__actions { display: grid; gap: 7px; }
+  &__execute { width: max-content; padding: 6px 10px; border: 1px solid #91c5a7; border-radius: 6px; background: #f1faf5; color: #187044; cursor: pointer; }
   &__state { padding: 36px 0; color: #566581; }
   &__error { padding: 14px 16px; border-radius: 8px; background: #fff4f5; color: #b52535;
     button { min-height: 38px; padding: 7px 12px; border: 1px solid #b8c8de; border-radius: 6px; background: white; }

@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_session
 from app.models.care_procedure import CareProcedure, CareProcedureStatus
 from app.repositories.care_procedure import CareProcedureRepository
+from app.repositories.procedure_execution import ProcedureExecutionRepository
 from app.schemas.care_procedure import CareProcedureCreate, CareProcedureResponse, CareProcedureSummaryResponse, CareProcedureUpdate
 from app.services.care_procedure import CareProcedureService
 
@@ -39,7 +40,9 @@ async def list_procedures(session: Session, status: CareProcedureStatus | None =
 
 @router.get("/summary", response_model=CareProcedureSummaryResponse)
 async def summary(session: Session) -> CareProcedureSummaryResponse:
-    total, completed = await CareProcedureRepository(session).summary(date.today())
+    today = date.today()
+    total = await CareProcedureRepository(session).count_on_date(today)
+    completed = await ProcedureExecutionRepository(session).count_on_date(today)
     return CareProcedureSummaryResponse(today_total=total, today_completed=completed)
 
 

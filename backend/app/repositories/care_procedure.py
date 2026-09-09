@@ -41,9 +41,9 @@ class CareProcedureRepository:
     def add(self, procedure: CareProcedure) -> None:
         self.session.add(procedure)
 
-    async def summary(self, today: date) -> tuple[int, int]:
-        row = (await self.session.execute(select(
-            func.count(CareProcedure.id),
-            func.count(CareProcedure.id).filter(CareProcedure.status == CareProcedureStatus.COMPLETED),
-        ).where(CareProcedure.planned_date == today))).one()
-        return row[0], row[1]
+    async def count_on_date(self, planned_date: date) -> int:
+        return await self.session.scalar(
+            select(func.count(CareProcedure.id)).where(
+                CareProcedure.planned_date == planned_date
+            )
+        ) or 0

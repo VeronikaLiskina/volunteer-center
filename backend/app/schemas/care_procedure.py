@@ -39,7 +39,6 @@ class CareProcedureCreate(CareProcedureInput):
     planned_time: time
     duration_minutes: Duration
     volunteer_id: PositiveId
-    status: CareProcedureStatus = CareProcedureStatus.ASSIGNED
     comment: Comment | None = None
 
 
@@ -52,6 +51,17 @@ class CareProcedureUpdate(CareProcedureInput):
     volunteer_id: PositiveId | None = None
     status: CareProcedureStatus | None = None
     comment: Comment | None = None
+
+    @field_validator("status")
+    @classmethod
+    def reject_completed_status(
+        cls, value: CareProcedureStatus | None,
+    ) -> CareProcedureStatus | None:
+        if value == CareProcedureStatus.COMPLETED:
+            raise ValueError(
+                "Статус «Выполнена» можно установить только через учёт выполнения"
+            )
+        return value
 
     @model_validator(mode="after")
     def reject_null_required_fields(self) -> Self:

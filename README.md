@@ -1,6 +1,6 @@
 # АСУВЦ «Лапка»
 
-Учебное веб-приложение для управления волонтёрским центром помощи животным. Реализованы главная панель, health-check, учёт животных, волонтёров и планирование процедур ухода. Стек: FastAPI, PostgreSQL, SQLAlchemy AsyncSession, Alembic, React, TypeScript, Vite, SCSS/БЭМ.
+Учебное веб-приложение для управления волонтёрским центром помощи животным. Реализованы главная панель, health-check, учёт животных, волонтёров, планирование и выполнение процедур ухода. Стек: FastAPI, PostgreSQL, SQLAlchemy AsyncSession, Alembic, React, TypeScript, Vite, SCSS/БЭМ.
 
 ## Требования
 
@@ -38,7 +38,7 @@ python -m app.seed
 uvicorn app.main:app --reload
 ```
 
-Миграция `0001_animal_registry` создаёт таблицы животных и справочников, `0002_volunteers` — таблицу волонтёров, `0003_volunteer_duplicate_key` добавляет защиту контактов от конкурентных дублей, а `0004_care_procedures` — типы и плановые процедуры ухода. Seed можно запускать повторно: он добавляет отсутствующие типы животных, породы и типы процедур через `ON CONFLICT DO NOTHING`, не создаёт рабочие записи и не перезаписывает справочники.
+Миграция `0001_animal_registry` создаёт таблицы животных и справочников, `0002_volunteers` — таблицу волонтёров, `0003_volunteer_duplicate_key` добавляет защиту контактов от конкурентных дублей, `0004_care_procedures` — типы и плановые процедуры ухода, а `0005_procedure_executions` — фактические результаты выполнения. Seed можно запускать повторно: он добавляет отсутствующие типы животных, породы и типы процедур через `ON CONFLICT DO NOTHING`, не создаёт рабочие записи и не перезаписывает справочники.
 
 Если PowerShell блокирует активацию окружения, запускайте команды напрямую: `.venv\Scripts\python.exe -m pip install -r requirements.txt`, `.venv\Scripts\python.exe -m alembic upgrade head`, `.venv\Scripts\python.exe -m app.seed`, `.venv\Scripts\python.exe -m uvicorn app.main:app --reload`.
 
@@ -88,9 +88,15 @@ Health-check возвращает `200`, только если API может в
 
 ## Планирование процедур ухода
 
-Список и отдельные страницы формы доступны по маршрутам `/procedures`, `/procedures/new` и `/procedures/{id}/edit`. Процедура связывает животное, тип процедуры и ответственного волонтёра, а также содержит плановую дату/время, целую положительную продолжительность, статус и комментарий до 255 символов. Статусы: `assigned` («Назначена»), `completed` («Выполнена»), `cancelled` («Отменена») и `overdue` («Просрочена»). Сложной машины переходов статусов пока нет.
+Список и отдельные страницы формы доступны по маршрутам `/procedures`, `/procedures/new` и `/procedures/{id}/edit`. Процедура связывает животное, тип процедуры и ответственного волонтёра, а также содержит плановую дату/время, целую положительную продолжительность, статус и комментарий до 255 символов. Статусы: `assigned` («Назначена»), `completed` («Выполнена»), `cancelled` («Отменена») и `overdue` («Просрочена»). При создании статус не принимается от клиента и всегда устанавливается сервером в `assigned`; PATCH не позволяет установить `completed`. Форма отображает статус без возможности редактирования. Переходы статусов появятся вместе с отдельным учётом фактического выполнения.
 
-Новые назначения запрещены для архивных животных и неактивных волонтёров; эти же правила повторно проверяются при `PATCH` ссылочных полей. Форма предлагает только доступные карточки. Seed создаёт четыре типа: «Кормление», «Выгул», «Уборка» и «Обработка». Главная панель получает реальные количества и расписание на текущую дату. Фиксация фактического выполнения и результатов в этот модуль не входит.
+Новые назначения запрещены для архивных животных и неактивных волонтёров; эти же правила повторно проверяются при `PATCH` ссылочных полей. Форма предлагает только доступные карточки. Seed создаёт четыре типа: «Кормление», «Выгул», «Уборка» и «Обработка». Главная панель получает реальные количества и расписание на текущую дату.
+
+## Учёт выполнения процедур
+
+Для процедур в статусе `assigned` или `overdue` в списке доступно действие «Выполнить» и страница `/procedures/{id}/execute`. Сохранение создаёт фактический результат и в той же транзакции переводит процедуру в `completed`. Выполненные и отменённые процедуры выполнить нельзя. Одна процедура имеет не более одного выполнения — это защищено проверкой сервиса и UNIQUE-ограничением PostgreSQL.
+
+Запись выполнения содержит фактические дату и время, обязательный результат, необязательный комментарий до 255 символов и серверное время создания. Результат отображается в карточке процедуры и может быть уточнён через PATCH. Удаления выполнения нет. Показатель «Выполнено сегодня» считается по `procedure_executions.execution_date`, а не по текущему статусу плана.
 
 ## Схема и API
 
@@ -103,6 +109,7 @@ volunteers — самостоятельный реестр команды
 animals              (1) ─── (N) care_procedures
 volunteers           (1) ─── (N) care_procedures
 care_procedure_types (1) ─── (N) care_procedures
+care_procedures      (1) ─── (0..1) procedure_executions
 ```
 
 - `animal_types`: уникальное название типа.
@@ -111,6 +118,7 @@ care_procedure_types (1) ─── (N) care_procedures
 - `volunteers`: ФИО, нормализованный телефон, примечание и enum-статус `active`/`inactive`. CHECK-ограничения защищают непустое ФИО, формат телефона и статус; по статусу создан индекс.
 - `care_procedure_types`: уникальные названия типов процедур.
 - `care_procedures`: плановое назначение с FK на три реестра, enum-статусом и CHECK `duration_minutes > 0`; индексы созданы по дате, статусу, животному и волонтёру.
+- `procedure_executions`: единственный фактический результат процедуры с датой, временем и `created_at`; UNIQUE по `care_procedure_id` исключает повторное выполнение.
 
 | Метод | Путь | Назначение |
 |---|---|---|
@@ -133,10 +141,13 @@ care_procedure_types (1) ─── (N) care_procedures
 | POST | `/api/v1/volunteers/{id}/activate` | Повторная активация |
 | GET | `/api/v1/care-procedure-types` | Seed-справочник типов процедур |
 | GET | `/api/v1/care-procedures` | Список; фильтры `status`, три FK, `date_from`, `date_to`, `limit`, `offset` |
-| GET | `/api/v1/care-procedures/summary` | Количество всех и выполненных процедур на текущую дату backend |
+| GET | `/api/v1/care-procedures/summary` | Планы на сегодня и выполнения с сегодняшней фактической датой |
 | GET | `/api/v1/care-procedures/{id}` | Карточка процедуры со вложенными данными для интерфейса |
 | POST | `/api/v1/care-procedures` | Создание назначения, ответ 201 |
 | PATCH | `/api/v1/care-procedures/{id}` | Частичное редактирование с повторной проверкой связей |
+| GET | `/api/v1/care-procedures/{id}/execution` | Фактический результат; 404, если выполнения нет |
+| POST | `/api/v1/care-procedures/{id}/execute` | Транзакционно создать выполнение и установить `completed` |
+| PATCH | `/api/v1/care-procedures/{id}/execution` | Уточнить фактические дату, время, результат или комментарий |
 
 API удаления нет. Контракты запросов и ответов доступны в Swagger `/docs`.
 
@@ -161,7 +172,7 @@ npx.cmd playwright install chromium
 npm.cmd run test:e2e
 ```
 
-Браузерные тесты сами запускают Vite на `127.0.0.1:5174`. Используют тестовые ответы API и не создают записей в рабочей базе; проверяют оба модуля, формы, фильтры, смену статусов с подтверждением, ошибки сервера и мобильную ширину. Реальную серверную логику и БД проверяет pytest. Скриншоты/трассы сохраняются в игнорируемом `frontend/test-results/`.
+Браузерные тесты сами запускают Vite на `127.0.0.1:5174`. Используют тестовые ответы API и не создают записей в рабочей базе; проверяют основные модули, формы, фильтры, выполнение процедур, ошибки сервера и мобильную ширину. Реальную серверную логику и БД проверяет pytest. Скриншоты/трассы сохраняются в игнорируемом `frontend/test-results/`.
 
 ## Структура модуля и изменения
 
@@ -184,7 +195,8 @@ backend/
   migrations/versions/0002_volunteers.py
   migrations/versions/0003_volunteer_duplicate_key.py
   migrations/versions/0004_care_procedures.py
-  tests/{conftest,test_animals,test_volunteers,test_care_procedures}.py
+  migrations/versions/0005_procedure_executions.py
+  tests/{conftest,test_animals,test_volunteers,test_care_procedures,test_procedure_executions}.py
   pytest.ini
   requirements-dev.txt
 frontend/
@@ -192,9 +204,11 @@ frontend/
     api/{animals,dictionaries}.ts
     api/volunteers.ts
     api/{careProcedures,careProcedureTypes}.ts
+    api/procedureExecutions.ts
     types/animal.ts
     types/volunteer.ts
     types/careProcedure.ts
+    types/procedureExecution.ts
     pages/AnimalsPage/{AnimalsPage.tsx,AnimalsPage.scss}
     components/
       AnimalForm/{AnimalForm.tsx,AnimalForm.scss,validation.ts}
@@ -204,6 +218,8 @@ frontend/
       FormField/{FormField.tsx,FormField.scss}
       CareProcedureForm/{CareProcedureForm.tsx,CareProcedureForm.scss}
       CareProceduresTable/{CareProceduresTable.tsx,CareProceduresTable.scss}
+      ProcedureExecutionForm/{ProcedureExecutionForm.tsx,ProcedureExecutionForm.scss}
+      ProcedureExecutionResult/{ProcedureExecutionResult.tsx,ProcedureExecutionResult.scss}
   tests/{animals,volunteers,procedures}.spec.ts
   playwright.config.ts
 ```

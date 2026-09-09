@@ -41,7 +41,6 @@ async def procedure_data(client, animal_data, **changes):
         "planned_time": "10:30:00",
         "duration_minutes": 30,
         "volunteer_id": volunteer["id"],
-        "status": "assigned",
         "comment": "После прогулки",
     } | changes
 
@@ -51,10 +50,18 @@ async def test_create_and_get_with_references(client, animal_data):
     response = await client.post(API, json=payload)
     assert response.status_code == 201, response.text
     procedure = response.json()
+    assert procedure["status"] == "assigned"
     assert procedure["animal"] == {"id": payload["animal_id"], "name": "Барсик"}
     assert procedure["volunteer"]["full_name"] == "Иванова Анна"
     assert procedure["procedure_type"]["name"] in INITIAL_CARE_PROCEDURE_TYPES
     assert (await client.get(f"{API}/{procedure['id']}")).json() == procedure
+
+
+async def test_create_completed_procedure_is_forbidden(client, animal_data):
+    payload = await procedure_data(client, animal_data)
+    response = await client.post(API, json=payload | {"status": "completed"})
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["loc"][-1] == "status"
 
 
 @pytest.mark.parametrize(
@@ -99,6 +106,9 @@ async def test_patch_and_null_required_field(client, animal_data):
     assert response.json()["status"] == "cancelled"
     assert response.json()["comment"] is None
     assert (await client.patch(f"{API}/{procedure['id']}", json={"animal_id": None})).status_code == 422
+    completed = await client.patch(f"{API}/{procedure['id']}", json={"status": "completed"})
+    assert completed.status_code == 422
+    assert "только через учёт выполнения" in completed.text
 
 
 async def test_patch_revalidates_animal_and_volunteer(client, animal_data):
@@ -119,14 +129,15 @@ async def test_patch_revalidates_animal_and_volunteer(client, animal_data):
 async def test_filters_sorting_and_pagination(client, animal_data):
     first_data = await procedure_data(client, animal_data)
     first = (await client.post(API, json=first_data | {
-        "planned_date": "2026-09-11", "planned_time": "14:00:00", "status": "completed",
+        "planned_date": "2026-09-11", "planned_time": "14:00:00",
     })).json()
+    first = (await client.patch(f"{API}/{first['id']}", json={"status": "cancelled"})).json()
     second = (await client.post(API, json=first_data | {
-        "planned_date": "2026-09-10", "planned_time": "09:00:00", "status": "assigned",
+        "planned_date": "2026-09-10", "planned_time": "09:00:00",
     })).json()
     assert [item["id"] for item in (await client.get(API)).json()] == [second["id"], first["id"]]
     filters = {
-        "status": "completed", "animal_id": first_data["animal_id"],
+        "status": "cancelled", "animal_id": first_data["animal_id"],
         "volunteer_id": first_data["volunteer_id"],
         "procedure_type_id": first_data["procedure_type_id"],
         "date_from": "2026-09-11", "date_to": "2026-09-11",
@@ -139,9 +150,17 @@ async def test_filters_sorting_and_pagination(client, animal_data):
 async def test_summary_uses_backend_current_date(client, animal_data):
     payload = await procedure_data(client, animal_data)
     today = date.today().isoformat()
-    await client.post(API, json=payload | {"planned_date": today, "status": "assigned"})
-    await client.post(API, json=payload | {"planned_date": today, "status": "completed"})
-    await client.post(API, json=payload | {"planned_date": "2099-01-01", "status": "completed"})
+    await client.post(API, json=payload | {"planned_date": today})
+    completed = (await client.post(API, json=payload | {"planned_date": today})).json()
+    future = (await client.post(API, json=payload | {"planned_date": "2099-01-01"})).json()
+    execution = {
+        "execution_date": today,
+        "execution_time": "12:00:00",
+        "result": "Выполнено",
+        "comment": None,
+    }
+    await client.post(f"{API}/{completed['id']}/execute", json=execution)
+    await client.post(f"{API}/{future['id']}/execute", json=execution | {"execution_date": "2099-01-01"})
     assert (await client.get(f"{API}/summary")).json() == {
         "today_total": 2, "today_completed": 1,
     }

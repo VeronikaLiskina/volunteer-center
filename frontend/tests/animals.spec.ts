@@ -47,7 +47,7 @@ test.beforeEach(async ({ page }) => {
 
 test("navigation, field validation, dependent breed, save, edit, confirmation and archive", async ({ page }, testInfo) => {
   await page.goto("/");
-  await expect(page.getByText("Система работает", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Забота сегодня. Лучшее завтра." })).toBeVisible();
   await page.getByRole("link", { name: "Животные", exact: true }).click();
   await expect(page).toHaveURL(/\/animals$/);
   await expect(page.getByRole("link", { name: /Добавить животное/ })).toBeVisible();
@@ -146,29 +146,56 @@ test("dashboard matches layout, displays API counts and opens animal sections", 
   await page.route("**/api/v1/care-procedures?*", (route) => route.fulfill({ json: [] }));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Главная панель" })).toBeVisible();
-  await expect(page.locator(".dashboard-metrics__card")).toHaveCount(4);
-  await expect(page.locator(".dashboard-metrics__value").first()).toHaveText("3");
-  await expect(page.locator(".dashboard-metrics__value").nth(1)).toHaveText("4");
-  await expect(page.locator(".dashboard-metrics__value").nth(2)).toHaveText("2");
-  await expect(page.locator(".dashboard-metrics__value").last()).toHaveText("5");
-  await expect(page.getByText("Под опекой: 3 · В архиве: 1")).toBeVisible();
-  await expect(page.getByText("Активны: 5 · Неактивны: 2")).toBeVisible();
-  await expect(page.getByRole("link", { name: /Карточка животного/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Справочники/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Забота сегодня. Лучшее завтра." })).toBeVisible();
+  await expect(page.locator(".home-stats__item")).toHaveCount(4);
+  await expect(page.locator(".home-stats__value").first()).toHaveText("3");
+  await expect(page.locator(".home-stats__value").nth(1)).toHaveText("4");
+  await expect(page.locator(".home-stats__value").nth(2)).toHaveText("2");
+  await expect(page.locator(".home-stats__value").last()).toHaveText("5");
+  await expect(page.locator(".quick-action")).toHaveCount(4);
+  await expect(page.locator(".analytics-link")).toHaveCount(2);
+  await expect(page.getByText("Процедуры на сегодня", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Состояние системы", { exact: true })).toHaveCount(0);
   await page.screenshot({ path: testInfo.outputPath("dashboard-desktop.png"), fullPage: true });
   await page.setViewportSize({ width: 375, height: 812 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath("dashboard-mobile.png"), fullPage: true });
-  await page.getByRole("link", { name: /Карточка животного/ }).click();
-  await expect(page).toHaveURL(/\/animals\/new$/);
-  await expect(page.getByRole("link", { name: "Закрыть и вернуться к списку животных" })).toBeVisible();
-  await page.getByRole("link", { name: "Закрыть и вернуться к списку животных" }).click();
-  await expect(page).toHaveURL(/\/animals$/);
+
+  for (const [title, path] of [
+    ["Добавить животное", "/animals/new"],
+    ["Назначить процедуру", "/procedures/new"],
+    ["Добавить волонтёра", "/volunteers/new"],
+    ["Справочники", "/animals/dictionaries"],
+  ] as const) {
+    await page.goto("/");
+    await page.locator(".quick-action").filter({ hasText: title }).click();
+    await expect(page).toHaveURL(new RegExp(`${path.replaceAll("/", "\\/")}$`));
+  }
+
+  for (const [title, path] of [["Аналитика", "/analytics"], ["Отчёты", "/reports"]] as const) {
+    await page.goto("/");
+    await page.locator(".analytics-link").filter({ hasText: title }).click();
+    await expect(page).toHaveURL(new RegExp(`${path}$`));
+  }
+});
+
+test("dashboard keeps its layout while statistics load and handles a partial API error", async ({ page }) => {
+  let releaseRequests: () => void = () => undefined;
+  const gate = new Promise<void>((resolve) => { releaseRequests = resolve; });
+  await page.route("**/api/v1/animals/summary", async (route) => { await gate; await route.fulfill({ json: { total: 8, in_care: 7, archived: 1 } }); });
+  await page.route("**/api/v1/volunteers/summary", async (route) => { await gate; await route.fulfill({ json: { total: 6, active: 5, inactive: 1 } }); });
+  await page.route("**/api/v1/care-procedures/summary", async (route) => { await gate; await route.fulfill({ json: { today_total: 4, today_completed: 3 } }); });
   await page.goto("/");
-  await page.getByRole("link", { name: /Справочники/ }).click();
-  await expect(page).toHaveURL(/\/animals\/dictionaries$/);
-  await expect(page.getByRole("heading", { name: "Справочники", exact: true })).toBeFocused();
-  await page.getByRole("link", { name: "Закрыть справочники и вернуться к списку животных" }).click();
-  await expect(page).toHaveURL(/\/animals$/);
+  await expect(page.locator(".home-stats__skeleton")).toHaveCount(4);
+  await expect(page.locator(".home-stats")).toBeVisible();
+  releaseRequests();
+  await expect(page.locator(".home-stats__value")).toHaveText(["7", "4", "3", "5"]);
+
+  await page.route("**/api/v1/animals/summary", (route) => route.fulfill({ status: 503, json: { detail: "Статистика животных недоступна" } }));
+  await page.route("**/api/v1/volunteers/summary", (route) => route.fulfill({ json: { total: 6, active: 5, inactive: 1 } }));
+  await page.route("**/api/v1/care-procedures/summary", (route) => route.fulfill({ json: { today_total: 4, today_completed: 3 } }));
+  await page.reload();
+  await expect(page.getByRole("alert")).toContainText("Часть статистики недоступна");
+  await expect(page.locator(".home-stats__value")).toHaveText(["—", "4", "3", "5"]);
+  await expect(page.locator(".quick-action")).toHaveCount(4);
 });
