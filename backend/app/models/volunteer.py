@@ -16,7 +16,7 @@ class Volunteer(Base):
     __table_args__ = (
         CheckConstraint("btrim(full_name) <> ''", name="ck_volunteers_full_name_not_blank"),
         CheckConstraint("phone ~ '^\\+7[0-9]{10}$'", name="ck_volunteers_phone_normalized"),
-        UniqueConstraint("full_name", "phone", name="uq_volunteers_full_name_phone"),
+        UniqueConstraint("duplicate_key", name="uq_volunteers_duplicate_key"),
         Index("ix_volunteers_status", "status"),
     )
 
@@ -30,3 +30,5 @@ class Volunteer(Base):
         server_default=VolunteerStatus.ACTIVE.value,
     )
     note: Mapped[str | None] = mapped_column(String(255))
+    # Server-generated fingerprint, deliberately absent from public API schemas.
+    duplicate_key: Mapped[str] = mapped_column(String(64))

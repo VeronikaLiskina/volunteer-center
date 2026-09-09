@@ -5,6 +5,7 @@ from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError
 
 from app.models import Volunteer, VolunteerStatus
+from app.services.volunteer import volunteer_duplicate_key
 
 API = "/api/v1/volunteers"
 
@@ -29,6 +30,7 @@ async def test_create_normalizes_phone_and_gets_card(client, volunteer_data):
         "status": "active",
         "note": "Помогает по выходным",
     }
+    assert "duplicate_key" not in volunteer
     assert (await client.get(f"{API}/{volunteer['id']}")).json() == volunteer
 
 
@@ -120,8 +122,10 @@ async def test_database_unique_contact_constraint(client, volunteer_data, sessio
     original = await session.scalar(select(Volunteer).where(Volunteer.id == volunteer["id"]))
     with pytest.raises(IntegrityError):
         async with session.begin_nested():
-            session.add(Volunteer(full_name=original.full_name, phone=original.phone,
-                                  status=VolunteerStatus.ACTIVE))
+            duplicate_name = original.full_name.swapcase()
+            session.add(Volunteer(full_name=duplicate_name, phone=original.phone,
+                                  status=VolunteerStatus.ACTIVE,
+                                  duplicate_key=volunteer_duplicate_key(duplicate_name, original.phone)))
             await session.flush()
 
 

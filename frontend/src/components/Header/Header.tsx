@@ -21,6 +21,7 @@ export function Header() {
         <nav className="header__navigation" aria-label="Главная навигация">
           <NavLink to="/" end className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Главная</NavLink>
           <NavLink to="/animals" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Животные</NavLink>
+          <NavLink to="/procedures" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Процедуры</NavLink>
           <NavLink to="/volunteers" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Волонтёры</NavLink>
         </nav>
         <div className="header__account">

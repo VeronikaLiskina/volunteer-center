@@ -1,6 +1,6 @@
 # АСУВЦ «Лапка»
 
-Учебное веб-приложение для управления волонтёрским центром помощи животным. Реализованы главная панель, health-check, учёт животных и учёт волонтёров. Стек: FastAPI, PostgreSQL, SQLAlchemy AsyncSession, Alembic, React, TypeScript, Vite, SCSS/БЭМ.
+Учебное веб-приложение для управления волонтёрским центром помощи животным. Реализованы главная панель, health-check, учёт животных, волонтёров и планирование процедур ухода. Стек: FastAPI, PostgreSQL, SQLAlchemy AsyncSession, Alembic, React, TypeScript, Vite, SCSS/БЭМ.
 
 ## Требования
 
@@ -38,7 +38,7 @@ python -m app.seed
 uvicorn app.main:app --reload
 ```
 
-Миграция `0001_animal_registry` создаёт таблицы животных и справочников, следующая миграция `0002_volunteers` — таблицу волонтёров. Seed можно запускать повторно: он добавляет отсутствующие типы и породы через `ON CONFLICT DO NOTHING`, не создаёт животных или волонтёров и не перезаписывает справочники.
+Миграция `0001_animal_registry` создаёт таблицы животных и справочников, `0002_volunteers` — таблицу волонтёров, `0003_volunteer_duplicate_key` добавляет защиту контактов от конкурентных дублей, а `0004_care_procedures` — типы и плановые процедуры ухода. Seed можно запускать повторно: он добавляет отсутствующие типы животных, породы и типы процедур через `ON CONFLICT DO NOTHING`, не создаёт рабочие записи и не перезаписывает справочники.
 
 Если PowerShell блокирует активацию окружения, запускайте команды напрямую: `.venv\Scripts\python.exe -m pip install -r requirements.txt`, `.venv\Scripts\python.exe -m alembic upgrade head`, `.venv\Scripts\python.exe -m app.seed`, `.venv\Scripts\python.exe -m uvicorn app.main:app --reload`.
 
@@ -58,6 +58,7 @@ URL backend берётся из `VITE_API_URL`; пример — в `frontend/.e
 - приложение: http://localhost:5173
 - учёт животных: http://localhost:5173/animals
 - учёт волонтёров: http://localhost:5173/volunteers
+- планирование процедур: http://localhost:5173/procedures
 - health-check API: http://localhost:8000/api/v1/health
 - Swagger UI: http://localhost:8000/docs
 
@@ -83,7 +84,13 @@ Health-check возвращает `200`, только если API может в
 
 Новый волонтёр всегда создаётся со статусом `active` («Активен»). Статус нельзя передать в `POST` или обычный `PATCH`: он изменяется только действиями активации и деактивации. Деактивация требует подтверждения, не удаляет запись и идемпотентна; неактивные волонтёры не возвращаются endpoint-ом `/volunteers/active`. Физического удаления нет.
 
-Телефон принимается в форматах `+7 (999) 123-45-67`, `89991234567` и аналогичных, а хранится как `+79991234567`. ФИО очищается от лишних пробелов. Совпадение нормализованного телефона и ФИО без учёта регистра считается очевидным дубликатом и возвращает `409`. Невалидные данные возвращают `422`, отсутствующая карточка — `404`.
+Телефон принимается в форматах `+7 (999) 123-45-67`, `89991234567` и аналогичных, а хранится как `+79991234567`. ФИО очищается от лишних пробелов. Совпадение нормализованного телефона и ФИО без учёта регистра считается очевидным дубликатом и возвращает `409`; SHA-256 `duplicate_key` дополнительно защищён UNIQUE-ограничением PostgreSQL и не попадает в API. Невалидные данные возвращают `422`, отсутствующая карточка — `404`.
+
+## Планирование процедур ухода
+
+Список и отдельные страницы формы доступны по маршрутам `/procedures`, `/procedures/new` и `/procedures/{id}/edit`. Процедура связывает животное, тип процедуры и ответственного волонтёра, а также содержит плановую дату/время, целую положительную продолжительность, статус и комментарий до 255 символов. Статусы: `assigned` («Назначена»), `completed` («Выполнена»), `cancelled` («Отменена») и `overdue` («Просрочена»). Сложной машины переходов статусов пока нет.
+
+Новые назначения запрещены для архивных животных и неактивных волонтёров; эти же правила повторно проверяются при `PATCH` ссылочных полей. Форма предлагает только доступные карточки. Seed создаёт четыре типа: «Кормление», «Выгул», «Уборка» и «Обработка». Главная панель получает реальные количества и расписание на текущую дату. Фиксация фактического выполнения и результатов в этот модуль не входит.
 
 ## Схема и API
 
@@ -93,12 +100,17 @@ animal_types (1) ─── (N) animals
 breeds       (1) ─── (N) animals
 
 volunteers — самостоятельный реестр команды
+animals              (1) ─── (N) care_procedures
+volunteers           (1) ─── (N) care_procedures
+care_procedure_types (1) ─── (N) care_procedures
 ```
 
 - `animal_types`: уникальное название типа.
 - `breeds`: тип, название, необязательные границы веса. Название уникально внутри типа; границы пока не задаются seed и не используются как медицинские ограничения.
 - `animals`: карточка с весом, годом рождения, контактами, примечанием, enum-статусом и внутренним ключом дубликата. Составной FK `(breed_id, animal_type_id)` гарантирует принадлежность породы выбранному типу даже при прямой записи в БД. CHECK-ограничения защищают вес, год и статус.
 - `volunteers`: ФИО, нормализованный телефон, примечание и enum-статус `active`/`inactive`. CHECK-ограничения защищают непустое ФИО, формат телефона и статус; по статусу создан индекс.
+- `care_procedure_types`: уникальные названия типов процедур.
+- `care_procedures`: плановое назначение с FK на три реестра, enum-статусом и CHECK `duration_minutes > 0`; индексы созданы по дате, статусу, животному и волонтёру.
 
 | Метод | Путь | Назначение |
 |---|---|---|
@@ -119,6 +131,12 @@ volunteers — самостоятельный реестр команды
 | PATCH | `/api/v1/volunteers/{id}` | Частичное редактирование контактов и примечания |
 | POST | `/api/v1/volunteers/{id}/deactivate` | Деактивация без удаления |
 | POST | `/api/v1/volunteers/{id}/activate` | Повторная активация |
+| GET | `/api/v1/care-procedure-types` | Seed-справочник типов процедур |
+| GET | `/api/v1/care-procedures` | Список; фильтры `status`, три FK, `date_from`, `date_to`, `limit`, `offset` |
+| GET | `/api/v1/care-procedures/summary` | Количество всех и выполненных процедур на текущую дату backend |
+| GET | `/api/v1/care-procedures/{id}` | Карточка процедуры со вложенными данными для интерфейса |
+| POST | `/api/v1/care-procedures` | Создание назначения, ответ 201 |
+| PATCH | `/api/v1/care-procedures/{id}` | Частичное редактирование с повторной проверкой связей |
 
 API удаления нет. Контракты запросов и ответов доступны в Swagger `/docs`.
 
@@ -164,15 +182,19 @@ backend/
     seed.py
   migrations/versions/0001_animal_registry.py
   migrations/versions/0002_volunteers.py
-  tests/{conftest,test_animals,test_volunteers}.py
+  migrations/versions/0003_volunteer_duplicate_key.py
+  migrations/versions/0004_care_procedures.py
+  tests/{conftest,test_animals,test_volunteers,test_care_procedures}.py
   pytest.ini
   requirements-dev.txt
 frontend/
   src/
     api/{animals,dictionaries}.ts
     api/volunteers.ts
+    api/{careProcedures,careProcedureTypes}.ts
     types/animal.ts
     types/volunteer.ts
+    types/careProcedure.ts
     pages/AnimalsPage/{AnimalsPage.tsx,AnimalsPage.scss}
     components/
       AnimalForm/{AnimalForm.tsx,AnimalForm.scss,validation.ts}
@@ -180,7 +202,9 @@ frontend/
       VolunteerForm/{VolunteerForm.tsx,VolunteerForm.scss,validation.ts}
       VolunteersTable/{VolunteersTable.tsx,VolunteersTable.scss}
       FormField/{FormField.tsx,FormField.scss}
-  tests/{animals,volunteers}.spec.ts
+      CareProcedureForm/{CareProcedureForm.tsx,CareProcedureForm.scss}
+      CareProceduresTable/{CareProceduresTable.tsx,CareProceduresTable.scss}
+  tests/{animals,volunteers,procedures}.spec.ts
   playwright.config.ts
 ```
 

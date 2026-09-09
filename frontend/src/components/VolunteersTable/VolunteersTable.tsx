@@ -72,7 +72,7 @@ export function VolunteersTable({ volunteers, filters, loading, error, onFilters
     <div className="volunteers-table__heading-row">
       <div><h2 className="volunteers-table__title" id="volunteers-list-title">Список волонтёров</h2>
         <p className="volunteers-table__caption">Контактные данные и текущий статус команды</p></div>
-      {!loading && !error && <span className="volunteers-table__count">Найдено: {rows.length}</span>}
+      {!loading && !error && <span className="volunteers-table__count">На странице: {rows.length}</span>}
     </div>
     <form className="volunteers-table__filters" onSubmit={(event) => {
       event.preventDefault();

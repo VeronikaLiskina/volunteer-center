@@ -2,29 +2,40 @@ import { Link } from "react-router-dom";
 import { Icon } from "../Icon/Icon";
 import type { AnimalSummary } from "../../types/animal";
 import type { VolunteerSummary } from "../../types/volunteer";
+import { careProcedureStatusLabels, type CareProcedure, type CareProcedureSummary } from "../../types/careProcedure";
 import type { SystemState } from "../SystemStatus/SystemStatus";
 import "./DashboardPanels.scss";
 
-export function TodayProcedures() {
+export function TodayProcedures({ procedures, loading, error, onRetry }: {
+  procedures: CareProcedure[]; loading: boolean; error: string; onRetry: () => void;
+}) {
   return <section className="today-procedures" aria-labelledby="today-procedures-title">
     <h2 className="today-procedures__title" id="today-procedures-title">Процедуры на сегодня</h2>
     <div className="today-procedures__scroll">
       <table className="today-procedures__table">
         <thead><tr>{["Время", "Животное", "Процедура", "Волонтёр", "Статус"].map((title) =>
           <th scope="col" key={title}>{title}</th>)}</tr></thead>
-        <tbody><tr><td colSpan={5} className="today-procedures__empty">
+        <tbody>{loading ? <tr><td colSpan={5} className="today-procedures__state" role="status">Загружаем расписание…</td></tr>
+          : error ? <tr><td colSpan={5} className="today-procedures__state today-procedures__state--error" role="alert">{error}
+            <button type="button" onClick={onRetry}>Повторить</button></td></tr>
+          : procedures.length ? procedures.map((item) => <tr className="today-procedures__row" key={item.id}>
+            <td>{item.planned_time.slice(0, 5)}</td><td><strong>{item.animal.name}</strong></td>
+            <td>{item.procedure_type.name}</td><td>{item.volunteer.full_name}</td>
+            <td><span className={`today-procedures__status today-procedures__status--${item.status}`}>{careProcedureStatusLabels[item.status]}</span></td>
+          </tr>) : <tr><td colSpan={5} className="today-procedures__empty">
           <span className="today-procedures__empty-icon"><Icon name="calendar" /></span>
-          <p className="today-procedures__empty-title">Здесь появится план заботы на день</p>
-          <p className="today-procedures__empty-description">Расписание станет доступно после подключения<br />модуля планирования процедур.</p>
-        </td></tr></tbody>
+          <p className="today-procedures__empty-title">На сегодня процедур нет</p>
+          <p className="today-procedures__empty-description">Создайте назначение, чтобы оно появилось в расписании.</p>
+        </td></tr>}</tbody>
       </table>
     </div>
-    <span className="today-procedures__footer">Все процедуры <Icon name="arrow" /><span className="today-procedures__soon">Скоро</span></span>
+    <Link className="today-procedures__footer" to="/procedures">Все процедуры <Icon name="arrow" /></Link>
   </section>;
 }
 
-export function SystemOverview({ state, summary, volunteerSummary, onRetry }: {
-  state: SystemState; summary: AnimalSummary | null; volunteerSummary: VolunteerSummary | null; onRetry: () => void;
+export function SystemOverview({ state, summary, volunteerSummary, procedureSummary, onRetry }: {
+  state: SystemState; summary: AnimalSummary | null; volunteerSummary: VolunteerSummary | null;
+  procedureSummary: CareProcedureSummary | null; onRetry: () => void;
 }) {
   const systemText = { loading: "Проверяем подключение…", available: "Система работает", unavailable: "Сервис временно недоступен" }[state];
   return <section className="system-overview" aria-labelledby="system-overview-title">
@@ -44,7 +55,9 @@ export function SystemOverview({ state, summary, volunteerSummary, onRetry }: {
       </div></li>
       <li className="system-overview__item"><Icon name="calendar" /><div>
         <p className="system-overview__label">Планирование процедур</p>
-        <p className="system-overview__description">Модуль пока не подключён</p>
+        <p className="system-overview__description">{procedureSummary
+          ? `Сегодня: ${procedureSummary.today_total} · Выполнено: ${procedureSummary.today_completed}`
+          : "Сведения о расписании временно недоступны"}</p>
       </div></li>
       <li className="system-overview__item"><Icon name="user" /><div>
         <p className="system-overview__label">Команда волонтёров</p>
@@ -81,6 +94,14 @@ export function QuickActions() {
         <span className="quick-actions__content">
           <strong className="quick-actions__label">Карточка волонтёра</strong>
           <span className="quick-actions__description">Добавить участника команды</span>
+        </span>
+        <Icon name="arrow" />
+      </Link>
+      <Link className="quick-actions__action" to="/procedures/new">
+        <span className="quick-actions__icon"><Icon name="calendar" /></span>
+        <span className="quick-actions__content">
+          <strong className="quick-actions__label">Назначить процедуру</strong>
+          <span className="quick-actions__description">Добавить задачу в план ухода</span>
         </span>
         <Icon name="arrow" />
       </Link>

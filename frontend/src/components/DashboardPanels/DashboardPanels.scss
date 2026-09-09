@@ -10,7 +10,18 @@
   &__empty-icon { display: inline-grid; place-items: center; width: 56px; height: 56px; border-radius: 16px; color: #93b9fa; background: #f2f7ff; .icon { width: 30px; height: 30px; } }
   &__empty-title { margin: 18px 0 8px; font-size: 17px; font-weight: 500; }
   &__empty-description { margin: 0; font-size: 14px; color: #6a7b98; line-height: 1.7; }
-  &__footer { display: flex; align-items: center; gap: 10px; margin-top: 22px; color: #6a7b98; font-size: 14px; .icon { width: 16px; height: 16px; } }
+  &__row td { padding: 15px 14px; border-bottom: 1px solid $color-border; vertical-align: middle; }
+  &__status { display: inline-block; padding: 5px 8px; border-radius: 999px; font-size: 12px; white-space: nowrap;
+    &--assigned { color: #1251c4; background: #eaf2ff; }
+    &--completed { color: #187044; background: #eaf8ef; }
+    &--cancelled { color: #667085; background: #eef1f5; }
+    &--overdue { color: #a83340; background: #fff0f1; }
+  }
+  &__state { padding: 44px 20px; color: #6a7b98; text-align: center;
+    &--error { color: #b52535; }
+    button { margin-left: 12px; padding: 6px 10px; border: 1px solid #b8c8de; border-radius: 6px; background: white; cursor: pointer; }
+  }
+  &__footer { display: flex; align-items: center; gap: 10px; width: max-content; margin-top: 22px; color: #1251c4; font-size: 14px; text-decoration: none; .icon { width: 16px; height: 16px; } }
   &__soon { border-radius: 4px; padding: 4px 8px; background: #f2f5fa; font-size: 12px; }
 }
 .system-overview {

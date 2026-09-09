@@ -142,11 +142,15 @@ test("mobile layout and direct route", async ({ page }, testInfo) => {
 test("dashboard matches layout, displays API counts and opens animal sections", async ({ page }, testInfo) => {
   await page.route("**/api/v1/animals/summary", (route) => route.fulfill({ json: { total: 4, in_care: 3, archived: 1 } }));
   await page.route("**/api/v1/volunteers/summary", (route) => route.fulfill({ json: { total: 7, active: 5, inactive: 2 } }));
+  await page.route("**/api/v1/care-procedures/summary", (route) => route.fulfill({ json: { today_total: 4, today_completed: 2 } }));
+  await page.route("**/api/v1/care-procedures?*", (route) => route.fulfill({ json: [] }));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Главная панель" })).toBeVisible();
   await expect(page.locator(".dashboard-metrics__card")).toHaveCount(4);
   await expect(page.locator(".dashboard-metrics__value").first()).toHaveText("3");
+  await expect(page.locator(".dashboard-metrics__value").nth(1)).toHaveText("4");
+  await expect(page.locator(".dashboard-metrics__value").nth(2)).toHaveText("2");
   await expect(page.locator(".dashboard-metrics__value").last()).toHaveText("5");
   await expect(page.getByText("Под опекой: 3 · В архиве: 1")).toBeVisible();
   await expect(page.getByText("Активны: 5 · Неактивны: 2")).toBeVisible();

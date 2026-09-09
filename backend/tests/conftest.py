@@ -12,7 +12,7 @@ from sqlalchemy.pool import NullPool
 from app.core.config import settings
 from app.db.session import get_session
 from app.main import app
-from app.repositories.seed import seed_dictionaries
+from app.repositories.seed import seed_care_procedure_types, seed_dictionaries
 
 
 @pytest.fixture
@@ -46,6 +46,7 @@ async def session(db_connection) -> AsyncIterator[AsyncSession]:
     async with AsyncSession(bind=db_connection, expire_on_commit=False,
                             join_transaction_mode="create_savepoint") as session:
         await seed_dictionaries(session)
+        await seed_care_procedure_types(session)
         await session.commit()
         yield session
 

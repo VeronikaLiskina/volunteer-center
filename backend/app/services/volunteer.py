@@ -1,3 +1,5 @@
+import hashlib
+
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -5,6 +7,11 @@ from app.core.errors import VolunteerError
 from app.models.volunteer import Volunteer, VolunteerStatus
 from app.repositories.volunteer import VolunteerRepository
 from app.schemas.volunteer import VolunteerCreate, VolunteerUpdate
+
+
+def volunteer_duplicate_key(full_name: str, phone: str) -> str:
+    normalized_name = " ".join(full_name.casefold().split())
+    return hashlib.sha256(f"{normalized_name}\0{phone}".encode()).hexdigest()
 
 
 class VolunteerService:
@@ -19,7 +26,8 @@ class VolunteerService:
         return volunteer
 
     async def check_duplicate(self, full_name: str, phone: str, exclude_id: int | None = None) -> None:
-        if await self.repository.find_duplicate(full_name, phone, exclude_id):
+        key = volunteer_duplicate_key(full_name, phone)
+        if await self.repository.find_duplicate(key, exclude_id):
             raise VolunteerError("Волонтёр с такими ФИО и телефоном уже существует", 409)
 
     async def commit(self) -> None:
@@ -31,7 +39,8 @@ class VolunteerService:
 
     async def create(self, data: VolunteerCreate) -> Volunteer:
         await self.check_duplicate(data.full_name, data.phone)
-        volunteer = Volunteer(**data.model_dump(), status=VolunteerStatus.ACTIVE)
+        volunteer = Volunteer(**data.model_dump(), status=VolunteerStatus.ACTIVE,
+                              duplicate_key=volunteer_duplicate_key(data.full_name, data.phone))
         self.repository.add(volunteer)
         await self.commit()
         return await self.get(volunteer.id)
@@ -43,6 +52,7 @@ class VolunteerService:
         await self.check_duplicate(data.full_name, data.phone, volunteer_id)
         for field, value in data.model_dump().items():
             setattr(volunteer, field, value)
+        volunteer.duplicate_key = volunteer_duplicate_key(data.full_name, data.phone)
         await self.commit()
         return await self.get(volunteer_id)
 

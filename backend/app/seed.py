@@ -2,14 +2,15 @@
 import asyncio
 
 from app.db.session import async_session_factory, engine
-from app.repositories.seed import seed_dictionaries
+from app.repositories.seed import seed_care_procedure_types, seed_dictionaries
 
 
 async def main() -> None:
     try:
         async with async_session_factory.begin() as session:
             await seed_dictionaries(session)
-        print("Справочники типов животных и пород готовы.")
+            await seed_care_procedure_types(session)
+        print("Справочники животных, пород и процедур готовы.")
     finally:
         await engine.dispose()
 

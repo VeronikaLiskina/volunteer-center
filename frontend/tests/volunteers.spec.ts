@@ -85,6 +85,7 @@ test("volunteer creation, editing, deactivation, activation and filtering", asyn
   await expect(page.getByText("Волонтёры не найдены", { exact: true })).toBeVisible();
   await page.getByLabel("Статус").selectOption("active");
   await expect(page.getByRole("cell", { name: "Активен", exact: true })).toBeVisible();
+  await expect(page.getByText("На странице: 1", { exact: true })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("volunteers-desktop.png"), fullPage: true });
 
   await page.setViewportSize({ width: 375, height: 812 });

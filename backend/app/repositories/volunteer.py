@@ -34,13 +34,8 @@ class VolunteerRepository:
             query = query.with_for_update(of=Volunteer)
         return await self.session.scalar(query)
 
-    async def find_duplicate(
-        self, full_name: str, phone: str, exclude_id: int | None = None,
-    ) -> Volunteer | None:
-        query = select(Volunteer).where(
-            func.lower(Volunteer.full_name) == full_name.casefold(),
-            Volunteer.phone == phone,
-        )
+    async def find_duplicate(self, key: str, exclude_id: int | None = None) -> Volunteer | None:
+        query = select(Volunteer).where(Volunteer.duplicate_key == key)
         if exclude_id is not None:
             query = query.where(Volunteer.id != exclude_id)
         return await self.session.scalar(query)

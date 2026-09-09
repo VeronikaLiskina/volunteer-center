@@ -30,11 +30,16 @@ export function VolunteersPage() {
         if (!controller.signal.aborted) setList({ data: [],
           error: cause instanceof Error ? cause.message : "Не удалось загрузить волонтёров", key: listKey });
       });
+    return () => controller.abort();
+  }, [filters, listKey]);
+
+  useEffect(() => {
+    const controller = new AbortController();
     getVolunteerSummary(controller.signal)
       .then((data) => { if (!controller.signal.aborted) setSummary(data); })
       .catch(() => { if (!controller.signal.aborted) setSummary(null); });
     return () => controller.abort();
-  }, [filters, listKey]);
+  }, [revision]);
 
   async function changeStatus(volunteer: Volunteer, status: VolunteerStatus) {
     const saved = status === VolunteerStatus.Active

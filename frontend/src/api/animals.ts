@@ -13,6 +13,12 @@ export function getAnimals(filters: AnimalFilters, signal?: AbortSignal) {
   return request<Animal[]>(`/animals?${params}`, { signal });
 }
 
+export const getAssignableAnimals = (signal?: AbortSignal) =>
+  request<Animal[]>("/animals?status=in_care&limit=100&offset=0", { signal });
+
+export const getAnimalOptions = (signal?: AbortSignal) =>
+  request<Animal[]>("/animals?limit=100&offset=0", { signal });
+
 export const getAnimal = (id: number) => request<Animal>(`/animals/${id}`);
 export const createAnimal = (data: AnimalCreate) =>
   request<Animal>("/animals", { method: "POST", body: JSON.stringify(data) });

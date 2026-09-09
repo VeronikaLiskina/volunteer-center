@@ -9,6 +9,9 @@ export const getVolunteerSummary = (signal?: AbortSignal) =>
 export const getActiveVolunteers = (signal?: AbortSignal) =>
   request<Volunteer[]>("/volunteers/active", { signal });
 
+export const getVolunteerOptions = (signal?: AbortSignal) =>
+  request<Volunteer[]>("/volunteers?limit=100&offset=0", { signal });
+
 export function getVolunteers(filters: VolunteerFilters, signal?: AbortSignal) {
   const params = new URLSearchParams({ limit: String(VOLUNTEERS_PAGE_SIZE + 1), offset: String(filters.offset) });
   if (filters.search) params.set("search", filters.search);
@@ -16,7 +19,8 @@ export function getVolunteers(filters: VolunteerFilters, signal?: AbortSignal) {
   return request<Volunteer[]>(`/volunteers?${params}`, { signal });
 }
 
-export const getVolunteer = (id: number) => request<Volunteer>(`/volunteers/${id}`);
+export const getVolunteer = (id: number, signal?: AbortSignal) =>
+  request<Volunteer>(`/volunteers/${id}`, { signal });
 export const createVolunteer = (data: VolunteerCreate) =>
   request<Volunteer>("/volunteers", { method: "POST", body: JSON.stringify(data) });
 export const updateVolunteer = (id: number, data: VolunteerUpdate) =>

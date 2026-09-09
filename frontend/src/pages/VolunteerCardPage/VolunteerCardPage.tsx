@@ -21,7 +21,7 @@ export function VolunteerCardPage() {
     const request = !isEditRoute
       ? Promise.resolve(null)
       : hasValidEditId
-        ? getVolunteer(editId)
+        ? getVolunteer(editId, controller.signal)
         : Promise.reject(new Error("Некорректный номер карточки"));
     request.then((volunteer) => {
       if (!controller.signal.aborted) setResource({ volunteer, error: "", key: `${requestKey}-${revision}` });

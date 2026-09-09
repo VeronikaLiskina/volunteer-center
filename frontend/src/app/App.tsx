@@ -5,6 +5,8 @@ import { AnimalCardPage } from "../pages/AnimalCardPage/AnimalCardPage";
 import { DictionariesPage } from "../pages/DictionariesPage/DictionariesPage";
 import { VolunteersPage } from "../pages/VolunteersPage/VolunteersPage";
 import { VolunteerCardPage } from "../pages/VolunteerCardPage/VolunteerCardPage";
+import { CareProceduresPage } from "../pages/CareProceduresPage/CareProceduresPage";
+import { CareProcedureCardPage } from "../pages/CareProcedureCardPage/CareProcedureCardPage";
 import { Link, Route, Routes } from "react-router-dom";
 
 export function App() {
@@ -21,6 +23,9 @@ export function App() {
           <Route path="/volunteers" element={<VolunteersPage />} />
           <Route path="/volunteers/new" element={<VolunteerCardPage />} />
           <Route path="/volunteers/:volunteerId/edit" element={<VolunteerCardPage />} />
+          <Route path="/procedures" element={<CareProceduresPage />} />
+          <Route path="/procedures/new" element={<CareProcedureCardPage />} />
+          <Route path="/procedures/:procedureId/edit" element={<CareProcedureCardPage />} />
           <Route path="*" element={<div className="app__not-found"><h1>Страница не найдена</h1><Link to="/">На главную</Link></div>} />
         </Routes>
       </main>
