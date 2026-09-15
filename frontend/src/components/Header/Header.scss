@@ -19,7 +19,7 @@
   &__tagline { color: $color-text; font-size: 11px; line-height: 1.2; }
   &__logo { display: grid; width: 32px; height: 34px; place-items: center; color: $color-accent; }
   &__logo-icon { width: 29px; height: 29px; fill: currentColor; }
-  &__navigation { display: flex; justify-content: center; gap: 4px; min-width: 0; }
+  &__navigation { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; min-width: 0; }
   &__link {
     padding: 10px 12px;
     border-radius: 8px;

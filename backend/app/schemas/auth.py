@@ -1,7 +1,8 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from app.schemas.volunteer import Phone, FullName
 
-from app.models.user import UserRole
+from app.models.user import UserRole, RegistrationStatus
+from datetime import datetime
 
 
 class LoginRequest(BaseModel):
@@ -42,3 +43,33 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserResponse
+
+
+class RegisterRequest(LoginRequest):
+    full_name: FullName
+    password: str = Field(min_length=12, max_length=1024)
+
+    @field_validator("full_name")
+    @classmethod
+    def require_name(cls, value: str) -> str:
+        if not value:
+            raise ValueError("Укажите ФИО")
+        return value
+
+
+class RegistrationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    full_name: str
+    phone: str | None
+    registration_status: RegistrationStatus
+    role: UserRole | None
+    created_at: datetime
+    reviewed_at: datetime | None
+    reviewed_by: int | None
+    volunteer_id: int | None
+
+
+class ApproveRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    role: UserRole

@@ -1,0 +1,23 @@
+@use "../../styles/variables" as *;
+.registrations-page {
+  width: min(1280px, calc(100% - 48px)); margin: 32px auto 60px;
+  color: $color-text;
+  > p { line-height: 1.6; }
+  &__toolbar, &__actions { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
+  label { display: grid; gap: 8px; font-weight: 600; }
+  button, select { min-height: 44px; padding: 10px 14px; border: 1px solid $color-border; border-radius: 8px; background: white; color: $color-text; }
+  button { cursor: pointer; &:disabled { opacity: 0.6; cursor: wait; } }
+  &__list { display: grid; gap: 18px; }
+  &__card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 1fr); gap: 24px; padding: 24px; background: white; border: 1px solid $color-border; border-radius: 14px;
+    h2 { margin: 0; font-size: 20px; overflow-wrap: anywhere; }
+    p { line-height: 1.5; }
+  }
+  &__review { p { font-size: 14px; } button:first-child { background: $color-accent; color: white; } }
+  &__review .registrations-page__reject { color: #a83340; }
+  &__error { padding: 16px; background: #fff4f5; color: #b52535; border-radius: 8px; }
+  &__notice { padding: 16px; background: #eaf8ef; color: #187044; border-radius: 8px; }
+}
+@media (max-width: 650px) {
+  .registrations-page { width: calc(100% - 28px); margin-top: 24px; }
+  .registrations-page__card { grid-template-columns: minmax(0, 1fr); padding: 18px; gap: 8px; }
+}

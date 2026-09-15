@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import "./LoginPage.scss";
 
@@ -17,7 +17,7 @@ export function LoginPage() {
     finally { setBusy(false); }
   }
   return <section className="login-page">
-    <h1>Вход в «Лапку»</h1><p>Войдите с учётной записью, выданной координатором.</p>
+    <h1>Вход в «Лапку»</h1><p>Введите телефон и пароль. Новые учётные записи подтверждает координатор.</p>
     <form className="login-page__form" onSubmit={submit}>
       <label>Номер телефона<input type="tel" inputMode="tel" autoComplete="username" placeholder="+7 (999) 123-45-67"
         value={phone} onChange={(e) => setPhone(e.target.value)} required maxLength={32} aria-describedby="login-phone-hint" /></label>
@@ -26,5 +26,6 @@ export function LoginPage() {
       {(error || auth.error) && <p className="login-page__error" role="alert">{error || auth.error}</p>}
       <button type="submit" disabled={busy || auth.loading}>{busy ? "Входим…" : "Войти"}</button>
     </form>
+    <p>Нет учётной записи? <Link to="/register">Зарегистрироваться</Link></p>
   </section>;
 }

@@ -8,7 +8,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
-from app.models.user import AuthSession, User, UserRole
+from app.models.user import AuthSession, User, UserRole, RegistrationStatus
 from app.repositories.auth import AuthRepository
 from app.repositories.volunteer import VolunteerRepository
 from app.schemas.auth import TokenResponse, UserResponse, UserProfile
@@ -43,7 +43,13 @@ class AuthService:
         # Equal password work for unknown logins avoids an account enumeration shortcut.
         stored = user.password_hash if user else "scrypt$" + "00"*16 + "$" + "00"*64
         valid = await asyncio.to_thread(verify_password, password, stored)
-        if not valid or user is None or not user.is_active:
+        if not valid or user is None:
+            raise HTTPException(401, "Неверный номер телефона или пароль", headers={"WWW-Authenticate": "Bearer"})
+        if user.registration_status == RegistrationStatus.PENDING:
+            raise HTTPException(403, "Заявка ожидает подтверждения координатором. Попробуйте войти после подтверждения.")
+        if user.registration_status == RegistrationStatus.REJECTED:
+            raise HTTPException(403, "Заявка отклонена. Обратитесь к координатору.")
+        if not user.is_active or user.role is None:
             raise HTTPException(401, "Неверный номер телефона или пароль", headers={"WWW-Authenticate": "Bearer"})
         token = secrets.token_urlsafe(32)
         self.repository.add(AuthSession(user_id=user.id, token_hash=token_digest(token),

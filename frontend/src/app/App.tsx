@@ -12,6 +12,8 @@ import { AnalyticsPage } from "../pages/AnalyticsPage/AnalyticsPage";
 import { AuthProvider } from "../auth/AuthProvider";
 import { ProtectedRoute } from "../auth/ProtectedRoute";
 import { LoginPage } from "../pages/LoginPage/LoginPage";
+import { RegisterPage } from "../pages/RegisterPage/RegisterPage";
+import { RegistrationsPage } from "../pages/RegistrationsPage/RegistrationsPage";
 import { Link, Navigate, Route, Routes } from "react-router-dom";
 
 export function App() {
@@ -21,11 +23,13 @@ export function App() {
       <main className="app__content">
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route element={<ProtectedRoute />}>
           <Route path="/procedures" element={<CareProceduresPage />} />
           <Route path="/procedures/:procedureId/execute" element={<ProcedureExecutionPage />} />
           <Route element={<ProtectedRoute coordinator />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/registrations" element={<RegistrationsPage />} />
           <Route path="/animals" element={<AnimalsPage />} />
           <Route path="/animals/new" element={<AnimalCardPage />} />
           <Route path="/animals/:animalId/edit" element={<AnimalCardPage />} />

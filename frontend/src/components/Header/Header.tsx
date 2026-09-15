@@ -32,6 +32,7 @@ export function Header() {
           <NavLink to="/procedures" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Процедуры</NavLink>
           {user.role === "COORDINATOR" && <NavLink to="/volunteers" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Волонтёры</NavLink>}
           {user.role === "COORDINATOR" && <NavLink to="/analytics" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Аналитика и отчёты</NavLink>}
+          {user.role === "COORDINATOR" && <NavLink to="/registrations" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Заявки</NavLink>}
 
         </nav>}
         <div className="header__account">

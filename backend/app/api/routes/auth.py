@@ -8,9 +8,17 @@ from app.api.dependencies import CurrentUser, bearer
 from app.db.session import get_session
 from app.schemas.auth import LoginRequest, TokenResponse, UserResponse
 from app.services.auth import AuthService
+from app.schemas.auth import RegisterRequest
+from app.services.registration import RegistrationService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 Session = Annotated[AsyncSession, Depends(get_session)]
+
+
+@router.post("/register", status_code=201)
+async def register(data: RegisterRequest, session: Session):
+    await RegistrationService(session).register(data)
+    return {"message": "Заявка отправлена. Дождитесь подтверждения координатором."}
 
 
 @router.post("/login", response_model=TokenResponse)

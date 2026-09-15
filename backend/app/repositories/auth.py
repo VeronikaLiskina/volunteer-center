@@ -20,6 +20,7 @@ class AuthRepository:
         return await self.session.scalar(select(User).join(AuthSession).where(
             AuthSession.token_hash == token_hash,
             AuthSession.expires_at > datetime.now(timezone.utc), User.is_active.is_(True),
+            User.registration_status == "approved", User.role.is_not(None),
         ))
 
     async def revoke(self, token_hash: str) -> None:
