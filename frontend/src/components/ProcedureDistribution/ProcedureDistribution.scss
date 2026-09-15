@@ -3,20 +3,20 @@
 .procedure-distribution {
   min-height: 330px; padding: 24px; border: 1px solid $color-border; border-radius: 14px; background: white; box-shadow: $shadow-card;
   &__title { margin: 0 0 5px; font-size: 21px; }
-  &__subtitle { margin: 0; color: #71809a; font-size: 13px; }
+  &__subtitle { margin: 0; color: $color-text; font-size: 13px; }
   &__content { display: flex; align-items: center; gap: 28px; min-height: 240px; }
   &__chart { position: relative; flex: 0 0 150px; width: 150px; height: 150px; border-radius: 50%;
     &::after { content: ""; position: absolute; inset: 25px; border-radius: 50%; background: white; }
-    > span { position: absolute; z-index: 1; inset: 0; display: grid; place-content: center; color: #71809a; font-size: 12px; text-align: center;
+    > span { position: absolute; z-index: 1; inset: 0; display: grid; place-content: center; color: $color-text; font-size: 12px; text-align: center;
       strong { color: $color-text; font-size: 24px; }
     }
   }
   &__legend { display: grid; flex: 1; gap: 12px; margin: 0; padding: 0; list-style: none;
-    li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; color: #536681; font-size: 13px; }
+    li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; color: $color-text; font-size: 13px; }
     strong { color: $color-text; font-variant-numeric: tabular-nums; }
   }
   &__dot { width: 9px; height: 9px; border-radius: 50%; }
-  &__empty { display: grid; min-height: 220px; place-items: center; margin: 0; color: #71809a; }
+  &__empty { display: grid; min-height: 220px; place-items: center; margin: 0; color: $color-text; }
 }
 
 @media (max-width: 500px) {

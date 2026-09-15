@@ -1,0 +1,13 @@
+@use "../../styles/variables" as *;
+.login-page {
+  width: min(440px, calc(100% - 32px)); margin: 64px auto; padding: 28px;
+  background: $color-surface; border: 1px solid $color-border; border-radius: 16px; box-shadow: $shadow-card;
+  p { color: $color-text-muted; }
+  &__form { display: grid; gap: 20px;
+    label { display: grid; gap: 8px; font-weight: 600; }
+    input { width: 100%; min-width: 0; padding: 12px; border: 1px solid #899ab4; border-radius: 8px; }
+    button { padding: 12px; background: $color-accent; color: white; border: 0; border-radius: 8px; cursor: pointer; }
+  }
+  & &__error { color: #a62135; }
+  &__hint { margin: -12px 0 0; font-size: 13px; }
+}

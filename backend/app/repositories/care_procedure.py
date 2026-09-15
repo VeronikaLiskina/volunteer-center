@@ -41,9 +41,10 @@ class CareProcedureRepository:
     def add(self, procedure: CareProcedure) -> None:
         self.session.add(procedure)
 
-    async def count_on_date(self, planned_date: date) -> int:
+    async def count_on_date(self, planned_date: date, volunteer_id: int | None = None) -> int:
         return await self.session.scalar(
             select(func.count(CareProcedure.id)).where(
-                CareProcedure.planned_date == planned_date
+                CareProcedure.planned_date == planned_date,
+                *([CareProcedure.volunteer_id == volunteer_id] if volunteer_id is not None else []),
             )
         ) or 0

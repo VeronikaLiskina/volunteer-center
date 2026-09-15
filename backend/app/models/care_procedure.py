@@ -22,6 +22,7 @@ class CareProcedure(Base):
     __table_args__ = (CheckConstraint("duration_minutes > 0", name="ck_care_procedures_duration"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    revision: Mapped[int] = mapped_column(Integer, default=1, server_default="1")
     animal_id: Mapped[int] = mapped_column(ForeignKey("animals.id"), index=True)
     procedure_type_id: Mapped[int] = mapped_column(ForeignKey("care_procedure_types.id"))
     planned_date: Mapped[date] = mapped_column(Date, index=True)

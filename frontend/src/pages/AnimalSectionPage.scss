@@ -8,7 +8,7 @@
   &__header { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; margin-bottom: 28px; }
   &__eyebrow { margin: 0 0 8px; color: $color-accent; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
   &__title { margin: 0 0 10px; font-size: clamp(30px, 4vw, 42px); letter-spacing: -0.035em; }
-  &__description { margin: 0; color: #566581; font-size: 16px; line-height: 1.6; }
+  &__description { margin: 0; color: $color-text; font-size: 16px; line-height: 1.6; }
   &__close { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; padding: 10px 16px;
     border: 1px solid #b8c8de; border-radius: 8px; background: white; color: $color-text; text-decoration: none; white-space: nowrap;
     &:hover { border-color: $color-accent; background: $color-accent-soft; color: #1251c4; }

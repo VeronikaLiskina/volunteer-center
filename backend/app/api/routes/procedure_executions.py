@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_session
+from app.api.dependencies import CurrentUser, coordinator
 from app.models.procedure_execution import ProcedureExecution
 from app.schemas.procedure_execution import (
     ProcedureExecutionCreate,
@@ -17,8 +18,8 @@ Session = Annotated[AsyncSession, Depends(get_session)]
 ProcedureId = Annotated[int, Path(gt=0)]
 
 
-def get_service(session: Session) -> ProcedureExecutionService:
-    return ProcedureExecutionService(session)
+def get_service(session: Session, user: CurrentUser) -> ProcedureExecutionService:
+    return ProcedureExecutionService(session, user)
 
 
 Service = Annotated[ProcedureExecutionService, Depends(get_service)]
@@ -44,7 +45,7 @@ async def execute_procedure(
     return await service.execute(procedure_id, data)
 
 
-@router.patch("/{procedure_id}/execution", response_model=ProcedureExecutionResponse)
+@router.patch("/{procedure_id}/execution", response_model=ProcedureExecutionResponse, dependencies=[Depends(coordinator)])
 async def update_execution(
     procedure_id: ProcedureId,
     data: ProcedureExecutionUpdate,

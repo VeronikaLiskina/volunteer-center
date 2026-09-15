@@ -3,8 +3,7 @@ import { Icon, type IconName } from "../Icon/Icon";
 import "./AnalyticsLinks.scss";
 
 const links: { title: string; description: string; to: string; icon: IconName }[] = [
-  { title: "Аналитика", description: "Статистика работы центра", to: "/analytics", icon: "chart" },
-  { title: "Отчёты", description: "Сформировать отчёты", to: "/reports", icon: "file" },
+  { title: "Аналитика и отчёты", description: "Сводка за период, диаграммы и выгрузка XLSX", to: "/analytics", icon: "chart" },
 ];
 
 export function AnalyticsLinks() {

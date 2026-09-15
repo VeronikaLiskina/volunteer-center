@@ -1,4 +1,6 @@
 import { expect, test } from "@playwright/test";
+import { mockAuth } from "./auth-helper";
+import { readFile } from "node:fs/promises";
 
 const analytics = {
   animals: { total: 5, in_care: 4, archived: 1 },
@@ -24,6 +26,8 @@ const analytics = {
 };
 
 test.beforeEach(async ({ page }) => {
+  await mockAuth(page);
+  await page.route("**/api/v1/care-procedure-types", (route) => route.fulfill({ json: [{ id: 1, name: "Custom service" }] }));
   await page.route("**/api/v1/analytics", (route) => route.fulfill({ json: analytics }));
   await page.route("**/api/v1/reports?*", (route) => {
     const url = new URL(route.request().url());
@@ -32,6 +36,12 @@ test.beforeEach(async ({ page }) => {
       title: "Выполнение процедур",
       date_from: url.searchParams.get("date_from"),
       date_to: url.searchParams.get("date_to"),
+      procedure_type_id: Number(url.searchParams.get("procedure_type_id")) || null,
+      report_id: "d117f4b8-14ac-4213-8bbe-9481d14a5137",
+      procedure_type_name: "Custom service",
+      executions_by_month: analytics.executions_by_month,
+      procedure_types: analytics.procedure_types,
+      volunteer_activity: analytics.volunteer_activity,
       metrics: [
         { key: "total", label: "Всего процедур", value: 12 },
         { key: "completed", label: "Выполнено", value: 6 },
@@ -49,9 +59,9 @@ test.beforeEach(async ({ page }) => {
 
 test("analytics shows aggregates and charts on desktop and mobile", async ({ page }, testInfo) => {
   await page.goto("/analytics");
-  await expect(page.getByRole("heading", { name: "Аналитика центра" })).toBeVisible();
-  await expect(page.locator(".analytics-stat-card")).toHaveCount(3);
-  await expect(page.locator(".analytics-stat-card__row").filter({ hasText: "Под опекой" }).locator("dd")).toHaveText("4");
+  await expect(page.getByRole("heading", { name: "Аналитика и отчёты" })).toBeVisible();
+  await page.getByRole("button", { name: "Сформировать отчёт" }).click();
+  await expect(page.locator(".report-result__metric")).toHaveCount(4);
   await expect(page.locator(".procedure-chart__column")).toHaveCount(6);
   await expect(page.getByText("Кормление", { exact: true })).toBeVisible();
   await expect(page.getByText("Иванова Анна", { exact: true })).toBeVisible();
@@ -64,7 +74,8 @@ test("analytics shows aggregates and charts on desktop and mobile", async ({ pag
 
 test("reports validate filters, generate a result and show API errors", async ({ page }) => {
   await page.goto("/reports");
-  await expect(page.getByRole("heading", { name: "Отчёты", exact: true })).toBeVisible();
+  await expect(page).toHaveURL(/\/analytics$/);
+  await expect(page.getByRole("heading", { name: "Аналитика и отчёты", exact: true })).toBeVisible();
   await expect(page.getByText("Отчёт ещё не сформирован")).toBeVisible();
 
   const from = page.getByLabel("Дата начала");
@@ -76,11 +87,20 @@ test("reports validate filters, generate a result and show API errors", async ({
 
   await from.fill("2026-09-01");
   await to.fill("2026-09-30");
+  await page.getByRole("combobox", { name: "Услуга", exact: true }).selectOption("1");
   await page.getByRole("button", { name: "Сформировать отчёт" }).click();
   await expect(page.getByText("Сформированный отчёт")).toBeVisible();
   await expect(page.locator(".report-result__metric").filter({ hasText: "Всего процедур" }).locator("dd")).toHaveText("12");
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Скачать Excel" }).click();
+  // Draft filter edits must not silently change the generated report's export.
+  await from.fill("2025-01-01");
+  await page.getByRole("combobox", { name: "Услуга", exact: true }).selectOption("");
+  const exportRequest = page.waitForRequest("**/api/v1/reports/export.xlsx?*");
+  await page.getByRole("button", { name: "Выгрузить отчёт" }).click();
+  const exportUrl = new URL((await exportRequest).url());
+  expect(exportUrl.searchParams.get("procedure_type_id")).toBe("1");
+  expect(exportUrl.searchParams.get("date_from")).toBe("2026-09-01");
+  expect(exportUrl.searchParams.get("report_id")).toBe("d117f4b8-14ac-4213-8bbe-9481d14a5137");
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toBe("lapka-report-2026-09-01-2026-09-30.xlsx");
 
@@ -92,13 +112,81 @@ test("reports validate filters, generate a result and show API errors", async ({
 });
 
 test("analytics error can be retried", async ({ page }) => {
-  let failed = true;
-  await page.route("**/api/v1/analytics", (route) => failed
-    ? route.fulfill({ status: 503, json: { detail: "Аналитика временно недоступна" } })
-    : route.fulfill({ json: analytics }));
+  await page.route("**/api/v1/reports?*", (route) => route.fulfill({ status: 503, json: { detail: "Аналитика временно недоступна" } }));
   await page.goto("/analytics");
+  await page.getByRole("button", { name: "Сформировать отчёт" }).click();
   await expect(page.getByRole("alert")).toContainText("Аналитика временно недоступна");
-  failed = false;
-  await page.getByRole("button", { name: "Повторить" }).click();
-  await expect(page.locator(".analytics-stat-card")).toHaveCount(3);
+  await page.unroute("**/api/v1/reports?*");
+  await page.route("**/api/v1/reports?*", (route) => route.fulfill({ json: {
+    ...analytics, report_type: "procedure_execution", title: "Выполнение процедур",
+    date_from: "2026-09-01", date_to: "2026-09-30", procedure_type_name: "Все услуги", metrics: [],
+  } }));
+  await page.getByRole("button", { name: "Сформировать отчёт" }).click();
+  await expect(page.getByText("Сформированный отчёт")).toBeVisible();
+});
+
+for (const width of [1280, 375]) {
+  test(`dashboard downloads a complete PNG at viewport ${width}`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 812 });
+    await page.goto("/analytics");
+    await expect(page.getByRole("button", { name: "Скачать PNG" })).toHaveCount(0);
+    await page.getByLabel("Дата начала").fill("2026-09-01");
+    await page.getByLabel("Дата окончания").fill("2026-09-30");
+    await page.getByRole("button", { name: "Сформировать отчёт" }).click();
+    await expect(page.getByText("Сформированный отчёт")).toBeVisible();
+    await page.getByLabel("Дата начала").fill("2025-01-01");
+    const pendingDownload = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Скачать PNG" }).click();
+    const download = await pendingDownload;
+    expect(download.suggestedFilename()).toBe("lapka-dashboard-2026-09-01-2026-09-30.png");
+    const path = testInfo.outputPath("dashboard-export.png");
+    await download.saveAs(path);
+    const png = await readFile(path);
+    expect(png.subarray(0, 8).toString("hex")).toBe("89504e470d0a1a0a");
+    expect(png.readUInt32BE(16)).toBe(2400);
+    expect(png.readUInt32BE(20)).toBeGreaterThan(1500);
+    // Decode the actual download: catch blank output or missing CSS charts.
+    const pixels = await page.evaluate(async (dataUrl) => {
+      const image = new Image();
+      image.src = dataUrl;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = image.width; canvas.height = image.height;
+      const context = canvas.getContext("2d")!;
+      context.drawImage(image, 0, 0);
+      const rgba = context.getImageData(0, 0, canvas.width, canvas.height).data;
+      let blue = 0, green = 0, dark = 0;
+      for (let i = 0; i < rgba.length; i += 4) {
+        const [r, g, b] = [rgba[i], rgba[i + 1], rgba[i + 2]];
+        if (b > 180 && r < 140 && g > 100 && g < 190) blue++;
+        if (g > 140 && r < 120 && b < 170) green++;
+        if (r < 40 && g < 40 && b < 40) dark++;
+      }
+      return { blue, green, dark };
+    }, `data:image/png;base64,${png.toString("base64")}`);
+    expect(pixels.blue).toBeGreaterThan(1000);
+    expect(pixels.green).toBeGreaterThan(1000);
+    expect(pixels.dark).toBeGreaterThan(1000);
+    await expect(page.getByRole("button", { name: "Скачать PNG" })).toBeEnabled();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  });
+}
+
+test("PNG rendering failure allows retry", async ({ page }) => {
+  await page.goto("/analytics");
+  await page.getByRole("button", { name: "Сформировать отчёт" }).click();
+  await expect(page.getByText("Сформированный отчёт")).toBeVisible();
+  await page.evaluate(() => {
+    const original = HTMLCanvasElement.prototype.toBlob;
+    HTMLCanvasElement.prototype.toBlob = function (callback) {
+      HTMLCanvasElement.prototype.toBlob = original;
+      callback(null);
+    };
+  });
+  await page.getByRole("button", { name: "Скачать PNG" }).click();
+  await expect(page.getByRole("alert")).toContainText("Не удалось сохранить картинку");
+  const pendingDownload = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Скачать PNG" }).click();
+  expect((await pendingDownload).suggestedFilename()).toMatch(/\.png$/);
+  await expect(page.getByRole("alert")).toHaveCount(0);
 });

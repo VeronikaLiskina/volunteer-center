@@ -4,6 +4,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.procedure_execution import ProcedureExecution
+from app.models.care_procedure import CareProcedure
 
 
 class ProcedureExecutionRepository:
@@ -22,10 +23,11 @@ class ProcedureExecutionRepository:
             query = query.with_for_update()
         return await self.session.scalar(query)
 
-    async def count_on_date(self, execution_date: date) -> int:
+    async def count_on_date(self, execution_date: date, volunteer_id: int | None = None) -> int:
         return await self.session.scalar(
-            select(func.count(ProcedureExecution.id)).where(
-                ProcedureExecution.execution_date == execution_date
+            select(func.count(ProcedureExecution.id)).join(CareProcedure).where(
+                ProcedureExecution.execution_date == execution_date,
+                *([CareProcedure.volunteer_id == volunteer_id] if volunteer_id is not None else []),
             )
         ) or 0
 

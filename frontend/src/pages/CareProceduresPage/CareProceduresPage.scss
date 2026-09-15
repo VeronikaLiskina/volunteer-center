@@ -4,7 +4,7 @@
   width: min(1360px, calc(100% - 40px)); margin: 0 auto; padding: 40px 0 64px;
   &__header { display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; margin-bottom: 28px;
     h1 { margin: 0 0 10px; font-size: clamp(30px, 4vw, 42px); letter-spacing: -0.035em; }
-    p:last-child { margin: 0; color: #566581; font-size: 16px; line-height: 1.6; }
+    p:last-child { margin: 0; color: $color-text; font-size: 16px; line-height: 1.6; }
   }
   &__eyebrow { margin: 0 0 8px !important; color: $color-accent !important; font-size: 13px !important; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
   &__add { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 50px; padding: 12px 20px; border-radius: 8px;
@@ -12,7 +12,7 @@
     .icon { width: 22px; height: 22px; } &:hover { background: #0f5de9; box-shadow: 0 8px 22px rgba(23, 105, 255, 0.2); }
   }
   &__summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px;
-    article { display: flex; justify-content: space-between; align-items: center; min-height: 86px; padding: 20px 22px; border: 1px solid $color-border; border-radius: 12px; background: white; color: #566581; }
+    article { display: flex; justify-content: space-between; align-items: center; min-height: 86px; padding: 20px 22px; border: 1px solid $color-border; border-radius: 12px; background: white; color: $color-text; }
     strong { color: $color-text; font-size: 30px; font-variant-numeric: tabular-nums; }
   }
   &__summary-card--completed { border-color: #b6e0c8 !important; background: #f5fbf7 !important; strong { color: #187044; } }

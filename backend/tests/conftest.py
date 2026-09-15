@@ -13,6 +13,8 @@ from app.core.config import settings
 from app.db.session import get_session
 from app.main import app
 from app.repositories.seed import seed_care_procedure_types, seed_dictionaries
+from app.models.user import UserRole
+from app.services.auth import AuthService
 
 
 @pytest.fixture
@@ -59,6 +61,11 @@ async def client(session: AsyncSession) -> AsyncIterator[AsyncClient]:
     app.dependency_overrides[get_session] = override_session
     try:
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            await AuthService(session).create_user("+79990000001", "test-password-123", UserRole.COORDINATOR, None, full_name="Test User")
+            token = (await client.post("/api/v1/auth/login", json={
+                "phone": "+79990000001", "password": "test-password-123",
+            })).json()["access_token"]
+            client.headers["Authorization"] = f"Bearer {token}"
             yield client
     finally:
         app.dependency_overrides.pop(get_session, None)

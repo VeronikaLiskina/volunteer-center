@@ -9,7 +9,7 @@
 
   &__heading { margin-bottom: 15px; }
   &__title { margin: 0 0 4px; font-size: 24px; letter-spacing: -0.02em; }
-  &__subtitle { margin: 0; color: #74839b; font-size: 14px; }
+  &__subtitle { margin: 0; color: $color-text; font-size: 14px; }
   &__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 }
 
@@ -34,7 +34,7 @@
   }
   &__body { display: grid; gap: 4px; }
   &__title { font-size: 16px; }
-  &__description { color: #6a7c98; font-size: 13px; }
+  &__description { color: $color-text; font-size: 13px; }
   &__arrow { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: white; color: #50709b;
     .icon { width: 18px; height: 18px; }
   }

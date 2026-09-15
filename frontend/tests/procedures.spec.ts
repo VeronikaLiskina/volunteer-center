@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { mockAuth } from "./auth-helper";
 import { AnimalStatus, type Animal } from "../src/types/animal";
 import {
   CareProcedureStatus, type CareProcedure, type CareProcedureCreate,
@@ -78,6 +79,7 @@ test.beforeEach(async ({ page }) => {
     }
     return route.fulfill({ json: procedure });
   });
+  await mockAuth(page);
 });
 
 test("procedure navigation, validation, creation, editing and filters", async ({ page }, testInfo) => {

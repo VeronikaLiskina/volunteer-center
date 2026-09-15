@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { mockAuth } from "./auth-helper";
 import { VolunteerStatus, type Volunteer, type VolunteerCreate } from "../src/types/volunteer";
 
 test.beforeEach(async ({ page }) => {
@@ -40,6 +41,7 @@ test.beforeEach(async ({ page }) => {
     else if (method === "PATCH") Object.assign(volunteer, request.postDataJSON());
     return route.fulfill({ json: volunteer });
   });
+  await mockAuth(page);
 });
 
 test("volunteer creation, editing, deactivation, activation and filtering", async ({ page }, testInfo) => {

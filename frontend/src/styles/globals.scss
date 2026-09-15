@@ -26,6 +26,9 @@ select {
   font: inherit;
 }
 
+input, textarea, select { color: $color-text; }
+input::placeholder, textarea::placeholder { color: $color-text-muted; opacity: 1; }
+
 :focus-visible { outline: 2px solid $color-accent; outline-offset: 3px; }
 
 .app__not-found { width: min(1120px, calc(100% - 40px)); margin: 48px auto; }

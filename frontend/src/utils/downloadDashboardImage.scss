@@ -1,0 +1,19 @@
+@use "../styles/variables" as *;
+
+.dashboard-image-host { position: fixed; left: -100000px; top: 0; pointer-events: none; }
+.dashboard-image {
+  width: 1200px; padding: 32px; background: $color-background; color: $color-text;
+  .report-result__header { padding: 24px; background: white; border-radius: 14px; }
+  .report-result__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .report-result__metric { background: white; gap: 16px; }
+  .analytics-dashboard__charts { grid-template-columns: minmax(0, 1.25fr) minmax(360px, 0.75fr); }
+  .procedure-distribution__content { flex-direction: row; align-items: center; }
+  .procedure-chart__plot { overflow: visible; grid-auto-columns: minmax(0, 1fr); }
+  .volunteer-activity__item { grid-template-columns: 32px minmax(160px, 1fr) auto; }
+  .volunteer-activity__count { grid-column: auto; }
+  .volunteer-activity__person strong { white-space: normal; overflow-wrap: anywhere; }
+  &--long-period {
+    .analytics-dashboard__charts { grid-template-columns: minmax(0, 1fr); }
+    .procedure-chart__plot { grid-auto-flow: row; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: 240px; height: auto; }
+  }
+}

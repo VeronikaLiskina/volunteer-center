@@ -38,6 +38,6 @@ export const ReportType = {
 } as const;
 export type ReportType = (typeof ReportType)[keyof typeof ReportType];
 
-export interface ReportFiltersValue { report_type: ReportType; date_from: string; date_to: string }
+export interface ReportFiltersValue { report_type: ReportType; date_from: string; date_to: string; procedure_type_id?: number | null; report_id?: string | null }
 export interface ReportMetric { key: string; label: string; value: number }
-export interface ReportData extends ReportFiltersValue { title: string; metrics: ReportMetric[] }
+export interface ReportData extends ReportFiltersValue { title: string; metrics: ReportMetric[]; procedure_type_name: string; executions_by_month: MonthlyExecution[]; procedure_types: ProcedureTypeShare[]; volunteer_activity: VolunteerActivityItem[] }

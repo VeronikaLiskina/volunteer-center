@@ -4,7 +4,7 @@
   padding: 30px; border: 1px solid $color-border; border-radius: 14px; background: white; box-shadow: $shadow-card;
   &__heading { margin-bottom: 26px;
     h2 { margin: 0 0 8px; font-size: 24px; }
-    p { margin: 0; color: #566581; font-size: 14px; line-height: 1.5; }
+    p { margin: 0; color: $color-text; font-size: 14px; line-height: 1.5; }
   }
   &__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
   &__field--wide { grid-column: 1 / -1; }

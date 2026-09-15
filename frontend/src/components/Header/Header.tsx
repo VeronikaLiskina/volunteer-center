@@ -1,8 +1,13 @@
 import { Link, NavLink } from "react-router-dom";
 import { Icon } from "../Icon/Icon";
 import "./Header.scss";
+import { useAuth } from "../../auth/AuthContext";
+import { Notifications } from "../Notifications/Notifications";
+import { useState } from "react";
 
 export function Header() {
+  const { user, logout } = useAuth();
+  const [error, setError] = useState("");
   return (
     <header className="header">
       <div className="header__content">
@@ -21,17 +26,18 @@ export function Header() {
             <span className="header__tagline">С заботой о тех, кто рядом</span>
           </span>
         </Link>
-        <nav className="header__navigation" aria-label="Главная навигация">
-          <NavLink to="/" end className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Главная</NavLink>
-          <NavLink to="/animals" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Животные</NavLink>
+        {user && <nav className="header__navigation" aria-label="Главная навигация">
+          {user.role === "COORDINATOR" && <NavLink to="/" end className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Главная</NavLink>}
+          {user.role === "COORDINATOR" && <NavLink to="/animals" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Животные</NavLink>}
           <NavLink to="/procedures" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Процедуры</NavLink>
-          <NavLink to="/volunteers" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Волонтёры</NavLink>
-          <NavLink to="/analytics" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Аналитика</NavLink>
-          <NavLink to="/reports" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Отчёты</NavLink>
-        </nav>
+          {user.role === "COORDINATOR" && <NavLink to="/volunteers" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Волонтёры</NavLink>}
+          {user.role === "COORDINATOR" && <NavLink to="/analytics" className={({ isActive }) => `header__link${isActive ? " header__link--active" : ""}`}>Аналитика и отчёты</NavLink>}
+
+        </nav>}
         <div className="header__account">
-          <button className="header__notification" type="button" disabled aria-label="Уведомления пока недоступны" title="Уведомления пока недоступны"><Icon name="bell" /><span className="header__notification-dot" aria-hidden="true" /></button>
-          <span className="header__caption"><Icon name="user" />Гостевой режим</span>
+          {user && <><Notifications /><span className="header__caption" title={user.full_name}><Icon name="user" /><span className="header__full-name">{user.full_name}</span></span>
+            <button className="header__logout" type="button" onClick={() => { setError(""); void logout().catch((cause: unknown) => setError(cause instanceof Error ? cause.message : "Не удалось выйти")); }}>Выйти</button></>}
+          {error && <span role="alert">{error}</span>}
         </div>
       </div>
     </header>

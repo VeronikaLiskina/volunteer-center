@@ -9,15 +9,22 @@ import { CareProceduresPage } from "../pages/CareProceduresPage/CareProceduresPa
 import { CareProcedureCardPage } from "../pages/CareProcedureCardPage/CareProcedureCardPage";
 import { ProcedureExecutionPage } from "../pages/ProcedureExecutionPage/ProcedureExecutionPage";
 import { AnalyticsPage } from "../pages/AnalyticsPage/AnalyticsPage";
-import { ReportsPage } from "../pages/ReportsPage/ReportsPage";
-import { Link, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "../auth/AuthProvider";
+import { ProtectedRoute } from "../auth/ProtectedRoute";
+import { LoginPage } from "../pages/LoginPage/LoginPage";
+import { Link, Navigate, Route, Routes } from "react-router-dom";
 
 export function App() {
   return (
-    <div className="app">
+    <AuthProvider><div className="app">
       <Header />
       <main className="app__content">
         <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route element={<ProtectedRoute />}>
+          <Route path="/procedures" element={<CareProceduresPage />} />
+          <Route path="/procedures/:procedureId/execute" element={<ProcedureExecutionPage />} />
+          <Route element={<ProtectedRoute coordinator />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/animals" element={<AnimalsPage />} />
           <Route path="/animals/new" element={<AnimalCardPage />} />
@@ -26,15 +33,15 @@ export function App() {
           <Route path="/volunteers" element={<VolunteersPage />} />
           <Route path="/volunteers/new" element={<VolunteerCardPage />} />
           <Route path="/volunteers/:volunteerId/edit" element={<VolunteerCardPage />} />
-          <Route path="/procedures" element={<CareProceduresPage />} />
           <Route path="/procedures/new" element={<CareProcedureCardPage />} />
           <Route path="/procedures/:procedureId/edit" element={<CareProcedureCardPage />} />
-          <Route path="/procedures/:procedureId/execute" element={<ProcedureExecutionPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/reports" element={<Navigate to="/analytics" replace />} />
+          </Route>
+          </Route>
           <Route path="*" element={<div className="app__not-found"><h1>Страница не найдена</h1><Link to="/">На главную</Link></div>} />
         </Routes>
       </main>
-    </div>
+    </div></AuthProvider>
   );
 }

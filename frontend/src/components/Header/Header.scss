@@ -16,7 +16,7 @@
   &__brand { display: inline-flex; align-items: center; gap: 12px; color: $color-text; text-decoration: none; white-space: nowrap; }
   &__brand-copy { display: grid; gap: 2px; }
   &__name { font-size: 17px; font-weight: 700; line-height: 1.2; }
-  &__tagline { color: #7a88a1; font-size: 11px; line-height: 1.2; }
+  &__tagline { color: $color-text; font-size: 11px; line-height: 1.2; }
   &__logo { display: grid; width: 32px; height: 34px; place-items: center; color: $color-accent; }
   &__logo-icon { width: 29px; height: 29px; fill: currentColor; }
   &__navigation { display: flex; justify-content: center; gap: 4px; min-width: 0; }
@@ -33,7 +33,9 @@
     &:focus-visible { outline: 3px solid rgba(23, 105, 255, 0.2); outline-offset: 1px; }
   }
   &__account { display: flex; align-items: center; gap: 18px; }
-  &__notification { position: relative; display: grid; place-items: center; padding: 6px; border: 0; background: none; color: #72829c;
+  &__full-name { max-width: 220px; white-space: normal; overflow-wrap: anywhere; }
+  &__logout { padding: 8px 10px; color: #1251c4; background: $color-accent-soft; border: 1px solid $color-border; border-radius: 7px; cursor: pointer; }
+  &__notification { position: relative; display: grid; place-items: center; padding: 6px; border: 0; background: none; color: $color-text;
     .icon { width: 21px; height: 21px; }
   }
   &__notification-dot { position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border: 2px solid white; border-radius: 50%; background: #ef6a63; }
@@ -57,9 +59,14 @@
     &__content { width: calc(100% - 28px); gap: 8px 14px; }
     &__tagline { display: none; }
     &__name { font-size: 15px; }
-    &__caption { padding-left: 12px; border-left: 0; font-size: 0; gap: 0; }
+    &__caption { padding-left: 0; border-left: 0; font-size: 12px; gap: 6px; }
+    &__full-name { max-width: 170px; }
     &__account { gap: 4px; }
+    &__content { grid-template-columns: minmax(0, 1fr); }
+    &__account { grid-row: 2; justify-self: stretch; justify-content: flex-end; }
+    &__navigation { grid-row: 3; }
     &__navigation { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); overflow: visible; }
     &__link { padding: 8px 6px; font-size: 12px; text-align: center; }
+    &__link:last-child:nth-child(5) { grid-column: span 2; }
   }
 }

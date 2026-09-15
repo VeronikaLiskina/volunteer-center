@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, datetime
+from uuid import UUID
 from enum import StrEnum
 
 from pydantic import BaseModel
@@ -70,3 +71,10 @@ class ReportResponse(BaseModel):
     date_from: date
     date_to: date
     metrics: list[ReportMetric]
+    procedure_type_id: int | None = None
+    procedure_type_name: str = "Все услуги"
+    executions_by_month: list[MonthlyExecution] = []
+    procedure_types: list[ProcedureTypeShare] = []
+    volunteer_activity: list[VolunteerActivity] = []
+    report_id: UUID | None = None
+    generated_at: datetime | None = None

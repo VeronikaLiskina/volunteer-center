@@ -1,4 +1,10 @@
 import type { HealthResponse } from "../types/health";
+import { getToken, setToken } from "../auth/session";
+
+function authHeaders(): Record<string, string> {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
 
@@ -41,7 +47,7 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
   try {
     response = await fetch(`${API_URL}/api/v1${path}`, {
       ...options,
-      headers: { ...(options.body ? { "Content-Type": "application/json" } : {}), ...options.headers },
+      headers: { ...authHeaders(), ...(options.body ? { "Content-Type": "application/json" } : {}), ...options.headers },
       signal: options.signal
         ? AbortSignal.any([options.signal, AbortSignal.timeout(10000)])
         : AbortSignal.timeout(10000),
@@ -51,7 +57,10 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
     throw new ApiError("Сервис временно недоступен. Проверьте соединение и повторите попытку.", 0);
   }
   const body: unknown = await response.json().catch(() => null);
-  if (!response.ok) throw parseError(body, response.status);
+  if (!response.ok) {
+    if (response.status === 401 && path !== "/auth/login") setToken(null);
+    throw parseError(body, response.status);
+  }
   return body as T;
 }
 
@@ -60,7 +69,7 @@ export async function requestBlob(path: string, options: RequestInit = {}): Prom
   try {
     response = await fetch(`${API_URL}/api/v1${path}`, {
       ...options,
-      headers: { ...options.headers },
+      headers: { ...authHeaders(), ...options.headers },
       signal: options.signal
         ? AbortSignal.any([options.signal, AbortSignal.timeout(10000)])
         : AbortSignal.timeout(10000),
@@ -70,6 +79,7 @@ export async function requestBlob(path: string, options: RequestInit = {}): Prom
     throw new ApiError("Сервис временно недоступен. Проверьте соединение и повторите попытку.", 0);
   }
   if (!response.ok) {
+    if (response.status === 401) setToken(null);
     const body: unknown = await response.json().catch(() => null);
     throw parseError(body, response.status);
   }

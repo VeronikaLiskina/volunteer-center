@@ -9,15 +9,15 @@
   &__empty { text-align: center; padding: 60px 20px; }
   &__empty-icon { display: inline-grid; place-items: center; width: 56px; height: 56px; border-radius: 16px; color: #93b9fa; background: #f2f7ff; .icon { width: 30px; height: 30px; } }
   &__empty-title { margin: 18px 0 8px; font-size: 17px; font-weight: 500; }
-  &__empty-description { margin: 0; font-size: 14px; color: #6a7b98; line-height: 1.7; }
+  &__empty-description { margin: 0; font-size: 14px; color: $color-text; line-height: 1.7; }
   &__row td { padding: 15px 14px; border-bottom: 1px solid $color-border; vertical-align: middle; }
   &__status { display: inline-block; padding: 5px 8px; border-radius: 999px; font-size: 12px; white-space: nowrap;
     &--assigned { color: #1251c4; background: #eaf2ff; }
     &--completed { color: #187044; background: #eaf8ef; }
-    &--cancelled { color: #667085; background: #eef1f5; }
+    &--cancelled { color: $color-text; background: #eef1f5; }
     &--overdue { color: #a83340; background: #fff0f1; }
   }
-  &__state { padding: 44px 20px; color: #6a7b98; text-align: center;
+  &__state { padding: 44px 20px; color: $color-text; text-align: center;
     &--error { color: #b52535; }
     button { margin-left: 12px; padding: 6px 10px; border: 1px solid #b8c8de; border-radius: 6px; background: white; cursor: pointer; }
   }
@@ -36,7 +36,7 @@
     &--unavailable > .icon { color: #dd8a19; }
   }
   &__label { margin: 0 0 5px; font-size: 15px; font-weight: 500; }
-  &__description { margin: 0; color: #6a7b98; font-size: 13px; line-height: 1.5; }
+  &__description { margin: 0; color: $color-text; font-size: 13px; line-height: 1.5; }
   &__retry { border: 0; background: transparent; color: #1251c4; cursor: pointer; font-size: 14px; }
 }
 .quick-actions {
@@ -55,7 +55,7 @@
   }
   &__content { display: grid; gap: 5px; min-width: 0; }
   &__label { font-size: 16px; font-weight: 600; }
-  &__description { color: #61718d; font-size: 13px; }
+  &__description { color: $color-text; font-size: 13px; }
 }
 @media (max-width: 540px) {
   .today-procedures, .system-overview, .quick-actions { padding: 18px; }

@@ -5,7 +5,7 @@
   &__header { margin-bottom: 28px; }
   &__eyebrow { margin: 0 0 8px; color: $color-accent; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
   &__title { margin: 0 0 10px; font-size: clamp(30px, 4vw, 42px); letter-spacing: -0.035em; }
-  &__description { margin: 0; color: #60718d; font-size: 16px; }
+  &__description { margin: 0; color: $color-text; font-size: 16px; }
   &__loading { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
     span { height: 170px; border-radius: 14px; background: linear-gradient(90deg, #edf2f8 25%, #f8fafc 50%, #edf2f8 75%); background-size: 200% 100%; animation: analytics-loading 1.4s infinite; }
   }

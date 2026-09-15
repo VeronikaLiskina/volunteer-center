@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { mockAuth } from "./auth-helper";
 import { AnimalStatus, type Animal, type AnimalCreate } from "../src/types/animal";
 
 const types = [{ id: 1, name: "Кошка" }, { id: 2, name: "Собака" }];
@@ -43,6 +44,7 @@ test.beforeEach(async ({ page }) => {
     else if (method === "PATCH") Object.assign(animal, request.postDataJSON());
     return route.fulfill({ json: animal });
   });
+  await mockAuth(page);
 });
 
 test("navigation, field validation, dependent breed, save, edit, confirmation and archive", async ({ page }, testInfo) => {
@@ -153,7 +155,7 @@ test("dashboard matches layout, displays API counts and opens animal sections", 
   await expect(page.locator(".home-stats__value").nth(2)).toHaveText("2");
   await expect(page.locator(".home-stats__value").last()).toHaveText("5");
   await expect(page.locator(".quick-action")).toHaveCount(4);
-  await expect(page.locator(".analytics-link")).toHaveCount(2);
+  await expect(page.locator(".analytics-link")).toHaveCount(1);
   await expect(page.getByText("Процедуры на сегодня", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Состояние системы", { exact: true })).toHaveCount(0);
   await page.screenshot({ path: testInfo.outputPath("dashboard-desktop.png"), fullPage: true });
@@ -172,7 +174,7 @@ test("dashboard matches layout, displays API counts and opens animal sections", 
     await expect(page).toHaveURL(new RegExp(`${path.replaceAll("/", "\\/")}$`));
   }
 
-  for (const [title, path] of [["Аналитика", "/analytics"], ["Отчёты", "/reports"]] as const) {
+  for (const [title, path] of [["Аналитика и отчёты", "/analytics"]] as const) {
     await page.goto("/");
     await page.locator(".analytics-link").filter({ hasText: title }).click();
     await expect(page).toHaveURL(new RegExp(`${path}$`));

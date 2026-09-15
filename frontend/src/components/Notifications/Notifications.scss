@@ -1,0 +1,16 @@
+@use "../../styles/variables" as *;
+.notifications {
+  position: relative;
+  &__panel { position: absolute; z-index: 20; right: 0; top: 40px; width: min(420px, calc(100vw - 32px)); max-height: 75vh; overflow: auto;
+    padding: 18px; background: white; color: $color-text; border: 1px solid $color-border; border-radius: 12px; box-shadow: $shadow-card; white-space: normal; }
+  &__heading, &__actions { display: flex; gap: 12px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+  &__heading h2 { font-size: 18px; }
+  &__list { padding: 0; list-style: none; }
+  &__item { padding: 14px 10px; border-bottom: 1px solid $color-border; overflow-wrap: anywhere;
+    &--unread { background: $color-accent-soft; }
+    p { margin: 0 0 8px; }
+    time { display: block; color: $color-text-muted; font-size: 12px; margin-bottom: 10px; }
+  }
+  button, a { color: #1251c4; cursor: pointer; }
+}
+@media (max-width: 700px) { .notifications__panel { position: fixed; top: 140px; left: 16px; right: 16px; } }

@@ -13,7 +13,7 @@
   &__title { margin: 0; font-size: 19px; }
   &__values { display: grid; gap: 10px; margin: 0; }
   &__row { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; padding-top: 10px; border-top: 1px solid #edf1f6;
-    dt { color: #667590; font-size: 14px; }
+    dt { color: $color-text; font-size: 14px; }
     dd { margin: 0; color: $color-text; font-size: 21px; font-weight: 700; font-variant-numeric: tabular-nums; }
   }
 }

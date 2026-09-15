@@ -10,16 +10,19 @@ from app.schemas.procedure_execution import (
     ProcedureExecutionUpdate,
 )
 from app.services.care_procedure import CareProcedureService
+from app.models.user import User
 
 
 class ProcedureExecutionService:
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(self, session: AsyncSession, actor: User | None = None) -> None:
         self.session = session
+        self.actor = actor
         self.repository = ProcedureExecutionRepository(session)
 
     async def get(
         self, procedure_id: int, *, for_update: bool = False,
     ) -> ProcedureExecution:
+        await CareProcedureService(self.session, self.actor).get(procedure_id)
         execution = await self.repository.get_by_procedure(
             procedure_id, for_update=for_update
         )
@@ -37,7 +40,7 @@ class ProcedureExecutionService:
     async def execute(
         self, procedure_id: int, data: ProcedureExecutionCreate,
     ) -> ProcedureExecution:
-        procedure = await CareProcedureService(self.session).get(
+        procedure = await CareProcedureService(self.session, self.actor).get(
             procedure_id, for_update=True
         )
         if procedure.status == CareProcedureStatus.COMPLETED:

@@ -1,4 +1,6 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { getCareProcedureTypes } from "../../api/careProcedureTypes";
+import type { CareProcedureType } from "../../types/careProcedure";
 import { ReportType, type ReportFiltersValue } from "../../types/analytics";
 import "./ReportFilters.scss";
 
@@ -13,6 +15,18 @@ export function ReportFilters({ initialValue, loading, onSubmit }: {
 }) {
   const [value, setValue] = useState(initialValue);
   const [error, setError] = useState("");
+  const [types, setTypes] = useState<CareProcedureType[]>([]);
+  const [typesError, setTypesError] = useState("");
+  const [revision, setRevision] = useState(0);
+  useEffect(() => {
+    const controller = new AbortController();
+    getCareProcedureTypes(controller.signal).then((items) => {
+      if (!controller.signal.aborted) { setTypes(items); setTypesError(""); }
+    }).catch((cause: unknown) => {
+      if (!controller.signal.aborted) setTypesError(cause instanceof Error ? cause.message : "Не удалось загрузить услуги");
+    });
+    return () => controller.abort();
+  }, [revision]);
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -30,6 +44,15 @@ export function ReportFilters({ initialValue, loading, onSubmit }: {
         <span aria-hidden="true">—</span>
         <label>Дата окончания<input type="date" value={value.date_to} onChange={(event) => setValue({ ...value, date_to: event.target.value })} /></label>
       </div>
+    </fieldset>
+    <fieldset className="report-filters__fieldset" disabled={loading}>
+      <legend>Тип услуги</legend>
+      <label className="report-filters__service">Услуга<select value={value.procedure_type_id ?? ""}
+        onChange={(event) => setValue({ ...value, procedure_type_id: event.target.value ? Number(event.target.value) : null })}>
+        <option value="">Все услуги</option>
+        {types.map((type) => <option key={type.id} value={type.id}>{type.name}</option>)}
+      </select></label>
+      {typesError && <p role="alert">{typesError} <button type="button" onClick={() => setRevision((n) => n + 1)}>Повторить</button></p>}
     </fieldset>
     <fieldset className="report-filters__fieldset" disabled={loading}>
       <legend>Тип отчёта</legend>

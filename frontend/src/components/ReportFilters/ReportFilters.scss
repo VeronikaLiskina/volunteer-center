@@ -1,14 +1,19 @@
 @use "../../styles/variables" as *;
 
+.report-filters__service {
+  display: grid; gap: 8px; color: $color-text-muted; font-weight: 600;
+  select { min-width: 0; width: 100%; padding: 12px; border: 1px solid #899ab4; border-radius: 8px; background: white; }
+}
+
 .report-filters {
   padding: 26px; border: 1px solid $color-border; border-radius: 14px; background: white; box-shadow: $shadow-card;
   &__title { margin: 0 0 24px; font-size: 22px; }
   &__fieldset { min-width: 0; margin: 0 0 24px; padding: 0; border: 0;
-    legend { margin-bottom: 12px; color: #415470; font-size: 14px; font-weight: 700; }
+    legend { margin-bottom: 12px; color: $color-text; font-size: 14px; font-weight: 700; }
   }
   &__dates { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 10px;
-    label { display: grid; gap: 7px; color: #667590; font-size: 12px; }
-    > span { padding-bottom: 13px; color: #8b98ac; }
+    label { display: grid; gap: 7px; color: $color-text; font-size: 12px; }
+    > span { padding-bottom: 13px; color: $color-text; }
     input { width: 100%; min-height: 45px; padding: 9px 11px; border: 1px solid #b8c8de; border-radius: 7px; color: $color-text;
       &:focus { border-color: $color-accent; outline: 3px solid rgba(23, 105, 255, 0.12); }
     }
@@ -18,7 +23,7 @@
     &:has(input:checked) { border-color: #9ebfff; background: #f4f8ff; }
     input { margin-top: 3px; accent-color: $color-accent; }
     span { display: grid; gap: 3px; }
-    small { color: #71809a; }
+    small { color: $color-text; }
   }
   &__error { padding: 10px 12px; border-radius: 7px; background: #fff4f5; color: #b52535; font-size: 13px; }
   &__submit { width: 100%; min-height: 47px; padding: 11px 18px; border: 1px solid $color-accent; border-radius: 8px; background: $color-accent; color: white; cursor: pointer; font-weight: 600;

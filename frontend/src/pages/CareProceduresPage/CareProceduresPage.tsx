@@ -5,6 +5,7 @@ import { CareProceduresTable } from "../../components/CareProceduresTable/CarePr
 import { Icon } from "../../components/Icon/Icon";
 import type { CareProcedure, CareProcedureFilters, CareProcedureSummary } from "../../types/careProcedure";
 import "./CareProceduresPage.scss";
+import { useAuth } from "../../auth/AuthContext";
 
 const initialFilters: CareProcedureFilters = {
   status: "", animal_id: "", volunteer_id: "", procedure_type_id: "",
@@ -12,6 +13,7 @@ const initialFilters: CareProcedureFilters = {
 };
 
 export function CareProceduresPage() {
+  const isCoordinator = useAuth().user?.role === "COORDINATOR";
   const navigate = useNavigate();
   const location = useLocation();
   const [filters, setFilters] = useState(initialFilters);
@@ -43,8 +45,8 @@ export function CareProceduresPage() {
   return <div className="care-procedures-page">
     <header className="care-procedures-page__header">
       <div><p className="care-procedures-page__eyebrow">Забота по расписанию</p>
-        <h1>Процедуры ухода</h1><p>Планирование задач для животных и ответственных волонтёров</p></div>
-      <Link className="care-procedures-page__add" to="/procedures/new"><Icon name="calendar" />Назначить процедуру</Link>
+        <h1>{isCoordinator ? "Процедуры ухода" : "Мои процедуры"}</h1><p>{isCoordinator ? "Планирование задач для животных и ответственных волонтёров" : "Ваши назначения и результаты выполнения"}</p></div>
+      {isCoordinator && <Link className="care-procedures-page__add" to="/procedures/new"><Icon name="calendar" />Назначить процедуру</Link>}
     </header>
     <section className="care-procedures-page__summary" aria-label="Сводка на сегодня">
       <article><span>Запланировано сегодня</span><strong>{summary?.today_total ?? "—"}</strong></article>

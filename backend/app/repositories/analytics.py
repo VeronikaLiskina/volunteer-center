@@ -1,6 +1,6 @@
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 
-from sqlalchemy import func, select
+from sqlalchemy import case, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.animal import Animal, AnimalStatus
@@ -8,11 +8,43 @@ from app.models.care_procedure import CareProcedure, CareProcedureStatus
 from app.models.care_procedure_type import CareProcedureType
 from app.models.procedure_execution import ProcedureExecution
 from app.models.volunteer import Volunteer, VolunteerStatus
+from app.models.report_snapshot import ReportSnapshot
 
 
 class AnalyticsRepository:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
+
+    async def save_snapshot(self, report_id: str, user_id: int, data: dict) -> None:
+        now = datetime.now(timezone.utc)
+        await self.session.execute(delete(ReportSnapshot).where(ReportSnapshot.expires_at <= now))
+        self.session.add(ReportSnapshot(id=report_id, user_id=user_id, data=data, expires_at=now + timedelta(hours=24)))
+
+    async def get_snapshot(self, report_id: str, user_id: int) -> dict | None:
+        return await self.session.scalar(select(ReportSnapshot.data).where(
+            ReportSnapshot.id == report_id, ReportSnapshot.user_id == user_id,
+            ReportSnapshot.expires_at > datetime.now(timezone.utc)))
+
+    @staticmethod
+    def filters(date_from: date, date_to: date, procedure_type_id: int | None):
+        conditions = [CareProcedure.planned_date.between(date_from, date_to)]
+        if procedure_type_id is not None:
+            conditions.append(CareProcedure.procedure_type_id == procedure_type_id)
+        return conditions
+
+    async def filtered_details(self, date_from: date, date_to: date, procedure_type_id: int | None):
+        conditions = self.filters(date_from, date_to, procedure_type_id)
+        month = func.to_char(CareProcedure.planned_date, "YYYY-MM")
+        monthly = dict((await self.session.execute(select(month, func.count(ProcedureExecution.id))
+            .select_from(CareProcedure).join(ProcedureExecution)
+            .where(*conditions).group_by(month).order_by(month))).all())
+        distribution = (await self.session.execute(select(CareProcedureType.id, CareProcedureType.name, func.count(CareProcedure.id))
+            .join(CareProcedure).where(*conditions).group_by(CareProcedureType.id, CareProcedureType.name)
+            .order_by(CareProcedureType.name))).all()
+        activity = (await self.session.execute(select(Volunteer.id, Volunteer.full_name, func.count(ProcedureExecution.id))
+            .select_from(Volunteer).join(CareProcedure).outerjoin(ProcedureExecution).where(*conditions)
+            .group_by(Volunteer.id, Volunteer.full_name).order_by(func.count(ProcedureExecution.id).desc(), Volunteer.full_name))).all()
+        return monthly, distribution, activity
 
     async def animal_counts(self) -> tuple[int, int, int]:
         return (await self.session.execute(select(
@@ -69,17 +101,21 @@ class AnalyticsRepository:
         )
         return list(rows)
 
-    async def report_counts(self, date_from: date, date_to: date) -> dict[str, int]:
+    async def report_counts(self, date_from: date, date_to: date, procedure_type_id: int | None = None) -> dict[str, int]:
         condition = CareProcedure.planned_date.between(date_from, date_to)
+        status = case((
+            (CareProcedure.status == CareProcedureStatus.ASSIGNED)
+            & (CareProcedure.planned_date + CareProcedure.planned_time < datetime.now()),
+            CareProcedureStatus.OVERDUE.value), else_=CareProcedure.status)
         row = (await self.session.execute(select(
             func.count(CareProcedure.id).filter(condition),
-            func.count(CareProcedure.id).filter(condition, CareProcedure.status == CareProcedureStatus.ASSIGNED),
-            func.count(CareProcedure.id).filter(condition, CareProcedure.status == CareProcedureStatus.COMPLETED),
-            func.count(CareProcedure.id).filter(condition, CareProcedure.status == CareProcedureStatus.CANCELLED),
-            func.count(CareProcedure.id).filter(condition, CareProcedure.status == CareProcedureStatus.OVERDUE),
+            func.count(CareProcedure.id).filter(condition, status == CareProcedureStatus.ASSIGNED),
+            func.count(CareProcedure.id).filter(condition, status == CareProcedureStatus.COMPLETED),
+            func.count(CareProcedure.id).filter(condition, status == CareProcedureStatus.CANCELLED),
+            func.count(CareProcedure.id).filter(condition, status == CareProcedureStatus.OVERDUE),
             func.count(func.distinct(CareProcedure.animal_id)).filter(condition),
             func.count(func.distinct(CareProcedure.volunteer_id)).filter(condition),
-        ))).one()
+        ).where(*self.filters(date_from, date_to, procedure_type_id)))).one()
         return dict(zip(
             ("total", "assigned", "completed", "cancelled", "overdue", "animals", "volunteers"),
             row,
