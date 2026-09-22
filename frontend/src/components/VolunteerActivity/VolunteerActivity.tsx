@@ -5,10 +5,10 @@ import "./VolunteerActivity.scss";
 function procedureWord(value: number) {
   const lastTwo = value % 100;
   const last = value % 10;
-  if (lastTwo >= 11 && lastTwo <= 14) return "процедур";
-  if (last === 1) return "процедура";
-  if (last >= 2 && last <= 4) return "процедуры";
-  return "процедур";
+  if (lastTwo >= 11 && lastTwo <= 14) return "услуг";
+  if (last === 1) return "услуга";
+  if (last >= 2 && last <= 4) return "услуги";
+  return "услуг";
 }
 
 export function VolunteerActivity({ rows }: { rows: VolunteerActivityItem[] }) {
@@ -17,7 +17,7 @@ export function VolunteerActivity({ rows }: { rows: VolunteerActivityItem[] }) {
     <div className="volunteer-activity__heading">
       <span className="volunteer-activity__icon"><Icon name="user" /></span>
       <div><h2 className="volunteer-activity__title" id="volunteer-activity-title">Самые активные волонтёры</h2>
-        <p className="volunteer-activity__subtitle">По количеству выполненных процедур</p></div>
+        <p className="volunteer-activity__subtitle">По количеству выполненных услуг</p></div>
     </div>
     {rows.length ? <ol className="volunteer-activity__list">
       {rows.map((row, index) => <li className="volunteer-activity__item" key={row.volunteer_id}>
@@ -28,6 +28,6 @@ export function VolunteerActivity({ rows }: { rows: VolunteerActivityItem[] }) {
         </span>
         <span className="volunteer-activity__count"><strong>{row.completed_count}</strong> {procedureWord(row.completed_count)}</span>
       </li>)}
-    </ol> : <p className="volunteer-activity__empty">Выполненных процедур пока нет</p>}
+    </ol> : <p className="volunteer-activity__empty">Выполненных услуг пока нет</p>}
   </section>;
 }

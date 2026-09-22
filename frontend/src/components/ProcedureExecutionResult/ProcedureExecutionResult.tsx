@@ -12,7 +12,7 @@ export function ProcedureExecutionResult({ execution }: { execution: ProcedureEx
       <div><p>Фактические данные</p><h2 id="procedure-execution-result-title">Результат выполнения</h2></div>
       {execution && <span>Выполнена</span>}
     </div>
-    {!execution ? <p className="procedure-execution-result__empty">Процедура ещё не выполнена</p>
+    {!execution ? <p className="procedure-execution-result__empty">Услуга ещё не выполнена</p>
       : <dl className="procedure-execution-result__grid">
         <div className="procedure-execution-result__item"><dt>Дата выполнения</dt><dd>{formatDate(execution.execution_date)}</dd></div>
         <div className="procedure-execution-result__item"><dt>Время</dt><dd>{execution.execution_time.slice(0, 5)}</dd></div>

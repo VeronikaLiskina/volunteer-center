@@ -75,7 +75,7 @@ async def test_completed_procedure_cannot_be_executed(
         f"{API}/{planned_procedure['id']}/execute", json=execution_data
     )
     assert response.status_code == 409
-    assert response.json()["detail"]["message"] == "Процедура уже выполнена"
+    assert response.json()["detail"]["message"] == "Услуга уже выполнена"
 
 
 async def test_cancelled_procedure_leaves_no_execution(

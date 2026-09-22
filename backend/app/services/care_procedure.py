@@ -27,9 +27,9 @@ class CareProcedureService:
     async def get(self, procedure_id: int, *, for_update: bool = False) -> CareProcedure:
         procedure = await self.repository.get(procedure_id, for_update=for_update)
         if procedure is None:
-            raise CareProcedureError("Процедура не найдена", 404)
+            raise CareProcedureError("Услуга не найдена", 404)
         if self.actor and self.actor.role == UserRole.VOLUNTEER and procedure.volunteer_id != self.actor.volunteer_id:
-            raise HTTPException(404, "Процедура не найдена")
+            raise HTTPException(404, "Услуга не найдена")
         return procedure
 
     async def list(self, **filters):
@@ -51,28 +51,28 @@ class CareProcedureService:
         if animal is None:
             raise CareProcedureError("Животное не найдено", 422, "animal_id")
         if animal.status == AnimalStatus.ARCHIVED:
-            raise CareProcedureError("Нельзя назначить процедуру архивному животному", 409, "animal_id")
+            raise CareProcedureError("Нельзя назначить услугу архивному животному", 409, "animal_id")
         volunteer = await VolunteerRepository(self.session).get(volunteer_id)
         if volunteer is None:
             raise CareProcedureError("Волонтёр не найден", 422, "volunteer_id")
         if volunteer.status != VolunteerStatus.ACTIVE:
             raise CareProcedureError("Можно назначить только активного волонтёра", 409, "volunteer_id")
         if await get_care_procedure_type(self.session, procedure_type_id) is None:
-            raise CareProcedureError("Тип процедуры не найден", 422, "procedure_type_id")
+            raise CareProcedureError("Тип услуги не найден", 422, "procedure_type_id")
 
     async def commit(self) -> None:
         try:
             await self.session.commit()
         except IntegrityError as error:
             await self.session.rollback()
-            raise CareProcedureError("Не удалось сохранить процедуру из-за конфликта данных", 409) from error
+            raise CareProcedureError("Не удалось сохранить услугу из-за конфликта данных", 409) from error
 
     async def flush(self) -> None:
         try:
             await self.session.flush()
         except IntegrityError as error:
             await self.session.rollback()
-            raise CareProcedureError("Не удалось сохранить процедуру из-за конфликта данных", 409) from error
+            raise CareProcedureError("Не удалось сохранить услугу из-за конфликта данных", 409) from error
 
     async def create(self, data: CareProcedureCreate) -> CareProcedure:
         await self.validate_references(

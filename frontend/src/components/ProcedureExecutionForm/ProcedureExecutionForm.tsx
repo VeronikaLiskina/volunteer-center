@@ -27,6 +27,8 @@ function validate(values: FormValues): ProcedureExecutionFieldErrors {
   const errors: ProcedureExecutionFieldErrors = {};
   if (!values.execution_date) errors.execution_date = "Укажите дату выполнения";
   if (!values.execution_time) errors.execution_time = "Укажите время выполнения";
+  else if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(values.execution_time))
+    errors.execution_time = "Введите время в формате ЧЧ:ММ, от 00:00 до 23:59";
   if (!values.result.trim()) errors.result = "Опишите результат выполнения";
   if (values.comment.length > 255) errors.comment = "Не более 255 символов";
   return errors;
@@ -86,7 +88,7 @@ export function ProcedureExecutionForm({ onSave }: Props) {
   return <section className="procedure-execution-form" aria-labelledby="procedure-execution-form-title">
     <div className="procedure-execution-form__heading">
       <h2 id="procedure-execution-form-title">Результат выполнения</h2>
-      <p>Зафиксируйте фактические данные. После сохранения процедура будет закрыта.</p>
+      <p>Зафиксируйте фактические данные. После сохранения услуга будет закрыта.</p>
     </div>
     <form ref={formRef} onSubmit={submit} noValidate aria-busy={saving}>
       {error && <p className="procedure-execution-form__error" role="alert">{error}</p>}
@@ -99,7 +101,7 @@ export function ProcedureExecutionForm({ onSave }: Props) {
         </div>
         <div className="procedure-execution-form__field">
           <FormField name="execution_time" idPrefix="procedure-execution" label="Время выполнения" required error={errors.execution_time}>
-            <input {...fieldProps("execution_time")} type="time" required
+            <input {...fieldProps("execution_time")} type="text" placeholder="ЧЧ:ММ" maxLength={5} required
               onChange={(event) => change("execution_time", event.target.value)} />
           </FormField>
         </div>

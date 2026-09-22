@@ -15,7 +15,7 @@ export function DashboardMetrics({ summary, volunteerSummary, procedureSummary, 
   const cards: { title: string; value: string; hint: string; icon: IconName }[] = [
     { title: "Животных на учёте", value: loading ? "…" : summary ? String(summary.in_care) : "—",
       hint: loading ? "Загружаем данные" : summary ? "Под опекой центра" : "Данные недоступны", icon: "paw" },
-    { title: "Процедур на сегодня", value: proceduresLoading ? "…" : procedureSummary ? String(procedureSummary.today_total) : "—",
+    { title: "Услуг на сегодня", value: proceduresLoading ? "…" : procedureSummary ? String(procedureSummary.today_total) : "—",
       hint: proceduresLoading ? "Загружаем план" : procedureSummary ? "Назначено на текущую дату" : "Данные недоступны", icon: "clipboard" },
     { title: "Выполнено сегодня", value: proceduresLoading ? "…" : procedureSummary ? String(procedureSummary.today_completed) : "—",
       hint: proceduresLoading ? "Загружаем данные" : procedureSummary ? "Фактических выполнений за день" : "Данные недоступны", icon: "check" },

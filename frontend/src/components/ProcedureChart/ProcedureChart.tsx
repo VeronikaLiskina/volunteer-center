@@ -5,10 +5,10 @@ export function ProcedureChart({ rows, byPlannedMonth = false }: { rows: Monthly
   const max = Math.max(1, ...rows.map((item) => item.completed));
   return <section className="procedure-chart" aria-labelledby="procedure-chart-title">
     <div className="procedure-chart__heading">
-      <div><h2 className="procedure-chart__title" id="procedure-chart-title">Выполнение процедур</h2>
+      <div><h2 className="procedure-chart__title" id="procedure-chart-title">Выполнение услуг</h2>
         <p className="procedure-chart__subtitle">{byPlannedMonth ? "Выполненные назначения по плановым месяцам" : "По месяцам, на основе фактов выполнения"}</p></div>
     </div>
-    <div className="procedure-chart__plot" role="img" aria-label={`Выполнено процедур по месяцам: ${rows.map((item) => `${item.label} — ${item.completed}`).join(", ")}`}>
+    <div className="procedure-chart__plot" role="img" aria-label={`Выполнено услуг по месяцам: ${rows.map((item) => `${item.label} — ${item.completed}`).join(", ")}`}>
       {rows.map((item) => <div className="procedure-chart__column" key={item.month}>
         <span className="procedure-chart__value">{item.completed}</span>
         <span className="procedure-chart__track"><span className="procedure-chart__bar" style={{ height: `${item.completed ? Math.max(10, item.completed / max * 100) : 3}%` }} /></span>

@@ -18,7 +18,7 @@ function chartBackground(rows: ProcedureTypeShare[]) {
 export function ProcedureDistribution({ rows }: { rows: ProcedureTypeShare[] }) {
   const total = rows.reduce((sum, row) => sum + row.count, 0);
   return <section className="procedure-distribution" aria-labelledby="procedure-distribution-title">
-    <h2 className="procedure-distribution__title" id="procedure-distribution-title">Типы процедур</h2>
+    <h2 className="procedure-distribution__title" id="procedure-distribution-title">Типы услуг</h2>
     <p className="procedure-distribution__subtitle">Распределение всех назначений</p>
     {rows.length ? <div className="procedure-distribution__content">
       <div className="procedure-distribution__chart" style={{ background: chartBackground(rows) } as CSSProperties}

@@ -4,7 +4,7 @@ import "./QuickActions.scss";
 
 const actions: { title: string; description: string; to: string; icon: IconName; tone: string }[] = [
   { title: "Добавить животное", description: "Открыть форму регистрации нового животного", to: "/animals/new", icon: "paw", tone: "blue" },
-  { title: "Назначить процедуру", description: "Добавить задачу в план ухода", to: "/procedures/new", icon: "calendar", tone: "green" },
+  { title: "Назначить услугу", description: "Добавить задачу в план ухода", to: "/procedures/new", icon: "calendar", tone: "green" },
   { title: "Добавить волонтёра", description: "Пополнить команду помощи", to: "/volunteers/new", icon: "user", tone: "violet" },
   { title: "Справочники", description: "Посмотреть типы животных, породы и другие справочники", to: "/animals/dictionaries", icon: "book", tone: "neutral" },
 ];

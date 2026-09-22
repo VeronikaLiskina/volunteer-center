@@ -56,10 +56,10 @@ test.beforeEach(async ({ page }) => {
     }
     const id = Number(path.split("/")[2]);
     const procedure = procedures.find((item) => item.id === id);
-    if (!procedure) return route.fulfill({ status: 404, json: { detail: { message: "Процедура не найдена" } } });
+    if (!procedure) return route.fulfill({ status: 404, json: { detail: { message: "Услуга не найдена" } } });
     if (path.endsWith("/execute") && method === "POST") {
       if (procedure.status === CareProcedureStatus.Completed)
-        return route.fulfill({ status: 409, json: { detail: { message: "Процедура уже выполнена" } } });
+        return route.fulfill({ status: 409, json: { detail: { message: "Услуга уже выполнена" } } });
       const data = request.postDataJSON() as ProcedureExecutionCreate;
       const execution: ProcedureExecution = { ...data, id: executions.length + 1,
         care_procedure_id: id, created_at: "2026-09-09T10:45:00+08:00" };
@@ -84,41 +84,52 @@ test.beforeEach(async ({ page }) => {
 
 test("procedure navigation, validation, creation, editing and filters", async ({ page }, testInfo) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "Процедуры", exact: true }).click();
+  await page.getByRole("link", { name: "Услуги", exact: true }).click();
   await expect(page).toHaveURL(/\/procedures$/);
-  await expect(page.getByText("Процедуры не найдены", { exact: true })).toBeVisible();
-  await page.getByRole("link", { name: /Назначить процедуру/ }).click();
+  await expect(page.getByText("Услуги не найдены", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: /Назначить услугу/ }).click();
   await expect(page).toHaveURL(/\/procedures\/new$/);
   await expect(page.locator(".care-procedure-form__status-field")).toHaveText("Статус: Назначена");
   await expect(page.locator("#care-procedure-status")).toHaveCount(0);
-  await page.getByRole("button", { name: "Назначить процедуру" }).click();
+  await page.getByRole("button", { name: "Назначить услугу" }).click();
   await expect(page.locator("#care-procedure-animal_id-error")).toHaveText("Обязательное поле");
   await expect(page.locator("#care-procedure-volunteer_id-error")).toHaveText("Обязательное поле");
   await page.locator("#care-procedure-animal_id").selectOption("1");
   await page.locator("#care-procedure-procedure_type_id").selectOption("1");
-  await page.locator("#care-procedure-planned_time").fill("10:30");
+  const plannedTime = page.getByRole("textbox", { name: "Плановое время" });
+  await expect(plannedTime).toHaveAttribute("placeholder", "ЧЧ:ММ");
+  for (const invalidTime of ["24:00", "12:60", "9:30", "abc"]) {
+    await plannedTime.fill(invalidTime);
+    await page.getByRole("button", { name: "Назначить услугу" }).click();
+    await expect(page.locator("#care-procedure-planned_time-error")).toContainText("от 00:00 до 23:59");
+  }
+  await plannedTime.fill("21:03");
   await page.locator("#care-procedure-volunteer_id").selectOption("1");
   await page.locator("#care-procedure-duration_minutes").fill("0");
-  await page.getByRole("button", { name: "Назначить процедуру" }).click();
+  await page.getByRole("button", { name: "Назначить услугу" }).click();
   await expect(page.locator("#care-procedure-duration_minutes-error")).toContainText("больше нуля");
   await page.locator("#care-procedure-duration_minutes").fill("30");
   await page.locator("#care-procedure-comment").fill("После осмотра");
-  await page.getByRole("button", { name: "Назначить процедуру" }).click();
+  await page.getByRole("button", { name: "Назначить услугу" }).click();
   await expect(page).toHaveURL(/\/procedures$/);
-  await expect(page.getByText("Процедура для «Барсик» назначена", { exact: true })).toBeVisible();
+  await expect(page.getByText("Услуга для «Барсик» назначена", { exact: true })).toBeVisible();
   await expect(page.getByRole("cell", { name: "Барсик", exact: true })).toBeVisible();
+  await expect(page.getByRole("cell", { name: "21:03", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Изменить", exact: true }).click();
   await expect(page).toHaveURL(/\/procedures\/1\/edit$/);
   await expect(page.locator("#care-procedure-animal_id")).toHaveValue("1");
+  await expect(plannedTime).toHaveValue("21:03");
+  await plannedTime.fill("23:59");
   await page.locator("#care-procedure-procedure_type_id").selectOption("2");
   await page.getByRole("button", { name: "Сохранить изменения" }).click();
   await expect(page).toHaveURL(/\/procedures$/);
   await expect(page.getByRole("cell", { name: "Выгул", exact: false })).toBeVisible();
-  await expect(page.getByRole("region", { name: "Таблица процедур" }).getByText("Назначена", { exact: true })).toBeVisible();
+  await expect(page.getByRole("cell", { name: "23:59", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Таблица услуг" }).getByText("Назначена", { exact: true })).toBeVisible();
   await page.getByLabel("Статус").selectOption("completed");
-  await expect(page.getByText("Процедуры не найдены", { exact: true })).toBeVisible();
+  await expect(page.getByText("Услуги не найдены", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Сбросить" }).click();
-  await expect(page.getByRole("region", { name: "Таблица процедур" }).getByText("Назначена", { exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Таблица услуг" }).getByText("Назначена", { exact: true })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("procedures-desktop.png"), fullPage: true });
   await page.setViewportSize({ width: 375, height: 812 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -133,7 +144,7 @@ test("procedure errors, retry and invalid URL", async ({ page }) => {
   await expect(page.getByRole("alert")).toContainText("Расписание временно недоступно");
   failList = false;
   await page.getByRole("button", { name: "Повторить" }).click();
-  await expect(page.getByText("Процедуры не найдены", { exact: true })).toBeVisible();
+  await expect(page.getByText("Услуги не найдены", { exact: true })).toBeVisible();
 
   await page.route("**/api/v1/care-procedures", (route) => route.fulfill({ status: 409,
     json: { detail: { message: "Можно назначить только активного волонтёра", field: "volunteer_id" } } }));
@@ -142,11 +153,11 @@ test("procedure errors, retry and invalid URL", async ({ page }) => {
   await page.locator("#care-procedure-procedure_type_id").selectOption("1");
   await page.locator("#care-procedure-planned_time").fill("11:00");
   await page.locator("#care-procedure-volunteer_id").selectOption("1");
-  await page.getByRole("button", { name: "Назначить процедуру" }).click();
+  await page.getByRole("button", { name: "Назначить услугу" }).click();
   await expect(page.locator("#care-procedure-volunteer_id-error")).toHaveText("Можно назначить только активного волонтёра");
 
   await page.goto("/procedures/abc/edit");
-  await expect(page.getByRole("alert")).toContainText("Некорректный номер процедуры");
+  await expect(page.getByRole("alert")).toContainText("Некорректный номер услуги");
   await expect(page.locator("#care-procedure-animal_id")).toHaveCount(0);
 });
 
@@ -154,7 +165,7 @@ test("save and add another keeps the creation form and clears it", async ({ page
   await page.goto("/procedures/new");
   await page.locator("#care-procedure-animal_id").selectOption("1");
   await page.locator("#care-procedure-procedure_type_id").selectOption("1");
-  await page.locator("#care-procedure-planned_time").fill("09:30");
+  await page.locator("#care-procedure-planned_time").fill("00:00");
   await page.locator("#care-procedure-volunteer_id").selectOption("1");
   await page.getByRole("button", { name: "Сохранить и добавить ещё" }).click();
   await expect(page).toHaveURL(/\/procedures\/new$/);
@@ -170,7 +181,7 @@ test("assigned procedure can be executed and its result is shown", async ({ page
   await page.locator("#care-procedure-procedure_type_id").selectOption("1");
   await page.locator("#care-procedure-planned_time").fill("10:30");
   await page.locator("#care-procedure-volunteer_id").selectOption("1");
-  await page.getByRole("button", { name: "Назначить процедуру" }).click();
+  await page.getByRole("button", { name: "Назначить услугу" }).click();
 
   await page.getByRole("button", { name: "Выполнить" }).click();
   await expect(page).toHaveURL(/\/procedures\/1\/execute$/);
@@ -184,17 +195,22 @@ test("assigned procedure can be executed and its result is shown", async ({ page
   await expect(page.locator("#procedure-execution-execution_time-error")).toHaveText("Укажите время выполнения");
   await expect(page.locator("#procedure-execution-result-error")).toHaveText("Опишите результат выполнения");
   await page.locator("#procedure-execution-execution_date").fill("2026-09-09");
-  await page.locator("#procedure-execution-execution_time").fill("10:45");
+  const executionTime = page.getByRole("textbox", { name: "Время выполнения" });
+  await executionTime.fill("24:00");
+  await page.getByRole("button", { name: "Сохранить выполнение" }).click();
+  await expect(page.locator("#procedure-execution-execution_time-error")).toContainText("от 00:00 до 23:59");
+  await executionTime.fill("22:45");
   await page.locator("#procedure-execution-result").fill("Животное накормлено, состояние спокойное");
   await page.locator("#procedure-execution-comment").fill("Без особенностей");
   await page.getByRole("button", { name: "Сохранить выполнение" }).click();
 
   await expect(page).toHaveURL(/\/procedures$/);
-  await expect(page.getByText("Процедура выполнена", { exact: true })).toBeVisible();
-  await expect(page.getByRole("region", { name: "Таблица процедур" }).getByText("Выполнена", { exact: true })).toBeVisible();
+  await expect(page.getByText("Услуга выполнена", { exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Таблица услуг" }).getByText("Выполнена", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Выполнить" })).toHaveCount(0);
   await page.getByRole("button", { name: "Изменить", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Результат выполнения" })).toBeVisible();
   await expect(page.getByText("Животное накормлено, состояние спокойное", { exact: true })).toBeVisible();
   await expect(page.getByText("Без особенностей", { exact: true })).toBeVisible();
+  await expect(page.getByText("22:45", { exact: true })).toBeVisible();
 });

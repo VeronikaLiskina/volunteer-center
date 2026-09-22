@@ -27,7 +27,7 @@ function formatToday() {
 export function HomeStats({ animals, procedures, volunteers, onRetry }: HomeStatsProps) {
   const items: { label: string; icon: IconName; tone: string; value?: number; loading: boolean; error: string }[] = [
     { label: "Животных под опекой", icon: "paw", tone: "blue", value: animals.data?.in_care, loading: animals.loading, error: animals.error },
-    { label: "Процедур на сегодня", icon: "calendar", tone: "green", value: procedures.data?.today_total, loading: procedures.loading, error: procedures.error },
+    { label: "Услуг на сегодня", icon: "calendar", tone: "green", value: procedures.data?.today_total, loading: procedures.loading, error: procedures.error },
     { label: "Выполнено сегодня", icon: "check", tone: "violet", value: procedures.data?.today_completed, loading: procedures.loading, error: procedures.error },
     { label: "Активных волонтёров", icon: "user", tone: "neutral", value: volunteers.data?.active, loading: volunteers.loading, error: volunteers.error },
   ];

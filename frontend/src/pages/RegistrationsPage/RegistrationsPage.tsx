@@ -25,7 +25,7 @@ function RegistrationCard({ item, busy, onReview }: {
       <label>Назначить роль<select value={role} disabled={busy} onChange={(event) => setRole(event.target.value as Role)}>
         <option value="VOLUNTEER">Волонтёр</option><option value="COORDINATOR">Координатор</option>
       </select></label>
-      <p>{role === "COORDINATOR" ? "Полный доступ, включая рассмотрение заявок и назначение ролей." : "Доступ к своим назначениям и отметке выполнения процедур."}</p>
+      <p>{role === "COORDINATOR" ? "Полный доступ, включая рассмотрение заявок и назначение ролей." : "Доступ к своим назначениям и отметке выполнения услуг."}</p>
       <div className="registrations-page__actions">
         <button disabled={busy} onClick={() => void onReview(item.id, role)}>Подтвердить</button>
         <button className="registrations-page__reject" disabled={busy} onClick={() => void onReview(item.id, null)}>Отклонить</button>

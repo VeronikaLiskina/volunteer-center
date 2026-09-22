@@ -6,8 +6,8 @@ import "./ReportFilters.scss";
 
 const options = [
   { value: ReportType.AnimalCare, title: "Уход за животными", description: "Животные и назначенный уход" },
-  { value: ReportType.VolunteerActivity, title: "Работа волонтёров", description: "Участие команды в процедурах" },
-  { value: ReportType.ProcedureExecution, title: "Выполнение процедур", description: "Статусы назначений за период" },
+  { value: ReportType.VolunteerActivity, title: "Работа волонтёров", description: "Участие команды в услугах" },
+  { value: ReportType.ProcedureExecution, title: "Выполнение услуг", description: "Статусы назначений за период" },
 ];
 
 export function ReportFilters({ initialValue, loading, onSubmit }: {

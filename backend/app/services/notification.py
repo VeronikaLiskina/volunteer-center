@@ -16,9 +16,9 @@ class NotificationService:
 
     @staticmethod
     def message(procedure: CareProcedure, kind: str) -> str:
-        labels = {"assigned": "Назначена процедура", "changed": "Процедура изменена",
-                  "cancelled": "Процедура отменена", "reassigned": "Процедура передана другому волонтёру",
-                  "upcoming": "Процедура в ближайшие 24 часа", "overdue": "Процедура просрочена"}
+        labels = {"assigned": "Назначена услуга", "changed": "Услуга изменена",
+                  "cancelled": "Услуга отменена", "reassigned": "Услуга передана другому волонтёру",
+                  "upcoming": "Услуга в ближайшие 24 часа", "overdue": "Услуга просрочена"}
         return (f"{labels[kind]}: {procedure.procedure_type.name}, {procedure.animal.name}. "
                 f"{procedure.planned_date:%d.%m.%Y} {procedure.planned_time:%H:%M}")[:500]
 

@@ -105,8 +105,8 @@ async def test_report_can_be_exported_as_real_xlsx(client, animal_data):
         assert "xl/workbook.xml" in workbook.namelist()
         assert "xl/worksheets/sheet1.xml" in workbook.namelist()
         sheet = workbook.read("xl/worksheets/sheet1.xml").decode("utf-8")
-        assert "Выполнение процедур" in sheet
-        assert "Всего процедур" in sheet
+        assert "Выполнение услуг" in sheet
+        assert "Всего услуг" in sheet
 
 
 async def test_period_service_filters_and_export_agree(client, animal_data):

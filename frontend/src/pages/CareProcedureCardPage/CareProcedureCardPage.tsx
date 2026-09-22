@@ -35,12 +35,12 @@ export function CareProcedureCardPage() {
           throw cause;
         }),
       ]).then(([procedure, execution]) => ({ procedure, execution }))
-        : Promise.reject(new Error("Некорректный номер процедуры"));
+        : Promise.reject(new Error("Некорректный номер услуги"));
     request.then(({ procedure, execution }) => {
       if (!controller.signal.aborted) setResource({ procedure, execution, error: "", key: `${requestKey}-${revision}` });
     }).catch((cause: unknown) => {
       if (!controller.signal.aborted) setResource({ procedure: null, execution: null,
-        error: cause instanceof Error ? cause.message : "Не удалось открыть процедуру", key: `${requestKey}-${revision}` });
+        error: cause instanceof Error ? cause.message : "Не удалось открыть услугу", key: `${requestKey}-${revision}` });
     });
     return () => controller.abort();
   }, [editId, isEditRoute, requestKey, revision, validId]);
@@ -51,16 +51,16 @@ export function CareProcedureCardPage() {
       : await createCareProcedure(data);
     if (addAnother && !resource.procedure) return;
     navigate("/procedures", { state: { notice: resource.procedure
-      ? `Процедура для «${saved.animal.name}» обновлена`
-      : `Процедура для «${saved.animal.name}» назначена` } });
+      ? `Услуга для «${saved.animal.name}» обновлена`
+      : `Услуга для «${saved.animal.name}» назначена` } });
   }
 
   return <div className="care-procedure-card-page">
     <header className="care-procedure-card-page__header"><div>
       <p className="care-procedure-card-page__eyebrow">Планирование ухода</p>
-      <h1>{isEditRoute ? "Карточка процедуры" : "Назначение процедуры"}</h1>
+      <h1>{isEditRoute ? "Карточка услуги" : "Назначение услуги"}</h1>
       <p>Плановые сведения и зафиксированный результат выполнения</p>
-    </div><Link className="care-procedure-card-page__close" to="/procedures" aria-label="Закрыть и вернуться к списку процедур">
+    </div><Link className="care-procedure-card-page__close" to="/procedures" aria-label="Закрыть и вернуться к списку услуг">
       <span aria-hidden="true">×</span> Закрыть</Link></header>
     {loading ? <p className="care-procedure-card-page__state" role="status">Загружаем карточку…</p>
       : resource.error ? <p className="care-procedure-card-page__error" role="alert">{resource.error}

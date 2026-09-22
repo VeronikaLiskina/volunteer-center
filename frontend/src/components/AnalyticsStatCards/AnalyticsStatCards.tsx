@@ -6,7 +6,7 @@ export function AnalyticsStatCards({ data }: { data: AnalyticsData }) {
   const cards: { title: string; icon: IconName; tone: string; rows: [string, number][] }[] = [
     { title: "Животные", icon: "paw", tone: "blue", rows: [["Всего", data.animals.total], ["Под опекой", data.animals.in_care], ["В архиве", data.animals.archived]] },
     { title: "Волонтёры", icon: "user", tone: "green", rows: [["Всего", data.volunteers.total], ["Активные", data.volunteers.active], ["Неактивные", data.volunteers.inactive]] },
-    { title: "Процедуры", icon: "calendar", tone: "violet", rows: [["Всего", data.procedures.total], ["Выполнено", data.procedures.completed], ["Просрочено", data.procedures.overdue]] },
+    { title: "Услуги", icon: "calendar", tone: "violet", rows: [["Всего", data.procedures.total], ["Выполнено", data.procedures.completed], ["Просрочено", data.procedures.overdue]] },
   ];
   return <section className="analytics-stat-cards" aria-label="Общая статистика">
     {cards.map((card) => <article className="analytics-stat-card" key={card.title}>

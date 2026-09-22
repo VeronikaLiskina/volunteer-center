@@ -31,7 +31,7 @@ function DeactivateDialog({ volunteer, onConfirm, onClose }: {
   return <dialog className="volunteers-table__dialog" ref={dialog} aria-labelledby="deactivate-volunteer-title"
     onCancel={(event) => { event.preventDefault(); if (!busy) onClose(); }}>
     <h2 id="deactivate-volunteer-title">Деактивировать волонтёра?</h2>
-    <p>«{volunteer.full_name}» останется в базе, но не будет доступен для назначения новых процедур.</p>
+    <p>«{volunteer.full_name}» останется в базе, но не будет доступен для назначения новых услуг.</p>
     <div className="volunteers-table__dialog-actions">
       <button className="volunteers-table__button" type="button" autoFocus disabled={busy} onClick={onClose}>Отмена</button>
       <button className="volunteers-table__button volunteers-table__button--danger" type="button" disabled={busy}

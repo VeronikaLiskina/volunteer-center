@@ -50,11 +50,11 @@ export function CareProceduresTable({ procedures, filters, loading, error, onFil
 
   return <section className="care-procedures-table" aria-labelledby="care-procedures-list-title">
     <div className="care-procedures-table__heading-row">
-      <div><h2 id="care-procedures-list-title">План процедур</h2>
+      <div><h2 id="care-procedures-list-title">План услуг</h2>
         <p>Назначения отсортированы по плановой дате и времени</p></div>
       {!loading && !error && <span className="care-procedures-table__count">На странице: {rows.length}</span>}
     </div>
-    <div className="care-procedures-table__filters" aria-label="Фильтры процедур">
+    <div className="care-procedures-table__filters" aria-label="Фильтры услуг">
       <label>Статус<select value={filters.status} onChange={(event) => update({ status: event.target.value as CareProcedureFilters["status"] })}>
         <option value="">Все статусы</option>
         {Object.values(CareProcedureStatus).map((status) => <option key={status} value={status}>{careProcedureStatusLabels[status]}</option>)}
@@ -72,13 +72,13 @@ export function CareProceduresTable({ procedures, filters, loading, error, onFil
       <label>По дату<input type="date" value={filters.date_to} onChange={(event) => update({ date_to: event.target.value })} /></label>
       <button type="button" onClick={() => onFilters({ status: "", animal_id: "", volunteer_id: "", procedure_type_id: "", date_from: "", date_to: "", offset: 0 })}>Сбросить</button>
     </div>
-    {loading ? <p className="care-procedures-table__state" role="status">Загружаем процедуры…</p>
+    {loading ? <p className="care-procedures-table__state" role="status">Загружаем услуги…</p>
       : error ? <div className="care-procedures-table__error" role="alert"><p>{error}</p><button type="button" onClick={onRetry}>Повторить</button></div>
       : rows.length === 0 ? <div className="care-procedures-table__empty">
-        <span><Icon name="calendar" /></span><strong>Процедуры не найдены</strong>
+        <span><Icon name="calendar" /></span><strong>Услуги не найдены</strong>
         <p>Создайте первое назначение или измените фильтры.</p></div>
-      : <div className="care-procedures-table__scroll" tabIndex={0} role="region" aria-label="Таблица процедур">
-        <table><thead><tr>{["Дата", "Время", "Животное", "Процедура", "Волонтёр", "Статус", "Действие"].map((title) =>
+      : <div className="care-procedures-table__scroll" tabIndex={0} role="region" aria-label="Таблица услуг">
+        <table><thead><tr>{["Дата", "Время", "Животное", "Услуга", "Волонтёр", "Статус", "Действие"].map((title) =>
           <th key={title} scope="col">{title}</th>)}</tr></thead>
           <tbody>{rows.map((item) => <tr className="care-procedures-table__row" key={item.id}>
             <td>{formatDate(item.planned_date)}</td><td>{item.planned_time.slice(0, 5)}</td>

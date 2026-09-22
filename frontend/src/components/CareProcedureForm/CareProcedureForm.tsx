@@ -43,6 +43,8 @@ function validate(values: FormValues) {
   for (const field of ["animal_id", "procedure_type_id", "planned_date", "planned_time", "volunteer_id"] as const) {
     if (!values[field]) errors[field] = "Обязательное поле";
   }
+  if (values.planned_time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(values.planned_time))
+    errors.planned_time = "Введите время в формате ЧЧ:ММ, от 00:00 до 23:59";
   if (!values.duration_minutes) errors.duration_minutes = "Обязательное поле";
   else if (!/^\d+$/.test(values.duration_minutes) || Number(values.duration_minutes) <= 0)
     errors.duration_minutes = "Введите целое число больше нуля";
@@ -115,7 +117,7 @@ export function CareProcedureForm({ procedure, onSave }: Props) {
       }
     } catch (cause) {
       if (cause instanceof ApiError) { setErrors(cause.fields); setError(cause.message); }
-      else setError("Не удалось сохранить процедуру. Повторите попытку.");
+      else setError("Не удалось сохранить услугу. Повторите попытку.");
     } finally {
       setSaving(false);
     }
@@ -148,7 +150,7 @@ export function CareProcedureForm({ procedure, onSave }: Props) {
             {animals.map((animal) => <option key={animal.id} value={animal.id}>{animal.name}</option>)}
           </select>
         </FormField>
-        <FormField name="procedure_type_id" idPrefix="care-procedure" label="Тип процедуры" required error={errors.procedure_type_id}>
+        <FormField name="procedure_type_id" idPrefix="care-procedure" label="Тип услуги" required error={errors.procedure_type_id}>
           <select {...inputProps("procedure_type_id")} required onChange={(event) => change("procedure_type_id", event.target.value)}>
             <option value="">Выберите тип</option>
             {options.types.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
@@ -158,7 +160,8 @@ export function CareProcedureForm({ procedure, onSave }: Props) {
           <input {...inputProps("planned_date")} type="date" required onChange={(event) => change("planned_date", event.target.value)} />
         </FormField>
         <FormField name="planned_time" idPrefix="care-procedure" label="Плановое время" required error={errors.planned_time}>
-          <input {...inputProps("planned_time")} type="time" required onChange={(event) => change("planned_time", event.target.value)} />
+          <input {...inputProps("planned_time")} type="text" placeholder="ЧЧ:ММ" maxLength={5} required
+            onChange={(event) => change("planned_time", event.target.value)} />
         </FormField>
         <FormField name="duration_minutes" idPrefix="care-procedure" label="Продолжительность, мин" required error={errors.duration_minutes}>
           <input {...inputProps("duration_minutes")} type="number" min="1" max="1440" step="1" required
@@ -185,7 +188,7 @@ export function CareProcedureForm({ procedure, onSave }: Props) {
           type="submit" name="save_mode" value="another" disabled={saving}>Сохранить и добавить ещё</button>}
         <button className="care-procedure-form__button care-procedure-form__button--primary" type="submit"
           name="save_mode" value="close" disabled={saving}>
-          {saving ? "Сохранение…" : procedure ? "Сохранить изменения" : "Назначить процедуру"}
+          {saving ? "Сохранение…" : procedure ? "Сохранить изменения" : "Назначить услугу"}
         </button>
       </div>
     </form>

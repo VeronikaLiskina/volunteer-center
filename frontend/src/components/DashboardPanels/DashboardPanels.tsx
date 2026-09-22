@@ -10,10 +10,10 @@ export function TodayProcedures({ procedures, loading, error, onRetry }: {
   procedures: CareProcedure[]; loading: boolean; error: string; onRetry: () => void;
 }) {
   return <section className="today-procedures" aria-labelledby="today-procedures-title">
-    <h2 className="today-procedures__title" id="today-procedures-title">Процедуры на сегодня</h2>
+    <h2 className="today-procedures__title" id="today-procedures-title">Услуги на сегодня</h2>
     <div className="today-procedures__scroll">
       <table className="today-procedures__table">
-        <thead><tr>{["Время", "Животное", "Процедура", "Волонтёр", "Статус"].map((title) =>
+        <thead><tr>{["Время", "Животное", "Услуга", "Волонтёр", "Статус"].map((title) =>
           <th scope="col" key={title}>{title}</th>)}</tr></thead>
         <tbody>{loading ? <tr><td colSpan={5} className="today-procedures__state" role="status">Загружаем расписание…</td></tr>
           : error ? <tr><td colSpan={5} className="today-procedures__state today-procedures__state--error" role="alert">{error}
@@ -24,12 +24,12 @@ export function TodayProcedures({ procedures, loading, error, onRetry }: {
             <td><span className={`today-procedures__status today-procedures__status--${item.status}`}>{careProcedureStatusLabels[item.status]}</span></td>
           </tr>) : <tr><td colSpan={5} className="today-procedures__empty">
           <span className="today-procedures__empty-icon"><Icon name="calendar" /></span>
-          <p className="today-procedures__empty-title">На сегодня процедур нет</p>
+          <p className="today-procedures__empty-title">На сегодня услуг нет</p>
           <p className="today-procedures__empty-description">Создайте назначение, чтобы оно появилось в расписании.</p>
         </td></tr>}</tbody>
       </table>
     </div>
-    <Link className="today-procedures__footer" to="/procedures">Все процедуры <Icon name="arrow" /></Link>
+    <Link className="today-procedures__footer" to="/procedures">Все услуги <Icon name="arrow" /></Link>
   </section>;
 }
 
@@ -54,7 +54,7 @@ export function SystemOverview({ state, summary, volunteerSummary, procedureSumm
         <p className="system-overview__description">{summary ? `Под опекой: ${summary.in_care} · В архиве: ${summary.archived}` : "Сведения о животных загружаются отдельно"}</p>
       </div></li>
       <li className="system-overview__item"><Icon name="calendar" /><div>
-        <p className="system-overview__label">Планирование процедур</p>
+        <p className="system-overview__label">Планирование услуг</p>
         <p className="system-overview__description">{procedureSummary
           ? `Планов сегодня: ${procedureSummary.today_total} · Фактов выполнения: ${procedureSummary.today_completed}`
           : "Сведения о расписании временно недоступны"}</p>
@@ -100,7 +100,7 @@ export function QuickActions() {
       <Link className="quick-actions__action" to="/procedures/new">
         <span className="quick-actions__icon"><Icon name="calendar" /></span>
         <span className="quick-actions__content">
-          <strong className="quick-actions__label">Назначить процедуру</strong>
+          <strong className="quick-actions__label">Назначить услугу</strong>
           <span className="quick-actions__description">Добавить задачу в план ухода</span>
         </span>
         <Icon name="arrow" />

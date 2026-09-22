@@ -10,7 +10,7 @@ async def main() -> None:
         async with async_session_factory.begin() as session:
             await seed_dictionaries(session)
             await seed_care_procedure_types(session)
-        print("Справочники животных, пород и процедур готовы.")
+        print("Справочники животных, пород и услуг готовы.")
     finally:
         await engine.dispose()
 

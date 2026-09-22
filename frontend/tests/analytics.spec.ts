@@ -33,7 +33,7 @@ test.beforeEach(async ({ page }) => {
     const url = new URL(route.request().url());
     return route.fulfill({ json: {
       report_type: url.searchParams.get("report_type"),
-      title: "Выполнение процедур",
+      title: "Выполнение услуг",
       date_from: url.searchParams.get("date_from"),
       date_to: url.searchParams.get("date_to"),
       procedure_type_id: Number(url.searchParams.get("procedure_type_id")) || null,
@@ -43,7 +43,7 @@ test.beforeEach(async ({ page }) => {
       procedure_types: analytics.procedure_types,
       volunteer_activity: analytics.volunteer_activity,
       metrics: [
-        { key: "total", label: "Всего процедур", value: 12 },
+        { key: "total", label: "Всего услуг", value: 12 },
         { key: "completed", label: "Выполнено", value: 6 },
         { key: "cancelled", label: "Отменено", value: 1 },
         { key: "overdue", label: "Просрочено", value: 1 },
@@ -90,7 +90,7 @@ test("reports validate filters, generate a result and show API errors", async ({
   await page.getByRole("combobox", { name: "Услуга", exact: true }).selectOption("1");
   await page.getByRole("button", { name: "Сформировать отчёт" }).click();
   await expect(page.getByText("Сформированный отчёт")).toBeVisible();
-  await expect(page.locator(".report-result__metric").filter({ hasText: "Всего процедур" }).locator("dd")).toHaveText("12");
+  await expect(page.locator(".report-result__metric").filter({ hasText: "Всего услуг" }).locator("dd")).toHaveText("12");
   const downloadPromise = page.waitForEvent("download");
   // Draft filter edits must not silently change the generated report's export.
   await from.fill("2025-01-01");
@@ -118,7 +118,7 @@ test("analytics error can be retried", async ({ page }) => {
   await expect(page.getByRole("alert")).toContainText("Аналитика временно недоступна");
   await page.unroute("**/api/v1/reports?*");
   await page.route("**/api/v1/reports?*", (route) => route.fulfill({ json: {
-    ...analytics, report_type: "procedure_execution", title: "Выполнение процедур",
+    ...analytics, report_type: "procedure_execution", title: "Выполнение услуг",
     date_from: "2026-09-01", date_to: "2026-09-30", procedure_type_name: "Все услуги", metrics: [],
   } }));
   await page.getByRole("button", { name: "Сформировать отчёт" }).click();

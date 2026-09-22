@@ -94,9 +94,9 @@ class ReportsService:
         title = {
             ReportType.ANIMAL_CARE: "Уход за животными",
             ReportType.VOLUNTEER_ACTIVITY: "Работа волонтёров",
-            ReportType.PROCEDURE_EXECUTION: "Выполнение процедур",
+            ReportType.PROCEDURE_EXECUTION: "Выполнение услуг",
         }[report_type]
-        metrics = (("total", "Всего процедур"), ("completed", "Выполнено"),
+        metrics = (("total", "Всего услуг"), ("completed", "Выполнено"),
                    ("assigned", "Назначено"), ("cancelled", "Отменено"),
                    ("overdue", "Просрочено"), ("animals", "Животных в назначениях"),
                    ("volunteers", "Волонтёров в назначениях"))

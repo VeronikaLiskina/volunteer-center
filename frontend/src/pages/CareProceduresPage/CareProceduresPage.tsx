@@ -29,7 +29,7 @@ export function CareProceduresPage() {
     getCareProcedures(filters, controller.signal).then((data) => {
       if (!controller.signal.aborted) setList({ data, error: "", key: listKey });
     }).catch((cause: unknown) => {
-      if (!controller.signal.aborted) setList({ data: [], error: cause instanceof Error ? cause.message : "Не удалось загрузить процедуры", key: listKey });
+      if (!controller.signal.aborted) setList({ data: [], error: cause instanceof Error ? cause.message : "Не удалось загрузить услуги", key: listKey });
     });
     return () => controller.abort();
   }, [filters, listKey]);
@@ -45,8 +45,8 @@ export function CareProceduresPage() {
   return <div className="care-procedures-page">
     <header className="care-procedures-page__header">
       <div><p className="care-procedures-page__eyebrow">Забота по расписанию</p>
-        <h1>{isCoordinator ? "Процедуры ухода" : "Мои процедуры"}</h1><p>{isCoordinator ? "Планирование задач для животных и ответственных волонтёров" : "Ваши назначения и результаты выполнения"}</p></div>
-      {isCoordinator && <Link className="care-procedures-page__add" to="/procedures/new"><Icon name="calendar" />Назначить процедуру</Link>}
+        <h1>{isCoordinator ? "Услуги ухода" : "Мои услуги"}</h1><p>{isCoordinator ? "Планирование задач для животных и ответственных волонтёров" : "Ваши назначения и результаты выполнения"}</p></div>
+      {isCoordinator && <Link className="care-procedures-page__add" to="/procedures/new"><Icon name="calendar" />Назначить услугу</Link>}
     </header>
     <section className="care-procedures-page__summary" aria-label="Сводка на сегодня">
       <article><span>Запланировано сегодня</span><strong>{summary?.today_total ?? "—"}</strong></article>

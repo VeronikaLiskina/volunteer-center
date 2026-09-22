@@ -156,7 +156,7 @@ test("dashboard matches layout, displays API counts and opens animal sections", 
   await expect(page.locator(".home-stats__value").last()).toHaveText("5");
   await expect(page.locator(".quick-action")).toHaveCount(4);
   await expect(page.locator(".analytics-link")).toHaveCount(1);
-  await expect(page.getByText("Процедуры на сегодня", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Услуги на сегодня", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Состояние системы", { exact: true })).toHaveCount(0);
   await page.screenshot({ path: testInfo.outputPath("dashboard-desktop.png"), fullPage: true });
   await page.setViewportSize({ width: 375, height: 812 });
@@ -165,7 +165,7 @@ test("dashboard matches layout, displays API counts and opens animal sections", 
 
   for (const [title, path] of [
     ["Добавить животное", "/animals/new"],
-    ["Назначить процедуру", "/procedures/new"],
+    ["Назначить услугу", "/procedures/new"],
     ["Добавить волонтёра", "/volunteers/new"],
     ["Справочники", "/animals/dictionaries"],
   ] as const) {

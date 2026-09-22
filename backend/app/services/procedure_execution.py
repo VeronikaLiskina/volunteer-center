@@ -35,7 +35,7 @@ class ProcedureExecutionService:
             await self.session.commit()
         except IntegrityError as error:
             await self.session.rollback()
-            raise ProcedureExecutionError("Процедура уже была выполнена", 409) from error
+            raise ProcedureExecutionError("Услуга уже была выполнена", 409) from error
 
     async def execute(
         self, procedure_id: int, data: ProcedureExecutionCreate,
@@ -44,15 +44,15 @@ class ProcedureExecutionService:
             procedure_id, for_update=True
         )
         if procedure.status == CareProcedureStatus.COMPLETED:
-            raise ProcedureExecutionError("Процедура уже выполнена", 409)
+            raise ProcedureExecutionError("Услуга уже выполнена", 409)
         if procedure.status == CareProcedureStatus.CANCELLED:
-            raise ProcedureExecutionError("Отменённую процедуру выполнить нельзя", 409)
+            raise ProcedureExecutionError("Отменённую услугу выполнить нельзя", 409)
         if procedure.status not in (
             CareProcedureStatus.ASSIGNED, CareProcedureStatus.OVERDUE,
         ):
-            raise ProcedureExecutionError("Процедуру с этим статусом выполнить нельзя", 409)
+            raise ProcedureExecutionError("Услугу с этим статусом выполнить нельзя", 409)
         if await self.repository.get_by_procedure(procedure_id) is not None:
-            raise ProcedureExecutionError("Для процедуры уже существует выполнение", 409)
+            raise ProcedureExecutionError("Для услуги уже существует выполнение", 409)
 
         execution = ProcedureExecution(
             care_procedure_id=procedure_id, **data.model_dump()
