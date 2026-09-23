@@ -39,7 +39,7 @@ class AuthService:
         self.repository = AuthRepository(session)
 
     async def login(self, phone: str, password: str) -> TokenResponse:
-        user = await self.repository.by_phone(normalize_phone(phone.strip()))
+        user = await self.repository.by_phone(normalize_phone(phone.strip()), lock=True)
         # Equal password work for unknown logins avoids an account enumeration shortcut.
         stored = user.password_hash if user else "scrypt$" + "00"*16 + "$" + "00"*64
         valid = await asyncio.to_thread(verify_password, password, stored)
@@ -70,7 +70,7 @@ class AuthService:
     async def reset_password(self, phone: str, password: str) -> User:
         if not 12 <= len(password) <= 1024:
             raise ValueError("Пароль должен содержать от 12 до 1024 символов")
-        user = await self.repository.by_phone(normalize_phone(phone.strip()))
+        user = await self.repository.by_phone(normalize_phone(phone.strip()), lock=True)
         if user is None:
             raise ValueError("Пользователь с таким номером телефона не найден")
         user.password_hash = await asyncio.to_thread(hash_password, password)

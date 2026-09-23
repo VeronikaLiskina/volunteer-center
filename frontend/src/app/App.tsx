@@ -13,6 +13,7 @@ import { AuthProvider } from "../auth/AuthProvider";
 import { ProtectedRoute } from "../auth/ProtectedRoute";
 import { LoginPage } from "../pages/LoginPage/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage/RegisterPage";
+import { ForgotPasswordPage } from "../pages/ForgotPasswordPage/ForgotPasswordPage";
 import { RegistrationsPage } from "../pages/RegistrationsPage/RegistrationsPage";
 import { Link, Navigate, Route, Routes } from "react-router-dom";
 
@@ -24,6 +25,7 @@ export function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route element={<ProtectedRoute />}>
           <Route path="/procedures" element={<CareProceduresPage />} />
           <Route path="/procedures/:procedureId/execute" element={<ProcedureExecutionPage />} />

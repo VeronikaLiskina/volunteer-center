@@ -10,8 +10,9 @@ class AuthRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def by_phone(self, phone: str) -> User | None:
-        return await self.session.scalar(select(User).where(User.phone == phone))
+    async def by_phone(self, phone: str, *, lock: bool = False) -> User | None:
+        statement = select(User).where(User.phone == phone)
+        return await self.session.scalar(statement.with_for_update() if lock else statement)
 
     async def get(self, user_id: int) -> User | None:
         return await self.session.get(User, user_id)

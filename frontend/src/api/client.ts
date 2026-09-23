@@ -11,6 +11,7 @@ const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:8000").replac
 export class ApiError extends Error {
   status: number;
   fields: Record<string, string>;
+  retryAfter?: number;
 
   constructor(message: string, status: number, fields: Record<string, string> = {}) {
     super(message);
@@ -59,7 +60,10 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
   const body: unknown = await response.json().catch(() => null);
   if (!response.ok) {
     if (response.status === 401 && path !== "/auth/login") setToken(null);
-    throw parseError(body, response.status);
+    const error = parseError(body, response.status);
+    const retryAfter = Number(response.headers.get("Retry-After"));
+    if (Number.isFinite(retryAfter) && retryAfter > 0) error.retryAfter = retryAfter;
+    throw error;
   }
   return body as T;
 }

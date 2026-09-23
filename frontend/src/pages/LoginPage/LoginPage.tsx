@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import "./LoginPage.scss";
 
 export function LoginPage() {
   const auth = useAuth();
+  const navigate = useNavigate();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -23,6 +24,10 @@ export function LoginPage() {
         value={phone} onChange={(e) => setPhone(e.target.value)} required maxLength={32} aria-describedby="login-phone-hint" /></label>
       <p className="login-page__hint" id="login-phone-hint">Можно ввести номер с +7 или 8.</p>
       <label>Пароль<input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required maxLength={1024} /></label>
+      <button className="login-page__forgot-password" type="button"
+        onClick={() => navigate("/forgot-password", { state: { phone } })}>
+        Забыли пароль
+      </button>
       {(error || auth.error) && <p className="login-page__error" role="alert">{error || auth.error}</p>}
       <button type="submit" disabled={busy || auth.loading}>{busy ? "Входим…" : "Войти"}</button>
     </form>
