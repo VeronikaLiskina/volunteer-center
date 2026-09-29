@@ -27,7 +27,10 @@ select {
 }
 
 input, textarea, select { color: $color-text; }
-input::placeholder, textarea::placeholder { color: $color-text-muted; opacity: 1; }
+input::placeholder, textarea::placeholder { color: $color-placeholder; opacity: 1; }
+form select[required]:has(option[value=""]:checked) { color: $color-placeholder; }
+form select[required] option { color: $color-text; }
+form select[required] option[value=""] { color: $color-placeholder; }
 
 :focus-visible { outline: 2px solid $color-accent; outline-offset: 3px; }
 

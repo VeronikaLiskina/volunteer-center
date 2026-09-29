@@ -25,7 +25,7 @@ export function LoginPage() {
       <p className="login-page__hint" id="login-phone-hint">Можно ввести номер с +7 или 8.</p>
       <label>Пароль<input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required maxLength={1024} /></label>
       <button className="login-page__forgot-password" type="button"
-        onClick={() => navigate("/forgot-password", { state: { phone } })}>
+        onClick={() => navigate("/forgot-password")}>
         Забыли пароль
       </button>
       {(error || auth.error) && <p className="login-page__error" role="alert">{error || auth.error}</p>}

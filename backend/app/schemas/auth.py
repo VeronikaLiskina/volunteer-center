@@ -73,22 +73,3 @@ class RegistrationResponse(BaseModel):
 class ApproveRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     role: UserRole
-
-
-class PasswordResetRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
-    phone: Phone
-
-
-class PasswordResetResponse(BaseModel):
-    request_id: str
-    message: str = "Если этот номер зарегистрирован, на него придёт SMS с кодом."
-    resend_after: int = 60
-    expires_in: int = 300
-
-
-class PasswordResetConfirm(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    request_id: str = Field(pattern=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
-    code: str = Field(pattern=r"^[0-9]{6}$")
-    password: str = Field(min_length=12, max_length=1024)

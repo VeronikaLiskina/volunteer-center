@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import SecretStr, computed_field
+from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import URL
 
@@ -16,9 +16,6 @@ class Settings(BaseSettings):
     postgres_port: int
 
     cors_origins: list[str] = ["http://localhost:5173"]
-    sms_ru_api_id: SecretStr | None = None
-    sms_ru_sender: str | None = None
-    password_reset_secret: SecretStr | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

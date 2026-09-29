@@ -8,8 +8,7 @@ from app.models.procedure_execution import ProcedureExecution
 from app.models.user import User, AuthSession
 from app.models.notification import Notification
 from app.models.report_snapshot import ReportSnapshot
-from app.models.password_reset import PasswordReset, PasswordResetLimit
 
 __all__ = ["Animal", "AnimalStatus", "AnimalType", "Breed", "Volunteer", "VolunteerStatus",
            "CareProcedure", "CareProcedureStatus", "CareProcedureType", "ProcedureExecution",
-           "User", "AuthSession", "Notification", "ReportSnapshot", "PasswordReset", "PasswordResetLimit"]
+           "User", "AuthSession", "Notification", "ReportSnapshot"]

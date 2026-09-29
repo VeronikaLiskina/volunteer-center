@@ -1,5 +1,6 @@
 import { useRef, useState, type FormEvent } from "react";
 import { ApiError } from "../../api/client";
+import { capitalizeNameInput } from "../../utils/capitalizeNameInput";
 import type { Volunteer, VolunteerCreate, VolunteerField, VolunteerFieldErrors } from "../../types/volunteer";
 import { FormField } from "../FormField/FormField";
 import { initialVolunteerValues, toVolunteerPayload, validateVolunteer } from "./validation";
@@ -74,8 +75,8 @@ export function VolunteerForm({ volunteer, onSave }: VolunteerFormProps) {
       {error && <p className="volunteer-form__error" role="alert">{error}</p>}
       <div className="volunteer-form__grid">
         <FormField name="full_name" idPrefix="volunteer" label="ФИО" required error={errors.full_name}>
-          <input {...fieldProps("full_name")} required maxLength={100} autoComplete="name"
-            placeholder="Например, Иванова Анна Сергеевна" onChange={(event) => change("full_name", event.target.value)} />
+          <input {...fieldProps("full_name")} required maxLength={100} autoComplete="name" autoCapitalize="words"
+            placeholder="Например, Иванова Анна Сергеевна" onChange={(event) => change("full_name", capitalizeNameInput(event.currentTarget))} />
         </FormField>
         <FormField name="phone" idPrefix="volunteer" label="Телефон" required error={errors.phone}>
           <input {...fieldProps("phone")} required type="tel" maxLength={32} autoComplete="tel"

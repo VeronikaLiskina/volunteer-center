@@ -1,5 +1,6 @@
 import { useRef, useState, type FormEvent } from "react";
 import { ApiError } from "../../api/client";
+import { capitalizeNameInput } from "../../utils/capitalizeNameInput";
 import { AnimalStatus, animalStatusLabels, type Animal, type AnimalCreate, type AnimalType, type Breed,
   type AnimalField, type AnimalFieldErrors } from "../../types/animal";
 import { FormField } from "../FormField/FormField";
@@ -82,8 +83,8 @@ export function AnimalForm({ animal, types, breeds, onSave, onClear }: AnimalFor
       <fieldset className="animal-form__fieldset" disabled={saving || archived}>
         <div className="animal-form__grid">
           <FormField name="name" label="Кличка" required error={errors.name}>
-            <input {...fieldProps("name")} required maxLength={50} placeholder="Введите кличку"
-              onChange={(e) => change("name", e.target.value)} />
+            <input {...fieldProps("name")} required maxLength={50} placeholder="Введите кличку" autoCapitalize="words"
+              onChange={(e) => change("name", capitalizeNameInput(e.currentTarget))} />
           </FormField>
           <FormField name="animal_type_id" label="Тип животного" required error={errors.animal_type_id}>
             <select {...fieldProps("animal_type_id")} required onChange={(e) => change("animal_type_id", e.target.value)}>
@@ -107,8 +108,8 @@ export function AnimalForm({ animal, types, breeds, onSave, onClear }: AnimalFor
               onChange={(e) => change("birth_year", e.target.value)} />
           </FormField>
           <FormField name="owner_name" label="ФИО хозяина / ответственного лица" error={errors.owner_name}>
-            <input {...fieldProps("owner_name")} maxLength={100} placeholder="Введите ФИО"
-              onChange={(e) => change("owner_name", e.target.value)} />
+            <input {...fieldProps("owner_name")} maxLength={100} placeholder="Введите ФИО" autoCapitalize="words"
+              onChange={(e) => change("owner_name", capitalizeNameInput(e.currentTarget))} />
           </FormField>
           <FormField name="owner_phone" label="Телефон хозяина" error={errors.owner_phone}>
             <input {...fieldProps("owner_phone")} type="tel" maxLength={32} placeholder="+7 (999) 123-45-67"

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import { ApiError, request } from "../../api/client";
+import { capitalizeNameInput } from "../../utils/capitalizeNameInput";
 import "../LoginPage/LoginPage.scss";
 
 export function RegisterPage() {
@@ -37,7 +38,8 @@ export function RegisterPage() {
     </div> : <>
       <p>Укажите ФИО, телефон и придумайте пароль. Координатор рассмотрит заявку и назначит роль.</p>
       <form className="login-page__form" onSubmit={submit}>
-        <label>ФИО<input autoComplete="name" required maxLength={100} value={fullName} onChange={(event) => setFullName(event.target.value)} /></label>
+        <label>ФИО<input autoComplete="name" autoCapitalize="words" required maxLength={100} value={fullName}
+          onChange={(event) => setFullName(capitalizeNameInput(event.currentTarget))} /></label>
         <label>Номер телефона<input type="tel" autoComplete="tel" required maxLength={32} placeholder="+7 (999) 123-45-67"
           value={phone} onChange={(event) => setPhone(event.target.value)} /></label>
         <label>Пароль<input type="password" autoComplete="new-password" required minLength={12} maxLength={1024}

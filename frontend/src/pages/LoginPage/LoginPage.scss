@@ -16,7 +16,5 @@
     &:hover { text-decoration-thickness: 2px; }
     &:focus-visible { outline: 2px solid $color-accent; outline-offset: 4px; }
   }
-  &__recovery-actions { display: grid; gap: 12px; }
-  &__form &__secondary { background: transparent; color: $color-accent; border: 1px solid $color-border; }
   &__hint { margin: -12px 0 0; font-size: 13px; }
 }
