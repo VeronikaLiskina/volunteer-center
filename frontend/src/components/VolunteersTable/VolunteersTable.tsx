@@ -1,4 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { DeactivateVolunteerDialog } from "../DeactivateVolunteerDialog/DeactivateVolunteerDialog";
+import type { Reassignment } from "../../api/volunteers";
+import { formatPhone } from "../../utils/phone";
+import { useState } from "react";
 import { VOLUNTEERS_PAGE_SIZE } from "../../api/volunteers";
 import { VolunteerStatus, volunteerStatusLabels, type Volunteer, type VolunteerFilters } from "../../types/volunteer";
 import { Icon } from "../Icon/Icon";
@@ -11,39 +14,8 @@ interface VolunteersTableProps {
   error: string;
   onFilters: (filters: VolunteerFilters) => void;
   onEdit: (id: number) => void;
-  onStatus: (volunteer: Volunteer, status: VolunteerStatus) => Promise<void>;
+  onStatus: (volunteer: Volunteer, status: VolunteerStatus, replacements?: Reassignment[]) => Promise<void>;
   onRetry: () => void;
-}
-
-function DeactivateDialog({ volunteer, onConfirm, onClose }: {
-  volunteer: Volunteer; onConfirm: () => Promise<boolean>; onClose: () => void;
-}) {
-  const dialog = useRef<HTMLDialogElement>(null);
-  const [busy, setBusy] = useState(false);
-  useEffect(() => { dialog.current?.showModal(); }, []);
-
-  async function confirm() {
-    setBusy(true);
-    if (await onConfirm()) onClose();
-    setBusy(false);
-  }
-
-  return <dialog className="volunteers-table__dialog" ref={dialog} aria-labelledby="deactivate-volunteer-title"
-    onCancel={(event) => { event.preventDefault(); if (!busy) onClose(); }}>
-    <h2 id="deactivate-volunteer-title">Деактивировать волонтёра?</h2>
-    <p>«{volunteer.full_name}» останется в базе, но не будет доступен для назначения новых услуг.</p>
-    <div className="volunteers-table__dialog-actions">
-      <button className="volunteers-table__button" type="button" autoFocus disabled={busy} onClick={onClose}>Отмена</button>
-      <button className="volunteers-table__button volunteers-table__button--danger" type="button" disabled={busy}
-        onClick={() => void confirm()}>{busy ? "Деактивация…" : "Деактивировать"}</button>
-    </div>
-  </dialog>;
-}
-
-function formatPhone(phone: string) {
-  return /^\+7\d{10}$/.test(phone)
-    ? `+7 (${phone.slice(2, 5)}) ${phone.slice(5, 8)}-${phone.slice(8, 10)}-${phone.slice(10)}`
-    : phone;
 }
 
 export function VolunteersTable({ volunteers, filters, loading, error, onFilters,
@@ -134,7 +106,7 @@ export function VolunteersTable({ volunteers, filters, loading, error, onFilters
         disabled={loading || Boolean(error) || volunteers.length <= VOLUNTEERS_PAGE_SIZE}
         onClick={() => onFilters({ ...filters, offset: filters.offset + VOLUNTEERS_PAGE_SIZE })}>Далее</button>
     </div>
-    {deactivateTarget && <DeactivateDialog volunteer={deactivateTarget} onClose={() => setDeactivateTarget(null)}
-      onConfirm={() => changeStatus(deactivateTarget, VolunteerStatus.Inactive)} />}
+    {deactivateTarget && <DeactivateVolunteerDialog volunteer={deactivateTarget} onClose={() => setDeactivateTarget(null)}
+      onConfirm={(replacements) => onStatus(deactivateTarget, VolunteerStatus.Inactive, replacements)} />}
   </section>;
 }

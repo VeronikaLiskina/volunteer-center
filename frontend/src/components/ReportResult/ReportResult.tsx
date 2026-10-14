@@ -1,10 +1,9 @@
+import { formatDate } from "../../utils/date";
 import { Icon } from "../Icon/Icon";
 import type { ReportData } from "../../types/analytics";
 import "./ReportResult.scss";
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${value}T00:00:00`));
-}
+
 
 export function ReportResult({ result, loading, error, exporting, exportError, onExport, exportingImage, imageError, onExportImage }: {
   result: ReportData | null; loading: boolean; error: string; exporting: boolean; exportError: string;
@@ -27,7 +26,7 @@ export function ReportResult({ result, loading, error, exporting, exportError, o
           </div>)}
         </dl>
         <div className="report-result__footer">
-          <p className="report-result__note">XLSX — данные отчёта. PNG — показатели, диаграммы и рейтинг волонтёров картинкой.</p>
+          <p className="report-result__note">XLSX — данные отчёта. PNG — показатели, диаграммы и таблицы выбранного отчёта.</p>
           <div className="report-result__downloads">
             <button className="report-result__export" type="button" disabled={exporting} onClick={() => void onExport(result)}>
               <Icon name="file" />{exporting ? "Подготавливаем Excel…" : "Выгрузить отчёт"}

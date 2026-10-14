@@ -1,4 +1,5 @@
 import { request } from "./client";
+import type { CareProcedure } from "../types/careProcedure";
 import type { Volunteer, VolunteerCreate, VolunteerFilters, VolunteerSummary, VolunteerUpdate } from "../types/volunteer";
 
 export const VOLUNTEERS_PAGE_SIZE = 20;
@@ -25,7 +26,11 @@ export const createVolunteer = (data: VolunteerCreate) =>
   request<Volunteer>("/volunteers", { method: "POST", body: JSON.stringify(data) });
 export const updateVolunteer = (id: number, data: VolunteerUpdate) =>
   request<Volunteer>(`/volunteers/${id}`, { method: "PATCH", body: JSON.stringify(data) });
-export const deactivateVolunteer = (id: number) =>
-  request<Volunteer>(`/volunteers/${id}/deactivate`, { method: "POST" });
+export interface Reassignment { procedure_id: number; volunteer_id: number }
+export interface DeactivationAssignment { procedure: CareProcedure; candidates: Volunteer[] }
+export const getDeactivationAssignments = (id: number, signal?: AbortSignal) =>
+  request<DeactivationAssignment[]>(`/volunteers/${id}/deactivation-assignments`, { signal });
+export const deactivateVolunteer = (id: number, reassignments: Reassignment[] = []) =>
+  request<Volunteer>(`/volunteers/${id}/deactivate`, { method: "POST", body: JSON.stringify({ reassignments }) });
 export const activateVolunteer = (id: number) =>
   request<Volunteer>(`/volunteers/${id}/activate`, { method: "POST" });

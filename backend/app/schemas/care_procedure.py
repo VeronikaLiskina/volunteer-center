@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from app.models.care_procedure import CareProcedureStatus
 from app.schemas.care_procedure_type import CareProcedureTypeResponse
+from app.schemas.volunteer import VolunteerResponse
 
 PositiveId = Annotated[int, Field(gt=0)]
 Duration = Annotated[int, Field(gt=0, le=1440)]
@@ -17,14 +18,15 @@ class AnimalReference(BaseModel):
     name: str
 
 
-class VolunteerReference(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-    full_name: str
-
-
 class CareProcedureInput(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    @field_validator("planned_time", check_fields=False)
+    @classmethod
+    def local_time(cls, value: time | None) -> time | None:
+        if value is not None and value.tzinfo is not None:
+            raise ValueError("Укажите местное время без часового пояса")
+        return value
 
     @field_validator("comment", mode="before", check_fields=False)
     @classmethod
@@ -83,11 +85,17 @@ class CareProcedureResponse(BaseModel):
     volunteer_id: int
     status: CareProcedureStatus
     comment: str | None
+    suspended_by_archive: bool = False
     animal: AnimalReference
     procedure_type: CareProcedureTypeResponse
-    volunteer: VolunteerReference
+    volunteer: VolunteerResponse
 
 
 class CareProcedureSummaryResponse(BaseModel):
     today_total: int
     today_completed: int
+
+
+class DeactivationAssignment(BaseModel):
+    procedure: CareProcedureResponse
+    candidates: list[VolunteerResponse]

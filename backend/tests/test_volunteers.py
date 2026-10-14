@@ -28,6 +28,7 @@ async def test_create_normalizes_phone_and_gets_card(client, volunteer_data):
         "full_name": "Иванов Иван Иванович",
         "phone": "+79991234567",
         "status": "active",
+        "available_from": None, "available_to": None,
         "note": "Помогает по выходным",
     }
     assert "duplicate_key" not in volunteer

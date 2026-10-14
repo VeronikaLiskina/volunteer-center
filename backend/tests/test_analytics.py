@@ -68,7 +68,7 @@ async def test_reports_by_type_and_period_validation(client, animal_data):
         result = response.json()
         assert result["report_type"] == report_type
         assert set(expected_keys) <= {metric["key"] for metric in result["metrics"]}
-        assert len(result["metrics"]) == 7
+        assert len(result["metrics"]) == {"animal_care": 4, "volunteer_activity": 5, "procedure_execution": 6}[report_type]
 
     invalid = await client.get("/api/v1/reports", params={
         "report_type": "procedure_execution",
@@ -122,10 +122,10 @@ async def test_period_service_filters_and_export_agree(client, animal_data):
                "procedure_type_id": completed["procedure_type_id"]}
     report = (await client.get("/api/v1/reports", params=filters)).json()
     values = {m["key"]: m["value"] for m in report["metrics"]}
-    assert values == {"total": 1, "completed": 1, "assigned": 0, "cancelled": 0, "overdue": 0, "animals": 1, "volunteers": 1}
+    assert values == {"total": 1, "completed": 1, "assigned": 0, "cancelled": 0, "overdue": 0, "failed": 0}
     assert sum(r["completed"] for r in report["executions_by_month"]) == 1
     assert sum(r["count"] for r in report["procedure_types"]) == 1
-    assert sum(r["completed_count"] for r in report["volunteer_activity"]) == 1
+    assert report["volunteer_activity"] == []
     assert len(report["executions_by_month"]) == 1
     assert len(report["procedure_types"]) == 1
     analytics = (await client.get("/api/v1/analytics", params=filters)).json()

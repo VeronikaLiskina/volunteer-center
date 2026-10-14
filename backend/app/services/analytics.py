@@ -96,20 +96,35 @@ class ReportsService:
             ReportType.VOLUNTEER_ACTIVITY: "Работа волонтёров",
             ReportType.PROCEDURE_EXECUTION: "Выполнение услуг",
         }[report_type]
-        metrics = (("total", "Всего услуг"), ("completed", "Выполнено"),
-                   ("assigned", "Назначено"), ("cancelled", "Отменено"),
-                   ("overdue", "Просрочено"), ("animals", "Животных в назначениях"),
-                   ("volunteers", "Волонтёров в назначениях"))
+        animals, workload, failed = await self.repository.report_details(date_from, date_to, procedure_type_id)
+        values["failed"] = failed
+        values["cancelled"] -= failed  # Explicit failures have their own report category.
+        values["active_volunteers"] = sum(row[2] == "active" for row in workload)
+        values["completed_minutes"] = sum(row[5] for row in workload)
+        metrics = {
+            ReportType.ANIMAL_CARE: (("animals", "Животных в назначениях"), ("total", "Всего услуг"),
+                ("completed", "Выполнено"), ("failed", "Не выполнено")),
+            ReportType.VOLUNTEER_ACTIVITY: (("volunteers", "Волонтёров в назначениях"),
+                ("active_volunteers", "Активных среди участников"), ("total", "Всего назначений"),
+                ("completed", "Выполнено"), ("completed_minutes", "Плановых минут выполненных услуг")),
+            ReportType.PROCEDURE_EXECUTION: (("total", "Всего услуг"), ("completed", "Выполнено"),
+                ("failed", "Не выполнено"), ("assigned", "Назначено"), ("cancelled", "Отменено"),
+                ("overdue", "Просрочено")),
+        }[report_type]
         return ReportResponse(
             report_type=report_type, title=title, date_from=date_from, date_to=date_to,
             metrics=[ReportMetric(key=key, label=label, value=values[key]) for key, label in metrics],
             procedure_type_id=procedure_type_id, procedure_type_name=type_name,
-            executions_by_month=[MonthlyExecution(month=month.strftime("%Y-%m"),
+            executions_by_month=[] if report_type == ReportType.ANIMAL_CARE else [MonthlyExecution(month=month.strftime("%Y-%m"),
                 label=f"{MONTH_LABELS[month.month - 1]} {month.year}", completed=monthly.get(month.strftime("%Y-%m"), 0)) for month in months],
-            procedure_types=[ProcedureTypeShare(procedure_type_id=type_id, name=name, count=count,
+            procedure_types=[] if report_type == ReportType.VOLUNTEER_ACTIVITY else [ProcedureTypeShare(procedure_type_id=type_id, name=name, count=count,
                 percentage=round(count * 100 / values["total"], 1)) for type_id, name, count in distribution],
-            volunteer_activity=[VolunteerActivity(volunteer_id=volunteer_id, full_name=name, completed_count=count)
+            volunteer_activity=[] if report_type != ReportType.VOLUNTEER_ACTIVITY else [VolunteerActivity(volunteer_id=volunteer_id, full_name=name, completed_count=count)
                 for volunteer_id, name, count in activity],
+            animal_activity=[dict(animal_id=row[0], name=row[1], total=row[2], completed=row[3])
+                for row in animals] if report_type == ReportType.ANIMAL_CARE else [],
+            volunteer_workload=[dict(volunteer_id=row[0], full_name=row[1], total=row[3], completed=row[4], completed_minutes=row[5])
+                for row in workload] if report_type == ReportType.VOLUNTEER_ACTIVITY else [],
         )
 
     async def export_xlsx(
@@ -158,7 +173,14 @@ def build_xlsx(report: ReportResponse) -> bytes:
         ("Выполнено по плановому месяцу", [(item.label, item.completed) for item in report.executions_by_month]),
         ("Активность волонтёров: выполнено", [(item.full_name, item.completed_count) for item in report.volunteer_activity]),
     ]
+    sections.extend([
+        ("Уход по животным: назначений", [(item.name, item.total) for item in report.animal_activity]),
+        ("Нагрузка волонтёров: назначений", [(item.full_name, item.total) for item in report.volunteer_workload]),
+        ("Плановых минут выполненных услуг", [(item.full_name, item.completed_minutes) for item in report.volunteer_workload]),
+    ])
     for title, items in sections:
+        if not items:
+            continue
         rows.append(f'<row r="{index}">{inline_cell(f"A{index}", title, 1)}</row>')
         index += 1
         for label, value in items:

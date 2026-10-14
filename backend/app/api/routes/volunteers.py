@@ -11,7 +11,9 @@ from app.schemas.volunteer import (
     VolunteerResponse,
     VolunteerSummaryResponse,
     VolunteerUpdate,
+    VolunteerDeactivate,
 )
+from app.schemas.care_procedure import DeactivationAssignment
 from app.services.volunteer import VolunteerService
 
 router = APIRouter(prefix="/volunteers", tags=["volunteers"])
@@ -64,8 +66,13 @@ async def update_volunteer(volunteer_id: VolunteerId, data: VolunteerUpdate, ser
 
 
 @router.post("/{volunteer_id}/deactivate", response_model=VolunteerResponse)
-async def deactivate_volunteer(volunteer_id: VolunteerId, service: Service) -> Volunteer:
-    return await service.set_status(volunteer_id, VolunteerStatus.INACTIVE)
+async def deactivate_volunteer(volunteer_id: VolunteerId, service: Service, data: VolunteerDeactivate | None = None) -> Volunteer:
+    return await service.deactivate(volunteer_id, data or VolunteerDeactivate())
+
+
+@router.get("/{volunteer_id}/deactivation-assignments", response_model=list[DeactivationAssignment])
+async def deactivation_assignments(volunteer_id: VolunteerId, service: Service):
+    return await service.deactivation_assignments(volunteer_id)
 
 
 @router.post("/{volunteer_id}/activate", response_model=VolunteerResponse)

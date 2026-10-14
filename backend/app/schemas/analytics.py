@@ -65,6 +65,21 @@ class ReportMetric(BaseModel):
     value: int
 
 
+class AnimalActivity(BaseModel):
+    animal_id: int
+    name: str
+    total: int
+    completed: int
+
+
+class VolunteerWorkload(BaseModel):
+    volunteer_id: int
+    full_name: str
+    total: int
+    completed: int
+    completed_minutes: int
+
+
 class ReportResponse(BaseModel):
     report_type: ReportType
     title: str
@@ -78,3 +93,5 @@ class ReportResponse(BaseModel):
     volunteer_activity: list[VolunteerActivity] = []
     report_id: UUID | None = None
     generated_at: datetime | None = None
+    animal_activity: list[AnimalActivity] = []
+    volunteer_workload: list[VolunteerWorkload] = []

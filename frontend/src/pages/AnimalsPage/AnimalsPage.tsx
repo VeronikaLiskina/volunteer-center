@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { archiveAnimal, getAnimals, getAnimalSummary } from "../../api/animals";
+import { restoreAnimal, archiveAnimal, getAnimals, getAnimalSummary } from "../../api/animals";
 import { getAnimalTypes } from "../../api/dictionaries";
 import { AnimalsTable } from "../../components/AnimalsTable/AnimalsTable";
 import { Icon } from "../../components/Icon/Icon";
@@ -55,8 +55,8 @@ export function AnimalsPage() {
   }, [revision]);
 
   async function archive(animal: Animal) {
-    const saved = await archiveAnimal(animal.id);
-    setNotice(`Карточка «${saved.name}» переведена в архив`);
+    const saved = await (animal.status === "archived" ? restoreAnimal(animal.id) : archiveAnimal(animal.id));
+    setNotice(`Карточка «${saved.name}» ${saved.status === "archived" ? "переведена в архив" : "восстановлена"}`);
     setRevision((value) => value + 1);
   }
 

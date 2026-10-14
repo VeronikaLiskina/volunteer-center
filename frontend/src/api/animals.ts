@@ -26,3 +26,5 @@ export const updateAnimal = (id: number, data: AnimalUpdate) =>
   request<Animal>(`/animals/${id}`, { method: "PATCH", body: JSON.stringify(data) });
 export const archiveAnimal = (id: number) =>
   request<Animal>(`/animals/${id}/archive`, { method: "POST" });
+
+export const restoreAnimal = (id: number) => request<Animal>(`/animals/${id}/restore`, { method: "POST" });

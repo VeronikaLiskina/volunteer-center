@@ -27,6 +27,7 @@ class ProcedureExecutionRepository:
         return await self.session.scalar(
             select(func.count(ProcedureExecution.id)).join(CareProcedure).where(
                 ProcedureExecution.execution_date == execution_date,
+                ProcedureExecution.is_completed.is_(True),
                 *([CareProcedure.volunteer_id == volunteer_id] if volunteer_id is not None else []),
             )
         ) or 0

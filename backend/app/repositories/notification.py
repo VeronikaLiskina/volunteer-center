@@ -27,6 +27,7 @@ class NotificationRepository:
     async def scheduled(self, user: User, now: datetime) -> list[CareProcedure]:
         query = select(CareProcedure).options(*CareProcedureRepository(self.session).with_references()).where(
             CareProcedure.status.in_([CareProcedureStatus.ASSIGNED, CareProcedureStatus.OVERDUE]),
+            CareProcedure.suspended_by_archive.is_(False),
             CareProcedure.planned_date + CareProcedure.planned_time <= now + timedelta(hours=24),
         )
         if user.role == UserRole.VOLUNTEER:

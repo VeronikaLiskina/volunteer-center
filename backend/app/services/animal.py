@@ -10,6 +10,9 @@ from app.repositories.animal import AnimalRepository
 from app.repositories.animal_type import get_animal_type
 from app.repositories.breed import get_breed
 from app.schemas.animal import AnimalCreate, AnimalUpdate
+from app.repositories.care_procedure import CareProcedureRepository
+from app.services.care_procedure import CareProcedureService
+from app.services.notification import NotificationService
 
 
 def duplicate_key(data: AnimalCreate) -> str:
@@ -78,7 +81,32 @@ class AnimalService:
         return await self.get(animal_id)
 
     async def archive(self, animal_id: int) -> Animal:
-        animal = await self.get(animal_id, for_update=True)
-        animal.status = AnimalStatus.ARCHIVED
-        await self.commit()
-        return await self.get(animal_id)
+        return await self.set_archived(animal_id, True)
+
+    async def restore(self, animal_id: int) -> Animal:
+        return await self.set_archived(animal_id, False)
+
+    async def set_archived(self, animal_id: int, archived: bool) -> Animal:
+        repository = CareProcedureRepository(self.session)
+        try:
+            await repository.lock_schedule()
+            animal = await self.get(animal_id, for_update=True)
+            target = AnimalStatus.ARCHIVED if archived else AnimalStatus.IN_CARE
+            if animal.status != target:
+                procedures = await repository.pending(animal_id=animal_id, suspended=not archived)
+                for procedure in procedures:
+                    if not archived:
+                        await CareProcedureService(self.session).validate_assignment(
+                            volunteer_id=procedure.volunteer_id, planned_date=procedure.planned_date,
+                            planned_time=procedure.planned_time, duration_minutes=procedure.duration_minutes,
+                            exclude_id=procedure.id)
+                    procedure.suspended_by_archive = archived
+                    procedure.revision += 1
+                    await self.session.flush()
+                    await NotificationService(self.session).event(procedure, "suspended" if archived else "restored")
+                animal.status = target
+            await self.commit()
+            return await self.get(animal_id)
+        except Exception:
+            await self.session.rollback()
+            raise

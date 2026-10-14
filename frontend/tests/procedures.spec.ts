@@ -64,7 +64,7 @@ test.beforeEach(async ({ page }) => {
       const execution: ProcedureExecution = { ...data, id: executions.length + 1,
         care_procedure_id: id, created_at: "2026-09-09T10:45:00+08:00" };
       executions = [...executions, execution];
-      procedure.status = CareProcedureStatus.Completed;
+      procedure.status = data.is_completed === false ? CareProcedureStatus.Cancelled : CareProcedureStatus.Completed;
       return route.fulfill({ status: 201, json: execution });
     }
     if (path.endsWith("/execution")) {
@@ -194,7 +194,7 @@ test("assigned procedure can be executed and its result is shown", async ({ page
   await expect(page.locator("#procedure-execution-execution_date-error")).toHaveText("Укажите дату выполнения");
   await expect(page.locator("#procedure-execution-execution_time-error")).toHaveText("Укажите время выполнения");
   await expect(page.locator("#procedure-execution-result-error")).toHaveText("Опишите результат выполнения");
-  await page.locator("#procedure-execution-execution_date").fill("2026-09-09");
+  await page.locator("#procedure-execution-execution_date").fill("09.09.2026");
   const executionTime = page.getByRole("textbox", { name: "Время выполнения" });
   await executionTime.fill("24:00");
   await page.getByRole("button", { name: "Сохранить выполнение" }).click();

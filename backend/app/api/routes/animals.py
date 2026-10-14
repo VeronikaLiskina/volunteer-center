@@ -57,3 +57,8 @@ async def update_animal(animal_id: AnimalId, data: AnimalUpdate, service: Servic
 @router.post("/{animal_id}/archive", response_model=AnimalResponse)
 async def archive_animal(animal_id: AnimalId, service: Service) -> Animal:
     return await service.archive(animal_id)
+
+
+@router.post("/{animal_id}/restore", response_model=AnimalResponse)
+async def restore_animal(animal_id: AnimalId, service: Service) -> Animal:
+    return await service.restore(animal_id)

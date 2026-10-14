@@ -1,3 +1,4 @@
+import { formatDate } from "../../utils/date";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getCareProcedure } from "../../api/careProcedures";
@@ -7,10 +8,7 @@ import { CareProcedureStatus, careProcedureStatusLabels, type CareProcedure } fr
 import type { ProcedureExecutionCreate } from "../../types/procedureExecution";
 import "./ProcedureExecutionPage.scss";
 
-function formatDate(value: string) {
-  const [year, month, day] = value.split("-");
-  return `${day}.${month}.${year}`;
-}
+
 
 export function ProcedureExecutionPage() {
   const { procedureId } = useParams();
@@ -38,11 +36,11 @@ export function ProcedureExecutionPage() {
 
   async function save(data: ProcedureExecutionCreate) {
     await executeProcedure(id, data);
-    navigate("/procedures", { state: { notice: "Услуга выполнена" } });
+    navigate("/procedures", { state: { notice: data.is_completed === false ? "Сохранена причина невыполнения" : "Услуга выполнена" } });
   }
 
   const procedure = resource.procedure;
-  const executable = procedure && (
+  const executable = procedure && !procedure.suspended_by_archive && (
     procedure.status === CareProcedureStatus.Assigned
     || procedure.status === CareProcedureStatus.Overdue
   );
@@ -51,7 +49,7 @@ export function ProcedureExecutionPage() {
     <header className="procedure-execution-page__header"><div>
       <p className="procedure-execution-page__eyebrow">Фактическое выполнение</p>
       <h1>Выполнение услуги</h1>
-      <p>Заполните результат работы — после сохранения услуга получит статус «Выполнена».</p>
+      <p>Укажите, выполнена ли услуга. Если нет — опишите причину.</p>
     </div><Link className="procedure-execution-page__close" to="/procedures" aria-label="Закрыть и вернуться к списку услуг">
       <span aria-hidden="true">×</span> Закрыть</Link></header>
     {!resource.loaded ? <p className="procedure-execution-page__state" role="status">Загружаем услугу…</p>

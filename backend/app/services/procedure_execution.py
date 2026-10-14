@@ -1,10 +1,14 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic import ValidationError
 
 from app.core.errors import ProcedureExecutionError
 from app.models.care_procedure import CareProcedureStatus
 from app.models.procedure_execution import ProcedureExecution
 from app.repositories.procedure_execution import ProcedureExecutionRepository
+from app.repositories.care_procedure import CareProcedureRepository
+from app.models.animal import AnimalStatus
+from app.models.volunteer import VolunteerStatus
 from app.schemas.procedure_execution import (
     ProcedureExecutionCreate,
     ProcedureExecutionUpdate,
@@ -40,9 +44,14 @@ class ProcedureExecutionService:
     async def execute(
         self, procedure_id: int, data: ProcedureExecutionCreate,
     ) -> ProcedureExecution:
+        await CareProcedureRepository(self.session).lock_schedule()
         procedure = await CareProcedureService(self.session, self.actor).get(
             procedure_id, for_update=True
         )
+        if procedure.suspended_by_archive or procedure.animal.status == AnimalStatus.ARCHIVED:
+            raise ProcedureExecutionError("Услуга приостановлена из-за архивации животного", 409)
+        if procedure.volunteer.status != VolunteerStatus.ACTIVE:
+            raise ProcedureExecutionError("Волонтёр неактивен", 409)
         if procedure.status == CareProcedureStatus.COMPLETED:
             raise ProcedureExecutionError("Услуга уже выполнена", 409)
         if procedure.status == CareProcedureStatus.CANCELLED:
@@ -58,7 +67,7 @@ class ProcedureExecutionService:
             care_procedure_id=procedure_id, **data.model_dump()
         )
         self.repository.add(execution)
-        procedure.status = CareProcedureStatus.COMPLETED
+        procedure.status = CareProcedureStatus.COMPLETED if data.is_completed else CareProcedureStatus.CANCELLED
         await self.commit()
         return await self.get(procedure_id)
 
@@ -66,7 +75,12 @@ class ProcedureExecutionService:
         self, procedure_id: int, changes: ProcedureExecutionUpdate,
     ) -> ProcedureExecution:
         execution = await self.get(procedure_id, for_update=True)
-        for field, value in changes.model_dump(exclude_unset=True).items():
+        current = {field: getattr(execution, field) for field in ProcedureExecutionCreate.model_fields}
+        try:
+            validated = ProcedureExecutionCreate.model_validate(current | changes.model_dump(exclude_unset=True))
+        except ValidationError as error:
+            raise ProcedureExecutionError("Укажите корректный результат и причину невыполнения", 422) from error
+        for field, value in validated.model_dump().items():
             setattr(execution, field, value)
         await self.commit()
         return await self.get(procedure_id)

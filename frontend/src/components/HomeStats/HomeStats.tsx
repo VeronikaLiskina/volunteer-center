@@ -1,3 +1,4 @@
+import { formatDate, localDate } from "../../utils/date";
 import { Icon, type IconName } from "../Icon/Icon";
 import type { AnimalSummary } from "../../types/animal";
 import type { CareProcedureSummary } from "../../types/careProcedure";
@@ -19,7 +20,7 @@ interface HomeStatsProps {
 
 function formatToday() {
   const now = new Date();
-  const date = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" }).format(now);
+  const date = formatDate(localDate(now));
   const weekday = new Intl.DateTimeFormat("ru-RU", { weekday: "short" }).format(now).replace(".", "");
   return `${date}, ${weekday}`;
 }

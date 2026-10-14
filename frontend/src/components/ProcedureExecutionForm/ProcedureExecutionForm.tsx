@@ -1,3 +1,4 @@
+import { DateInput } from "../../components/DateInput/DateInput";
 import { useRef, useState, type FormEvent } from "react";
 import { ApiError } from "../../api/client";
 import type {
@@ -19,22 +20,25 @@ function currentValues(): FormValues {
     execution_date: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`,
     execution_time: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`,
     result: "",
+    failure_reason: "",
     comment: "",
   };
 }
 
-function validate(values: FormValues): ProcedureExecutionFieldErrors {
+function validate(values: FormValues, completed: boolean): ProcedureExecutionFieldErrors {
   const errors: ProcedureExecutionFieldErrors = {};
   if (!values.execution_date) errors.execution_date = "Укажите дату выполнения";
   if (!values.execution_time) errors.execution_time = "Укажите время выполнения";
   else if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(values.execution_time))
     errors.execution_time = "Введите время в формате ЧЧ:ММ, от 00:00 до 23:59";
-  if (!values.result.trim()) errors.result = "Опишите результат выполнения";
+  if (completed && !values.result.trim()) errors.result = "Опишите результат выполнения";
   if (values.comment.length > 255) errors.comment = "Не более 255 символов";
+  if (!completed && !values.failure_reason.trim()) errors.failure_reason = "Укажите причину невыполнения";
   return errors;
 }
 
 export function ProcedureExecutionForm({ onSave }: Props) {
+  const [completed, setCompleted] = useState(true);
   const [values, setValues] = useState(currentValues);
   const [errors, setErrors] = useState<ProcedureExecutionFieldErrors>({});
   const [error, setError] = useState("");
@@ -60,7 +64,7 @@ export function ProcedureExecutionForm({ onSave }: Props) {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const fieldErrors = validate(values);
+    const fieldErrors = validate(values, completed);
     setErrors(fieldErrors);
     setError("");
     if (Object.keys(fieldErrors).length) {
@@ -73,6 +77,8 @@ export function ProcedureExecutionForm({ onSave }: Props) {
         execution_date: values.execution_date,
         execution_time: `${values.execution_time}:00`,
         result: values.result.trim(),
+        is_completed: completed,
+        failure_reason: completed ? null : values.failure_reason.trim(),
         comment: values.comment.trim() || null,
       });
     } catch (cause) {
@@ -92,10 +98,18 @@ export function ProcedureExecutionForm({ onSave }: Props) {
     </div>
     <form ref={formRef} onSubmit={submit} noValidate aria-busy={saving}>
       {error && <p className="procedure-execution-form__error" role="alert">{error}</p>}
+      <label>Итог услуги
+        <select value={String(completed)} onChange={(event) => { setCompleted(event.target.value === "true"); setErrors({}); }}>
+          <option value="true">Выполнено</option><option value="false">Не выполнено</option>
+        </select>
+      </label>
+      {!completed && <FormField name="failure_reason" idPrefix="procedure-execution" label="Причина невыполнения" required error={errors.failure_reason}>
+        <textarea {...fieldProps("failure_reason")} required rows={3} onChange={(event) => change("failure_reason", event.target.value)} />
+      </FormField>}
       <div className="procedure-execution-form__grid">
         <div className="procedure-execution-form__field">
           <FormField name="execution_date" idPrefix="procedure-execution" label="Дата выполнения" required error={errors.execution_date}>
-            <input {...fieldProps("execution_date")} type="date" required
+            <DateInput {...fieldProps("execution_date")} type="date" required
               onChange={(event) => change("execution_date", event.target.value)} />
           </FormField>
         </div>
@@ -106,9 +120,9 @@ export function ProcedureExecutionForm({ onSave }: Props) {
           </FormField>
         </div>
         <div className="procedure-execution-form__field procedure-execution-form__field--wide">
-          <FormField name="result" idPrefix="procedure-execution" label="Результат" required error={errors.result}>
+          <FormField name="result" idPrefix="procedure-execution" label="Результат" required={completed} error={errors.result}>
             <textarea {...fieldProps("result")} className={`procedure-execution-form__textarea${errors.result ? " procedure-execution-form__textarea--error" : ""}`}
-              rows={6} required placeholder="Что было сделано и как чувствует себя животное"
+              rows={6} required={completed} placeholder="Что было сделано и как чувствует себя животное"
               onChange={(event) => change("result", event.target.value)} />
           </FormField>
         </div>

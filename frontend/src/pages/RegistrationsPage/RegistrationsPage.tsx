@@ -1,3 +1,4 @@
+import { formatDateTime } from "../../utils/date";
 import { useEffect, useState } from "react";
 import { request } from "../../api/client";
 import "./RegistrationsPage.scss";
@@ -10,7 +11,7 @@ interface Registration {
 }
 const statuses: Record<Status, string> = { pending: "Ожидают подтверждения", approved: "Подтверждены", rejected: "Отклонены" };
 const roles: Record<Role, string> = { COORDINATOR: "Координатор", VOLUNTEER: "Волонтёр" };
-const date = (value: string) => new Date(value).toLocaleString("ru-RU");
+const date = formatDateTime;
 
 function RegistrationCard({ item, busy, onReview }: {
   item: Registration; busy: boolean; onReview: (id: number, role: Role | null) => Promise<void>;

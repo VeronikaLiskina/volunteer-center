@@ -1,3 +1,4 @@
+import { DateInput } from "../../components/DateInput/DateInput";
 import { useEffect, useState, type FormEvent } from "react";
 import { getCareProcedureTypes } from "../../api/careProcedureTypes";
 import type { CareProcedureType } from "../../types/careProcedure";
@@ -40,9 +41,9 @@ export function ReportFilters({ initialValue, loading, onSubmit }: {
     <fieldset className="report-filters__fieldset" disabled={loading}>
       <legend>Выберите период</legend>
       <div className="report-filters__dates">
-        <label>Дата начала<input type="date" value={value.date_from} onChange={(event) => setValue({ ...value, date_from: event.target.value })} /></label>
+        <label>Дата начала<DateInput type="date" value={value.date_from} onChange={(event) => setValue({ ...value, date_from: event.target.value })} /></label>
         <span aria-hidden="true">—</span>
-        <label>Дата окончания<input type="date" value={value.date_to} onChange={(event) => setValue({ ...value, date_to: event.target.value })} /></label>
+        <label>Дата окончания<DateInput type="date" value={value.date_to} onChange={(event) => setValue({ ...value, date_to: event.target.value })} /></label>
       </div>
     </fieldset>
     <fieldset className="report-filters__fieldset" disabled={loading}>

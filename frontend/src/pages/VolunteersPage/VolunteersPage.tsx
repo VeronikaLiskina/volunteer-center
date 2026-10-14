@@ -1,3 +1,4 @@
+import type { Reassignment } from "../../api/volunteers";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { activateVolunteer, deactivateVolunteer, getVolunteers, getVolunteerSummary } from "../../api/volunteers";
@@ -41,10 +42,10 @@ export function VolunteersPage() {
     return () => controller.abort();
   }, [revision]);
 
-  async function changeStatus(volunteer: Volunteer, status: VolunteerStatus) {
+  async function changeStatus(volunteer: Volunteer, status: VolunteerStatus, replacements?: Reassignment[]) {
     const saved = status === VolunteerStatus.Active
       ? await activateVolunteer(volunteer.id)
-      : await deactivateVolunteer(volunteer.id);
+      : await deactivateVolunteer(volunteer.id, replacements);
     setNotice(status === VolunteerStatus.Active
       ? `${saved.full_name} снова активен`
       : `${saved.full_name} деактивирован`);

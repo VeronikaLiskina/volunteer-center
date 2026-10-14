@@ -1,3 +1,4 @@
+import { formatDateTime } from "../../utils/date";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { request } from "../../api/client";
@@ -45,7 +46,7 @@ export function Notifications() {
       {!data && !error && <p role="status">Загрузка…</p>}
       {data?.items.length === 0 && <p>Уведомлений пока нет</p>}
       <ul className="notifications__list">{data?.items.map((item) => <li className={`notifications__item${item.is_read ? "" : " notifications__item--unread"}`} key={item.id}>
-        <p>{item.message}</p><time dateTime={item.created_at}>{new Date(item.created_at).toLocaleString("ru-RU")}</time>
+        <p>{item.message}</p><time dateTime={item.created_at}>{formatDateTime(item.created_at)}</time>
         <div className="notifications__actions">{item.kind !== "reassigned" && <Link to={`/procedures/${item.procedure_id}/execute`} onClick={() => setOpen(false)}>Открыть услугу</Link>}
           {!item.is_read && <button type="button" onClick={() => void markRead(item.id)}>Прочитано</button>}</div>
       </li>)}</ul>

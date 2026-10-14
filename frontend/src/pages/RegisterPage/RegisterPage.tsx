@@ -1,3 +1,5 @@
+import { normalizePhone } from "../../utils/phone";
+import { PhoneInput } from "../../components/PhoneInput/PhoneInput";
 import { useState, type FormEvent } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
@@ -22,7 +24,7 @@ export function RegisterPage() {
     if (password !== repeat) { setError("Пароли не совпадают"); return; }
     setBusy(true);
     try {
-      await request("/auth/register", { method: "POST", body: JSON.stringify({ full_name: fullName, phone, password }) });
+      await request("/auth/register", { method: "POST", body: JSON.stringify({ full_name: fullName, phone: normalizePhone(phone), password }) });
       setPassword(""); setRepeat(""); setDone(true);
     } catch (cause) {
       setError(cause instanceof ApiError && Object.keys(cause.fields).length
@@ -40,7 +42,7 @@ export function RegisterPage() {
       <form className="login-page__form" onSubmit={submit}>
         <label>ФИО<input autoComplete="name" autoCapitalize="words" required maxLength={100} value={fullName}
           onChange={(event) => setFullName(capitalizeNameInput(event.currentTarget))} /></label>
-        <label>Номер телефона<input type="tel" autoComplete="tel" required maxLength={32} placeholder="+7 (999) 123-45-67"
+        <label>Номер телефона<PhoneInput type="tel" autoComplete="tel" required maxLength={32} placeholder="+7 (999) 123-45-67"
           value={phone} onChange={(event) => setPhone(event.target.value)} /></label>
         <label>Пароль<input type="password" autoComplete="new-password" required minLength={12} maxLength={1024}
           value={password} onChange={(event) => setPassword(event.target.value)} aria-describedby="register-password-hint" /></label>

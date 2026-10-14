@@ -17,6 +17,7 @@ class NotificationService:
     @staticmethod
     def message(procedure: CareProcedure, kind: str) -> str:
         labels = {"assigned": "Назначена услуга", "changed": "Услуга изменена",
+                  "suspended": "Услуга приостановлена: животное в архиве", "restored": "Услуга восстановлена",
                   "cancelled": "Услуга отменена", "reassigned": "Услуга передана другому волонтёру",
                   "upcoming": "Услуга в ближайшие 24 часа", "overdue": "Услуга просрочена"}
         return (f"{labels[kind]}: {procedure.procedure_type.name}, {procedure.animal.name}. "
@@ -38,8 +39,7 @@ class NotificationService:
     async def list(self, user: User, limit: int = 20, offset: int = 0) -> NotificationList:
         now = datetime.now()
         for procedure in await self.repository.scheduled(user, now):
-            planned = datetime.combine(procedure.planned_date, procedure.planned_time)
-            kind = "overdue" if planned < now or procedure.status == "overdue" else "upcoming"
+            kind = "overdue" if procedure.status == "overdue" else "upcoming"
             await self.repository.add_event(user.id, procedure, kind, self.message(procedure, kind))
         await self.session.commit()
         return NotificationList(

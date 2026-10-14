@@ -1,4 +1,5 @@
 import re
+from datetime import time
 from typing import Annotated, Self
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -28,6 +29,16 @@ Note = Annotated[str, Field(max_length=255)]
 
 class VolunteerInput(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    available_from: time | None = None
+    available_to: time | None = None
+
+    @model_validator(mode="after")
+    def validate_availability(self) -> Self:
+        if any(value is not None and value.tzinfo is not None for value in (self.available_from, self.available_to)):
+            raise ValueError("Укажите местное время без часового пояса")
+        if self.available_from is not None and self.available_to is not None and self.available_from >= self.available_to:
+            raise ValueError("Начало доступности должно быть раньше окончания")
+        return self
 
     @field_validator("note", mode="before", check_fields=False)
     @classmethod
@@ -62,9 +73,22 @@ class VolunteerResponse(BaseModel):
     phone: str
     status: VolunteerStatus
     note: str | None
+    available_from: time | None = None
+    available_to: time | None = None
 
 
 class VolunteerSummaryResponse(BaseModel):
     total: int
     active: int
     inactive: int
+
+
+class Reassignment(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    procedure_id: int = Field(gt=0)
+    volunteer_id: int = Field(gt=0)
+
+
+class VolunteerDeactivate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reassignments: list[Reassignment] = Field(default_factory=list)

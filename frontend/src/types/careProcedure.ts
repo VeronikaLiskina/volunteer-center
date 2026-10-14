@@ -17,7 +17,7 @@ export const careProcedureStatusLabels: Record<CareProcedureStatus, string> = {
 
 export interface CareProcedureType { id: number; name: string }
 export interface CareProcedureAnimal { id: number; name: string }
-export interface CareProcedureVolunteer { id: number; full_name: string }
+export interface CareProcedureVolunteer { id: number; full_name: string; status?: "active" | "inactive"; note?: string | null; available_from?: string | null; available_to?: string | null }
 
 export interface CareProcedureCreate {
   animal_id: number;
@@ -38,6 +38,7 @@ export type CareProcedureUpdate = Partial<CareProcedureCreate> & {
 };
 
 export interface CareProcedure extends CareProcedureCreate {
+  suspended_by_archive?: boolean;
   id: number;
   status: CareProcedureStatus;
   animal: CareProcedureAnimal;

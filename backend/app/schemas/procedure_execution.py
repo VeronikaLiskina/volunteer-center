@@ -1,7 +1,7 @@
 from datetime import date, datetime, time
 from typing import Annotated, Self
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, field_validator, model_validator
 
 Result = Annotated[str, Field(min_length=1)]
 Comment = Annotated[str, Field(max_length=255)]
@@ -19,8 +19,20 @@ class ProcedureExecutionInput(BaseModel):
 class ProcedureExecutionCreate(ProcedureExecutionInput):
     execution_date: date
     execution_time: time
-    result: Result
+    result: str = ""
+    is_completed: StrictBool = True
+    failure_reason: Result | None = None
     comment: Comment | None = None
+
+    @model_validator(mode="after")
+    def validate_outcome(self) -> Self:
+        if self.is_completed and not self.result:
+            raise ValueError("Опишите результат выполнения")
+        if not self.is_completed and not self.failure_reason:
+            raise ValueError("Укажите причину невыполнения")
+        if self.is_completed and self.failure_reason is not None:
+            raise ValueError("У выполненной услуги не может быть причины невыполнения")
+        return self
 
 
 class ProcedureExecutionUpdate(ProcedureExecutionInput):
@@ -28,6 +40,7 @@ class ProcedureExecutionUpdate(ProcedureExecutionInput):
     execution_time: time | None = None
     result: Result | None = None
     comment: Comment | None = None
+    failure_reason: Result | None = None
 
     @model_validator(mode="after")
     def reject_null_required_fields(self) -> Self:
@@ -45,5 +58,7 @@ class ProcedureExecutionResponse(BaseModel):
     execution_date: date
     execution_time: time
     result: str
+    is_completed: bool
+    failure_reason: str | None
     comment: str | None
     created_at: datetime

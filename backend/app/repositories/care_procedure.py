@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -15,10 +15,27 @@ class CareProcedureRepository:
         return (joinedload(CareProcedure.animal), joinedload(CareProcedure.procedure_type),
                 joinedload(CareProcedure.volunteer))
 
+    async def lock_schedule(self) -> None:
+        # One transaction lock for all schedule mutations, including archive and
+        # availability changes. Prevents concurrent check-then-assign races.
+        await self.session.execute(text("SELECT pg_advisory_xact_lock(73421901)"))
+
+    async def pending(self, *, volunteer_id: int | None = None, animal_id: int | None = None,
+                      suspended: bool = False) -> list[CareProcedure]:
+        query = select(CareProcedure).options(*self.with_references()).where(
+            CareProcedure.stored_status.in_([CareProcedureStatus.ASSIGNED, CareProcedureStatus.OVERDUE]),
+            CareProcedure.suspended_by_archive.is_(suspended),
+        ).order_by(CareProcedure.planned_date, CareProcedure.planned_time, CareProcedure.id)
+        if volunteer_id is not None:
+            query = query.where(CareProcedure.volunteer_id == volunteer_id)
+        if animal_id is not None:
+            query = query.where(CareProcedure.animal_id == animal_id)
+        return list(await self.session.scalars(query))
+
     async def list(self, *, status: CareProcedureStatus | None, animal_id: int | None,
                    volunteer_id: int | None, procedure_type_id: int | None,
                    date_from: date | None, date_to: date | None, limit: int, offset: int) -> list[CareProcedure]:
-        query = select(CareProcedure).options(*self.with_references())
+        query = select(CareProcedure).options(*self.with_references()).where(CareProcedure.suspended_by_archive.is_(False))
         for column, value in ((CareProcedure.status, status), (CareProcedure.animal_id, animal_id),
                               (CareProcedure.volunteer_id, volunteer_id),
                               (CareProcedure.procedure_type_id, procedure_type_id)):
@@ -45,6 +62,7 @@ class CareProcedureRepository:
         return await self.session.scalar(
             select(func.count(CareProcedure.id)).where(
                 CareProcedure.planned_date == planned_date,
+                CareProcedure.suspended_by_archive.is_(False),
                 *([CareProcedure.volunteer_id == volunteer_id] if volunteer_id is not None else []),
             )
         ) or 0

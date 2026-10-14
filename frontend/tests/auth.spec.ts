@@ -11,7 +11,7 @@ test("login protects pages, handles invalid credentials, and logs out", async ({
   await expect(page.getByRole("alert")).toHaveText("Неверный номер телефона или пароль");
   const user = { id: 1, phone: "+79990000001", full_name: "Лискина Вероника Ивановна", role: "COORDINATOR", is_active: true, volunteer_id: null };
   await page.route("**/api/v1/auth/login", (route) => {
-    expect(route.request().postDataJSON()).toEqual({ phone: "8 (999) 000-00-01", password: "invalid-password" });
+    expect(route.request().postDataJSON()).toEqual({ phone: "+79990000001", password: "invalid-password" });
     return route.fulfill({ json: { access_token: "valid-token", token_type: "bearer", user } });
   });
   await page.route("**/api/v1/auth/me", (route) => route.fulfill({ json: user }));

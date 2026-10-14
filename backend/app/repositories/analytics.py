@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta, timezone
 
-from sqlalchemy import case, delete, func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.animal import Animal, AnimalStatus
@@ -27,7 +27,7 @@ class AnalyticsRepository:
 
     @staticmethod
     def filters(date_from: date, date_to: date, procedure_type_id: int | None):
-        conditions = [CareProcedure.planned_date.between(date_from, date_to)]
+        conditions = [CareProcedure.planned_date.between(date_from, date_to), CareProcedure.suspended_by_archive.is_(False)]
         if procedure_type_id is not None:
             conditions.append(CareProcedure.procedure_type_id == procedure_type_id)
         return conditions
@@ -35,15 +35,15 @@ class AnalyticsRepository:
     async def filtered_details(self, date_from: date, date_to: date, procedure_type_id: int | None):
         conditions = self.filters(date_from, date_to, procedure_type_id)
         month = func.to_char(CareProcedure.planned_date, "YYYY-MM")
-        monthly = dict((await self.session.execute(select(month, func.count(ProcedureExecution.id))
+        monthly = dict((await self.session.execute(select(month, func.count(ProcedureExecution.id).filter(ProcedureExecution.is_completed.is_(True)))
             .select_from(CareProcedure).join(ProcedureExecution)
             .where(*conditions).group_by(month).order_by(month))).all())
         distribution = (await self.session.execute(select(CareProcedureType.id, CareProcedureType.name, func.count(CareProcedure.id))
             .join(CareProcedure).where(*conditions).group_by(CareProcedureType.id, CareProcedureType.name)
             .order_by(CareProcedureType.name))).all()
-        activity = (await self.session.execute(select(Volunteer.id, Volunteer.full_name, func.count(ProcedureExecution.id))
+        activity = (await self.session.execute(select(Volunteer.id, Volunteer.full_name, func.count(ProcedureExecution.id).filter(ProcedureExecution.is_completed.is_(True)))
             .select_from(Volunteer).join(CareProcedure).outerjoin(ProcedureExecution).where(*conditions)
-            .group_by(Volunteer.id, Volunteer.full_name).order_by(func.count(ProcedureExecution.id).desc(), Volunteer.full_name))).all()
+            .group_by(Volunteer.id, Volunteer.full_name).order_by(func.count(ProcedureExecution.id).filter(ProcedureExecution.is_completed.is_(True)).desc(), Volunteer.full_name))).all()
         return monthly, distribution, activity
 
     async def animal_counts(self) -> tuple[int, int, int]:
@@ -67,12 +67,12 @@ class AnalyticsRepository:
             func.count(CareProcedure.id).filter(CareProcedure.status == CareProcedureStatus.COMPLETED),
             func.count(CareProcedure.id).filter(CareProcedure.status == CareProcedureStatus.CANCELLED),
             func.count(CareProcedure.id).filter(CareProcedure.status == CareProcedureStatus.OVERDUE),
-        ))).one()
+        ).where(CareProcedure.suspended_by_archive.is_(False)))).one()
 
     async def monthly_executions(self, since: date) -> dict[str, int]:
         month = func.to_char(ProcedureExecution.execution_date, "YYYY-MM")
         rows = await self.session.execute(
-            select(month, func.count(ProcedureExecution.id))
+            select(month, func.count(ProcedureExecution.id).filter(ProcedureExecution.is_completed.is_(True)))
             .where(ProcedureExecution.execution_date >= since)
             .group_by(month)
             .order_by(month)
@@ -84,13 +84,13 @@ class AnalyticsRepository:
         rows = await self.session.execute(
             select(CareProcedureType.id, CareProcedureType.name, count)
             .join(CareProcedure, CareProcedure.procedure_type_id == CareProcedureType.id, isouter=True)
-            .group_by(CareProcedureType.id, CareProcedureType.name)
+            .where(CareProcedure.suspended_by_archive.is_(False)).group_by(CareProcedureType.id, CareProcedureType.name)
             .order_by(count.desc(), CareProcedureType.name)
         )
         return [(type_id, name, total) for type_id, name, total in rows if total]
 
     async def top_volunteers(self, limit: int = 5) -> list[tuple[int, str, int]]:
-        count = func.count(ProcedureExecution.id)
+        count = func.count(ProcedureExecution.id).filter(ProcedureExecution.is_completed.is_(True))
         rows = await self.session.execute(
             select(Volunteer.id, Volunteer.full_name, count)
             .join(CareProcedure, CareProcedure.volunteer_id == Volunteer.id)
@@ -103,10 +103,7 @@ class AnalyticsRepository:
 
     async def report_counts(self, date_from: date, date_to: date, procedure_type_id: int | None = None) -> dict[str, int]:
         condition = CareProcedure.planned_date.between(date_from, date_to)
-        status = case((
-            (CareProcedure.status == CareProcedureStatus.ASSIGNED)
-            & (CareProcedure.planned_date + CareProcedure.planned_time < datetime.now()),
-            CareProcedureStatus.OVERDUE.value), else_=CareProcedure.status)
+        status = CareProcedure.status
         row = (await self.session.execute(select(
             func.count(CareProcedure.id).filter(condition),
             func.count(CareProcedure.id).filter(condition, status == CareProcedureStatus.ASSIGNED),
@@ -121,3 +118,20 @@ class AnalyticsRepository:
             row,
             strict=True,
         ))
+
+    async def report_details(self, date_from, date_to, procedure_type_id):
+        conditions = self.filters(date_from, date_to, procedure_type_id)
+        animals = (await self.session.execute(select(
+            Animal.id, Animal.name, func.count(CareProcedure.id),
+            func.count(CareProcedure.id).filter(CareProcedure.status == CareProcedureStatus.COMPLETED),
+        ).join(CareProcedure).where(*conditions).group_by(Animal.id, Animal.name)
+          .order_by(func.count(CareProcedure.id).desc(), Animal.name))).all()
+        workload = (await self.session.execute(select(
+            Volunteer.id, Volunteer.full_name, Volunteer.status, func.count(CareProcedure.id),
+            func.count(ProcedureExecution.id).filter(ProcedureExecution.is_completed.is_(True)),
+            func.coalesce(func.sum(CareProcedure.duration_minutes).filter(ProcedureExecution.is_completed.is_(True)), 0),
+        ).select_from(Volunteer).join(CareProcedure).outerjoin(ProcedureExecution).where(*conditions)
+          .group_by(Volunteer.id, Volunteer.full_name, Volunteer.status).order_by(Volunteer.full_name))).all()
+        failed = await self.session.scalar(select(func.count(ProcedureExecution.id))
+            .join(CareProcedure).where(*conditions, ProcedureExecution.is_completed.is_(False)))
+        return animals, workload, failed or 0

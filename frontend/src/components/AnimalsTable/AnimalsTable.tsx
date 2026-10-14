@@ -37,13 +37,13 @@ function ArchiveDialog({ animal, onConfirm, onClose }: {
 
   return <dialog className="animals-table__dialog" ref={dialog} aria-labelledby="archive-title"
     onCancel={(event) => { event.preventDefault(); if (!busy) onClose(); }}>
-    <h2 id="archive-title">Архивировать карточку?</h2>
-    <p>Животное «{animal.name}» будет переведено в архив. Карточка сохранится и будет доступна для просмотра.</p>
+    <h2 id="archive-title">{animal.status === AnimalStatus.Archived ? "Восстановить карточку?" : "Архивировать карточку?"}</h2>
+    <p>{animal.status === AnimalStatus.Archived ? "Животное и приостановленные назначения вернутся в работу. Доступность прежних волонтёров будет проверена." : "Животное будет переведено в архив, его текущие назначения приостановлены. Карточка и история сохранятся."}</p>
     {error && <p className="animals-table__error" role="alert">{error}</p>}
     <div className="animals-table__dialog-actions">
       <button className="animals-table__button" type="button" autoFocus disabled={busy} onClick={onClose}>Отмена</button>
       <button className="animals-table__button animals-table__button--danger" type="button" disabled={busy}
-        onClick={() => void confirm()}>{busy ? "Архивирование…" : "В архив"}</button>
+        onClick={() => void confirm()}>{busy ? "Сохранение…" : animal.status === AnimalStatus.Archived ? "Восстановить" : "В архив"}</button>
     </div>
   </dialog>;
 }
@@ -114,8 +114,8 @@ export function AnimalsTable({ animals, types, filters, loading, error, opening,
               <button className="animals-table__action" type="button" disabled={opening || saving}
                 aria-label={`${animal.status === AnimalStatus.Archived ? "Просмотреть" : "Редактировать"} карточку ${animal.name}`}
                 onClick={() => onEdit(animal.id)}>{animal.status === AnimalStatus.Archived ? "Просмотр" : "Изменить"}</button>
-              {animal.status !== AnimalStatus.Archived && <button className="animals-table__action animals-table__action--archive"
-                type="button" disabled={saving || opening} onClick={() => setArchiveTarget(animal)} aria-label={`Архивировать карточку ${animal.name}`}>В архив</button>}
+              {<button className="animals-table__action animals-table__action--archive"
+                type="button" disabled={saving || opening} onClick={() => setArchiveTarget(animal)} aria-label={`${animal.status === AnimalStatus.Archived ? "Восстановить" : "Архивировать"} карточку ${animal.name}`}>{animal.status === AnimalStatus.Archived ? "Восстановить" : "В архив"}</button>}
             </div></td>
           </tr>)}</tbody>
         </table>

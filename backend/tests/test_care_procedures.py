@@ -50,7 +50,7 @@ async def test_create_and_get_with_references(client, animal_data):
     response = await client.post(API, json=payload)
     assert response.status_code == 201, response.text
     procedure = response.json()
-    assert procedure["status"] == "assigned"
+    assert procedure["status"] == ("overdue" if date.fromisoformat(payload["planned_date"]) < date.today() else "assigned")
     assert procedure["animal"] == {"id": payload["animal_id"], "name": "Барсик"}
     assert procedure["volunteer"]["full_name"] == "Иванова Анна"
     assert procedure["procedure_type"]["name"] in INITIAL_CARE_PROCEDURE_TYPES
@@ -151,7 +151,7 @@ async def test_summary_uses_backend_current_date(client, animal_data):
     payload = await procedure_data(client, animal_data)
     today = date.today().isoformat()
     await client.post(API, json=payload | {"planned_date": today})
-    completed = (await client.post(API, json=payload | {"planned_date": today})).json()
+    completed = (await client.post(API, json=payload | {"planned_date": today, "planned_time": "11:30"})).json()
     future = (await client.post(API, json=payload | {"planned_date": "2099-01-01"})).json()
     execution = {
         "execution_date": today,

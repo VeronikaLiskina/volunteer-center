@@ -64,7 +64,7 @@ test("analytics shows aggregates and charts on desktop and mobile", async ({ pag
   await expect(page.locator(".report-result__metric")).toHaveCount(4);
   await expect(page.locator(".procedure-chart__column")).toHaveCount(6);
   await expect(page.getByText("Кормление", { exact: true })).toBeVisible();
-  await expect(page.getByText("Иванова Анна", { exact: true })).toBeVisible();
+  await expect(page.locator(".volunteer-activity")).toHaveCount(0);
   await page.screenshot({ path: testInfo.outputPath("analytics-desktop.png"), fullPage: true });
 
   await page.setViewportSize({ width: 375, height: 812 });
@@ -80,20 +80,20 @@ test("reports validate filters, generate a result and show API errors", async ({
 
   const from = page.getByLabel("Дата начала");
   const to = page.getByLabel("Дата окончания");
-  await from.fill("2026-09-30");
-  await to.fill("2026-09-01");
+  await from.fill("30.09.2026");
+  await to.fill("01.09.2026");
   await page.getByRole("button", { name: "Сформировать отчёт" }).click();
   await expect(page.getByRole("alert")).toContainText("Дата начала не может быть позже");
 
-  await from.fill("2026-09-01");
-  await to.fill("2026-09-30");
+  await from.fill("01.09.2026");
+  await to.fill("30.09.2026");
   await page.getByRole("combobox", { name: "Услуга", exact: true }).selectOption("1");
   await page.getByRole("button", { name: "Сформировать отчёт" }).click();
   await expect(page.getByText("Сформированный отчёт")).toBeVisible();
   await expect(page.locator(".report-result__metric").filter({ hasText: "Всего услуг" }).locator("dd")).toHaveText("12");
   const downloadPromise = page.waitForEvent("download");
   // Draft filter edits must not silently change the generated report's export.
-  await from.fill("2025-01-01");
+  await from.fill("01.01.2025");
   await page.getByRole("combobox", { name: "Услуга", exact: true }).selectOption("");
   const exportRequest = page.waitForRequest("**/api/v1/reports/export.xlsx?*");
   await page.getByRole("button", { name: "Выгрузить отчёт" }).click();
@@ -130,11 +130,11 @@ for (const width of [1280, 375]) {
     await page.setViewportSize({ width, height: 812 });
     await page.goto("/analytics");
     await expect(page.getByRole("button", { name: "Скачать PNG" })).toHaveCount(0);
-    await page.getByLabel("Дата начала").fill("2026-09-01");
-    await page.getByLabel("Дата окончания").fill("2026-09-30");
+    await page.getByLabel("Дата начала").fill("01.09.2026");
+    await page.getByLabel("Дата окончания").fill("30.09.2026");
     await page.getByRole("button", { name: "Сформировать отчёт" }).click();
     await expect(page.getByText("Сформированный отчёт")).toBeVisible();
-    await page.getByLabel("Дата начала").fill("2025-01-01");
+    await page.getByLabel("Дата начала").fill("01.01.2025");
     const pendingDownload = page.waitForEvent("download");
     await page.getByRole("button", { name: "Скачать PNG" }).click();
     const download = await pendingDownload;

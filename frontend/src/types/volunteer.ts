@@ -10,6 +10,8 @@ export interface VolunteerCreate {
   full_name: string;
   phone: string;
   note: string | null;
+  available_from?: string | null;
+  available_to?: string | null;
 }
 
 export type VolunteerUpdate = Partial<VolunteerCreate>;

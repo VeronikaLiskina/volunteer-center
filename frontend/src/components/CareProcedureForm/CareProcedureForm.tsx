@@ -1,3 +1,5 @@
+import { VolunteerDetails } from "../VolunteerDetails/VolunteerDetails";
+import { DateInput } from "../../components/DateInput/DateInput";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { getAssignableAnimals } from "../../api/animals";
 import { getCareProcedureTypes } from "../../api/careProcedureTypes";
@@ -129,11 +131,9 @@ export function CareProcedureForm({ procedure, onSave }: Props) {
   const animals: { id: number; name: string }[] = options.animals.map(({ id, name }) => ({ id, name }));
   if (procedure && !animals.some((item) => item.id === procedure.animal_id))
     animals.push(procedure.animal);
-  const volunteers: { id: number; full_name: string }[] = options.volunteers.map(
-    ({ id, full_name }) => ({ id, full_name }),
-  );
+  const volunteers = [...options.volunteers];
   if (procedure && !volunteers.some((item) => item.id === procedure.volunteer_id))
-    volunteers.push(procedure.volunteer);
+    volunteers.push({ phone: "", note: null, status: "active", ...procedure.volunteer });
   const displayedStatus = procedure?.status ?? CareProcedureStatus.Assigned;
 
   return <section className="care-procedure-form" aria-labelledby="care-procedure-form-title">
@@ -157,7 +157,7 @@ export function CareProcedureForm({ procedure, onSave }: Props) {
           </select>
         </FormField>
         <FormField name="planned_date" idPrefix="care-procedure" label="Плановая дата" required error={errors.planned_date}>
-          <input {...inputProps("planned_date")} type="date" required onChange={(event) => change("planned_date", event.target.value)} />
+          <DateInput {...inputProps("planned_date")} type="date" required onChange={(event) => change("planned_date", event.target.value)} />
         </FormField>
         <FormField name="planned_time" idPrefix="care-procedure" label="Плановое время" required error={errors.planned_time}>
           <input {...inputProps("planned_time")} type="text" placeholder="ЧЧ:ММ" maxLength={5} required
@@ -173,6 +173,9 @@ export function CareProcedureForm({ procedure, onSave }: Props) {
             {volunteers.map((item) => <option key={item.id} value={item.id}>{item.full_name}</option>)}
           </select>
         </FormField>
+        {volunteers.filter((volunteer) => volunteer.id === Number(values.volunteer_id)).map((volunteer) =>
+          <VolunteerDetails key={volunteer.id} volunteer={volunteer} />)}
+        {procedure?.suspended_by_archive && <p role="status">Назначение приостановлено: животное в архиве.</p>}
         <div className="care-procedure-form__status-field">
           <span>Статус:</span> <strong>{careProcedureStatusLabels[displayedStatus]}</strong>
         </div>

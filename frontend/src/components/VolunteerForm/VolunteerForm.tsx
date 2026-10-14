@@ -1,3 +1,4 @@
+import { PhoneInput } from "../../components/PhoneInput/PhoneInput";
 import { useRef, useState, type FormEvent } from "react";
 import { ApiError } from "../../api/client";
 import { capitalizeNameInput } from "../../utils/capitalizeNameInput";
@@ -79,9 +80,13 @@ export function VolunteerForm({ volunteer, onSave }: VolunteerFormProps) {
             placeholder="Например, Иванова Анна Сергеевна" onChange={(event) => change("full_name", capitalizeNameInput(event.currentTarget))} />
         </FormField>
         <FormField name="phone" idPrefix="volunteer" label="Телефон" required error={errors.phone}>
-          <input {...fieldProps("phone")} required type="tel" maxLength={32} autoComplete="tel"
+          <PhoneInput {...fieldProps("phone")} required type="tel" maxLength={32} autoComplete="tel"
             placeholder="+7 (999) 123-45-67" onChange={(event) => change("phone", event.target.value)} />
         </FormField>
+        {(["available_from", "available_to"] as const).map((field) => <FormField key={field} name={field} idPrefix="volunteer"
+          label={field === "available_from" ? "Доступен с" : "Доступен до"} error={errors[field]}>
+          <input {...fieldProps(field)} type="time" onChange={(event) => change(field, event.target.value)} />
+        </FormField>)}
         <div className="volunteer-form__note">
           <FormField name="note" idPrefix="volunteer" label="Примечание" error={errors.note}>
             <textarea {...fieldProps("note")} rows={5} maxLength={255}

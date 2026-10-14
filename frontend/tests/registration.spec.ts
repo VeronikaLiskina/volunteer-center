@@ -24,7 +24,7 @@ test("self registration validates confirmation, preserves name, and waits for ap
   await page.screenshot({ path: testInfo.outputPath("registration-mobile.png"), fullPage: true });
   await page.getByRole("button", { name: "Отправить заявку" }).click();
   await expect(page.getByRole("heading", { name: "Заявка отправлена" })).toBeVisible();
-  expect(submitted).toEqual({ full_name: "Лискина Вероника Ивановна", phone: "89025781290", password: "registration-password" });
+  expect(submitted).toEqual({ full_name: "Лискина Вероника Ивановна", phone: "+79025781290", password: "registration-password" });
   expect(await page.evaluate(() => sessionStorage.getItem("lapka-token"))).toBeNull();
   await page.getByRole("link", { name: "Перейти ко входу" }).click();
   await page.getByLabel("Номер телефона").fill("89025781290");

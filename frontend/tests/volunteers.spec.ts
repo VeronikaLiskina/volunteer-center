@@ -36,6 +36,7 @@ test.beforeEach(async ({ page }) => {
     const id = Number(path.split("/")[2]);
     const volunteer = volunteers.find((item) => item.id === id);
     if (!volunteer) return route.fulfill({ status: 404, json: { detail: { message: "Волонтёр не найден" } } });
+    if (path.endsWith("/deactivation-assignments")) return route.fulfill({ json: [] });
     if (path.endsWith("/deactivate")) volunteer.status = VolunteerStatus.Inactive;
     else if (path.endsWith("/activate")) volunteer.status = VolunteerStatus.Active;
     else if (method === "PATCH") Object.assign(volunteer, request.postDataJSON());

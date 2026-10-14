@@ -40,4 +40,6 @@ export type ReportType = (typeof ReportType)[keyof typeof ReportType];
 
 export interface ReportFiltersValue { report_type: ReportType; date_from: string; date_to: string; procedure_type_id?: number | null; report_id?: string | null }
 export interface ReportMetric { key: string; label: string; value: number }
-export interface ReportData extends ReportFiltersValue { title: string; metrics: ReportMetric[]; procedure_type_name: string; executions_by_month: MonthlyExecution[]; procedure_types: ProcedureTypeShare[]; volunteer_activity: VolunteerActivityItem[] }
+export interface AnimalActivityItem { animal_id: number; name: string; total: number; completed: number }
+export interface VolunteerWorkloadItem { volunteer_id: number; full_name: string; total: number; completed: number; completed_minutes: number }
+export interface ReportData extends ReportFiltersValue { title: string; metrics: ReportMetric[]; procedure_type_name: string; executions_by_month: MonthlyExecution[]; procedure_types: ProcedureTypeShare[]; volunteer_activity: VolunteerActivityItem[]; animal_activity?: AnimalActivityItem[]; volunteer_workload?: VolunteerWorkloadItem[] }

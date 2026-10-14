@@ -1,3 +1,4 @@
+import { PhoneInput } from "../../components/PhoneInput/PhoneInput";
 import { useRef, useState, type FormEvent } from "react";
 import { ApiError } from "../../api/client";
 import { capitalizeNameInput } from "../../utils/capitalizeNameInput";
@@ -112,7 +113,7 @@ export function AnimalForm({ animal, types, breeds, onSave, onClear }: AnimalFor
               onChange={(e) => change("owner_name", capitalizeNameInput(e.currentTarget))} />
           </FormField>
           <FormField name="owner_phone" label="Телефон хозяина" error={errors.owner_phone}>
-            <input {...fieldProps("owner_phone")} type="tel" maxLength={32} placeholder="+7 (999) 123-45-67"
+            <PhoneInput {...fieldProps("owner_phone")} type="tel" maxLength={32} placeholder="+7 (999) 123-45-67"
               onChange={(e) => change("owner_phone", e.target.value)} />
           </FormField>
           <FormField name="note" label="Примечание" error={errors.note}>

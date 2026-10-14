@@ -1,3 +1,5 @@
+import { DateInput } from "../../components/DateInput/DateInput";
+import { formatDate } from "../../utils/date";
 import { useEffect, useState } from "react";
 import { getAnimalOptions } from "../../api/animals";
 import { CARE_PROCEDURES_PAGE_SIZE } from "../../api/careProcedures";
@@ -24,10 +26,7 @@ interface Props {
   onRetry: () => void;
 }
 
-function formatDate(value: string) {
-  const [year, month, day] = value.split("-");
-  return `${day}.${month}.${year}`;
-}
+
 
 export function CareProceduresTable({ procedures, filters, loading, error, onFilters, onEdit, onExecute, onRetry }: Props) {
   const isCoordinator = useAuth().user?.role === "COORDINATOR";
@@ -68,8 +67,8 @@ export function CareProceduresTable({ procedures, filters, loading, error, onFil
       <label>Тип<select value={filters.procedure_type_id} onChange={(event) => update({ procedure_type_id: event.target.value })}>
         <option value="">Все типы</option>{options.types.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
       </select></label></>}
-      <label>С даты<input type="date" value={filters.date_from} onChange={(event) => update({ date_from: event.target.value })} /></label>
-      <label>По дату<input type="date" value={filters.date_to} onChange={(event) => update({ date_to: event.target.value })} /></label>
+      <label>С даты<DateInput type="date" value={filters.date_from} onChange={(event) => update({ date_from: event.target.value })} /></label>
+      <label>По дату<DateInput type="date" value={filters.date_to} onChange={(event) => update({ date_to: event.target.value })} /></label>
       <button type="button" onClick={() => onFilters({ status: "", animal_id: "", volunteer_id: "", procedure_type_id: "", date_from: "", date_to: "", offset: 0 })}>Сбросить</button>
     </div>
     {loading ? <p className="care-procedures-table__state" role="status">Загружаем услуги…</p>

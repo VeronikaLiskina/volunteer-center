@@ -1,3 +1,4 @@
+import { normalizePhone } from "../../utils/phone";
 import type { Animal, AnimalCreate, AnimalFieldErrors } from "../../types/animal";
 
 export type AnimalFormValues = Record<keyof AnimalCreate, string>;
@@ -37,7 +38,7 @@ export function toPayload(values: AnimalFormValues): AnimalCreate {
   return {
     name: values.name.trim(), animal_type_id: Number(values.animal_type_id), breed_id: Number(values.breed_id),
     weight: values.weight.replace(",", "."), birth_year: Number(values.birth_year),
-    owner_name: values.owner_name.trim() || null, owner_phone: values.owner_phone.trim() || null,
+    owner_name: values.owner_name.trim() || null, owner_phone: normalizePhone(values.owner_phone.trim()) || null,
     note: values.note.trim() || null,
   };
 }
